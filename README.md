@@ -30,13 +30,17 @@ Initialize the poetry env
 poetry env use python3.10
 poetry install --no-dev
 ```
-Start app
+Start demo
 ```sh
-cd src && poetry run python main.py
+cd src && poetry run python main.py --sample
+```
+Start app optimized
+```sh
+cd src && poetry run python -OO main.py
 ```
 
 ### Shortcut to start app
-Run Directly or Create shortcut to Desktop from `start_app\windows_cmd.bat` or `start_app\windows_no_cmd.vbs`
+Run Directly or Create shortcut to Desktop from `shortcuts\windows.bat` or `shortcuts\windows_no_cmd.vbs`
 </details>
 
 <details> <summary>Mac OS</summary>
@@ -59,13 +63,17 @@ Initialize the poetry env
 poetry env use python3.10
 poetry install --no-dev
 ```
-Start app
+Start demo
 ```sh
-cd src && poetry run python main.py
+cd src && poetry run python main.py --sample
+```
+Start app optimized
+```sh
+cd src && poetry run python -OO main.py
 ```
 
 ### Shortcut to start app
-Run Directly or Create shortcut to Desktop from `start_app/macos.sh`  
+Run Directly or Create shortcut to Desktop from `shortcuts/macos.sh`  
 You may need to make it executable with `chmod +x macos.sh`
 </details>
 
@@ -108,12 +116,16 @@ Initialize the poetry env
 poetry env use python3.10
 poetry install --no-dev
 ```
-Start app
+Start demo
 ```sh
-cd src && poetry run python main.py
+cd src && poetry run python main.py --sample
+```
+Start app optimized
+```sh
+cd src && poetry run python -OO main.py
 ```
 
 ### Shortcut to start app
-Run Directly or Create shortcut to Desktop from `start_app/linux.sh`  
+Run Directly or Create shortcut to Desktop from `shortcuts/linux.sh`  
 You may need to make it executable with `chmod +x linux.sh`
 </details>

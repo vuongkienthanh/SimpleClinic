@@ -48,8 +48,5 @@ class CSVReader(csv.DictReader):
     def __exit__(self, *_):
         self.csvfile.close()
 
-    def to_list(self):
-        return [row for row in self]
-
     def close(self):
         self.csvfile.close()

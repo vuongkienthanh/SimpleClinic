@@ -88,24 +88,42 @@ def platform_settings():
         os.environ['GTK_THEME'] = "Default " + os.path.join(SRC_DIR, "main.py")
         pass
 
+def vacuum():
+    print(f"Database file is at {MY_DATABASE_PATH}")
+    print(f"Filesize before vacuum: {os.path.getsize(MY_DATABASE_PATH)} bytes")
+    con = dbf.Connection(MY_DATABASE_PATH)
+    con.execute("VACUUM")
+    con.close()
+    print(f"Filesize after vacuum: {os.path.getsize(MY_DATABASE_PATH)} bytes")
 
 if __name__ == "__main__":
 
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--reset", action="store_true",
-                    help="Back up database and create a clean one")
+    ap = argparse.ArgumentParser(
+        description="Phần mềm phòng khám tại nhà",
+        epilog="Dùng `python -OO` để tối ưu hóa"
+    )
+
+    ap.add_argument("--reset-database", action="store_true",
+                    help="Sao lưu và làm trắng dữ liệu")
     ap.add_argument("--reset-config", action="store_true",
-                    help="Reset to default user config")
+                    help="Khôi phục cài đặt gốc")
     ap.add_argument("--sample", action="store_true",
-                    help="Run app with sample database")
+                    help="Chạy demo")
+    ap.add_argument("--vacuum", action="store_true",
+                    help="Giảm kích thước database")
+    ap.add_argument("--version", action="version",
+                    help="Hiện thị phiên bản",
+                    version="pmpktn v2.0.0")
     args = ap.parse_args()
 
-    if args.reset:
+    if args.reset_database:
         make_bak()
         make_db()
     elif args.reset_config:
         replace_config()
     elif args.sample:
         mainloop(sample=True)
+    elif args.vacuum:
+        vacuum()
     else:
         mainloop()

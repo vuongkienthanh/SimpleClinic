@@ -1,13 +1,11 @@
 import decimal
 from db.csv_helper import CSVReader
 from db.db_class import *
-from paths import SAMPLE_DIR, DB_DIR
+from paths import SAMPLE_DIR, CREATE_TABLE_SQL
 from db.csv_helper import CSVReader
 import os.path
 import sqlite3
 from decimal import Decimal
-from collections.abc import Iterable
-from typing import overload
 
 
 class Connection():
@@ -15,6 +13,7 @@ class Connection():
         self.sqlcon = self._get_db_connection(path)
 
     def close(self):
+        self.sqlcon.execute("PRAGMA optimize")
         self.sqlcon.close()
 
     def register_custom_type(self):
@@ -48,9 +47,7 @@ class Connection():
 
     def make_db(self):
         with self.sqlcon as con:
-            create_table_sql_path = os.path.join(
-                DB_DIR, 'create_table.sql')
-            with open(create_table_sql_path, 'r') as f:
+            with open(CREATE_TABLE_SQL, 'r') as f:
                 sql = f.read()
                 con.executescript(sql)
 

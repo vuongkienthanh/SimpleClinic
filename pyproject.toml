@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pmpktn"
-version = "2.1.2"
+version = "2.0.0"
 description = "Phần mềm phòng khám tại nhà"
 license = "MIT"
 authors = ["vuongkienthanh <thanhstardust@outlook.com>"]

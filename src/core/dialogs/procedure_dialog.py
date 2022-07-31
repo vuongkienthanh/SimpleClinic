@@ -1,5 +1,5 @@
 from core import mainview as mv
-from core.mainview_widgets.procedure_widgets import Proc
+from core.mainview_widgets.procedure_widgets import ProcedureListItem
 from core.init import size, tsize
 from core.generic import NumberTextCtrl
 from db.db_class import Procedure
@@ -185,11 +185,7 @@ class UpdateDialog(BaseDialog):
             self.mv.order_book.page1.choice.SetString(self.idx, self.pr.name)
             procedurelist = self.mv.order_book.page1.procedurelist
             if len(procedurelist.pr_list) > 0:
-                for i in range(len(procedurelist.pr_list)):
-                    if procedurelist.pr_list[i].pr_id == self.pr.id:
-                        procedurelist.SetItem(i, 0, self.pr.name)
-                        procedurelist.pr_list[i] = Proc(
-                            self.pr.id, self.pr.price)
+                procedurelist.update(self.pr)
                 self.mv.price.FetchPrice()
             e.Skip()
         except Exception as error:

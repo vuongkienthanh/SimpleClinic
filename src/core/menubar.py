@@ -232,13 +232,13 @@ class MyMenuBar(wx.MenuBar):
                 _list.append(
                     "{}/ {} {} ngày {} lần, lần {} {} = {} {}".format(
                         i + 1,
-                        d['name'],
-                        d['usage'],
-                        d['times'],
-                        d['dose'],
-                        d['usage_unit'],
-                        d['quantity'],
-                        d['sale_unit'] or d['usage_unit']
+                        d.name,
+                        d.usage,
+                        d.times,
+                        d.dose,
+                        d.usage_unit,
+                        d.quantity,
+                        d.sale_unit or d.usage_unit
                     ))
             dl = '\n'.join(_list)
             t = '\n'.join([name, bd, diagnosis, dl])

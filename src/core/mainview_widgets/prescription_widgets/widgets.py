@@ -3,12 +3,14 @@ from core.mainview_widgets import order_book
 from core.init import k_tab, k_number, k_special, size, tsize
 import core.other_func as otf
 from core.generic import NumberTextCtrl, DoseTextCtrl
-from typing import Any
 import wx
 import sqlite3
 
 
 class DrugListItem():
+    __slots__ = ["drug_id", "times", "dose", "quantity", "name",
+                 "note", "usage", "usage_unit", "sale_unit", "sale_price"]
+
     def __init__(self,
                  drug_id: int,
                  times: int,

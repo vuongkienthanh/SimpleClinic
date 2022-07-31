@@ -185,15 +185,15 @@ class PrintOut(wx.Printout):
                 with wx.DCFontChanger(dc, list_num):
                     dc.DrawText(f"{i+1+added}/", atx(0.06), row(i))
                 with wx.DCFontChanger(dc, drug_name):
-                    dc.DrawText(f"{dl['name']}", atx(0.12), row(i))
-                    t = f"{dl['quantity']} {dl['sale_unit'] or dl['usage_unit']}"
+                    dc.DrawText(f"{dl.name}", atx(0.12), row(i))
+                    t = f"{dl.quantity} {dl.sale_unit or dl.usage_unit}"
                     dc.DrawText(t, atx(0.7), row(i))
                 with wx.DCFontChanger(dc, info_italic):
-                    t = dl['note'] or otf.get_usage_note_str(
-                        dl['usage'],
-                        str(dl['times']),
-                        dl['dose'],
-                        dl['usage_unit']
+                    t = dl.note or otf.get_usage_note_str(
+                        dl.usage,
+                        str(dl.times),
+                        dl.dose,
+                        dl.usage_unit
                     )
                     dc.DrawText(t, atx(0.12), row(i) + round(row_y / 2))
                 i += 1

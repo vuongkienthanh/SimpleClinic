@@ -155,6 +155,13 @@ class DrugList(wx.ListCtrl):
         update_list(index, item)
         update_ui(index, item)
 
+    def pop(self, idx: int):
+        assert idx >= 0
+        self.d_list.pop(idx)
+        self.DeleteItem(idx)
+        for i in range(self.ItemCount):
+            self.SetItem(i, 0, str(i + 1))
+
     def onSelect(self, e: wx.ListEvent):
         idx: int = e.Index
         item = self.d_list[idx]
@@ -180,12 +187,6 @@ class DrugList(wx.ListCtrl):
             # insert
             self.append(item)
 
-    def pop(self, idx: int):
-        if idx != -1:
-            self.d_list.pop(idx)
-            self.DeleteItem(idx)
-            for i in range(self.ItemCount):
-                self.SetItem(i, 0, str(i + 1))
 
 
 class Times(NumberTextCtrl):

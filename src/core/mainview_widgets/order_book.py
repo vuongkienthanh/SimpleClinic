@@ -106,7 +106,7 @@ class ProcedurePage(wx.Panel):
             self, choices=[pr.name for pr in self.mv.state.procedurelist])
         self.addbtn = AddProcedureButton(self)
         self.delbtn = DelProcedureButton(self)
-        self.procedurelist = ProcedureList(self)
+        self.procedurelistctrl = ProcedureListCtrl(self)
 
         choice_row = wx.BoxSizer(wx.HORIZONTAL)
         choice_row.AddMany([
@@ -117,6 +117,6 @@ class ProcedurePage(wx.Panel):
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.AddMany([
             (choice_row, 0, wx.EXPAND | wx.ALL, 5),
-            (self.procedurelist, 1, wx.EXPAND | wx.ALL, 5)
+            (self.procedurelistctrl, 1, wx.EXPAND | wx.ALL, 5)
         ])
         self.SetSizerAndFit(sizer)

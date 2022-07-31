@@ -52,7 +52,7 @@ class PriceCtrl(wx.TextCtrl):
         )
         price += sum(
             pr.price
-            for pr in self.mv.order_book.page1.procedurelist.pr_list
+            for pr in self.mv.order_book.page1.procedurelistctrl.pr_list
         )
         self.ChangeValue(otf.num_to_str(price))
 

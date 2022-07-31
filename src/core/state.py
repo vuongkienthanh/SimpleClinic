@@ -234,7 +234,7 @@ class State():
     @lineprocedurelist.setter
     def lineprocedurelist(self, llp: list[sqlite3.Row]):
         self._lineprocedurelist = llp
-        self.mv.order_book.page1.procedurelist.rebuild(llp)
+        self.mv.order_book.page1.procedurelistctrl.rebuild(llp)
 
     @property
     def queuelist(self) -> list[sqlite3.Row]:

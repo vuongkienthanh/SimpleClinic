@@ -1,5 +1,4 @@
 from core import mainview as mv
-from core.mainview_widgets.procedure_widgets import ProcedureListItem
 from core.init import size, tsize
 from core.generic import NumberTextCtrl
 from db.db_class import Procedure
@@ -101,10 +100,10 @@ class DeleteBtn(wx.Button):
             pr = self.mv.state.procedurelist.pop(idx)
             self.parent.procedurelist.pop(idx)
             self.mv.order_book.page1.choice.Delete(idx)
-            if self.mv.order_book.page1.procedurelist.ItemCount > 0:
-                for i in range(self.mv.order_book.page1.procedurelist.ItemCount):
-                    if self.mv.order_book.page1.procedurelist.GetItemText(i, 0) == pr.name:
-                        self.mv.order_book.page1.procedurelist.DeleteItem(i)
+            if self.mv.order_book.page1.procedurelistctrl.ItemCount > 0:
+                for i in range(self.mv.order_book.page1.procedurelistctrl.ItemCount):
+                    if self.mv.order_book.page1.procedurelistctrl.GetItemText(i, 0) == pr.name:
+                        self.mv.order_book.page1.procedurelistctrl.DeleteItem(i)
                 self.mv.price.FetchPrice()
         except Exception as error:
             wx.MessageBox(f"{error}", "Lỗi")
@@ -183,7 +182,7 @@ class UpdateDialog(BaseDialog):
             self.mv.con.update(self.pr)
             self.parent.procedurelist.update(self.idx, self.pr)
             self.mv.order_book.page1.choice.SetString(self.idx, self.pr.name)
-            procedurelist = self.mv.order_book.page1.procedurelist
+            procedurelist = self.mv.order_book.page1.procedurelistctrl
             if len(procedurelist.pr_list) > 0:
                 procedurelist.update(self.pr)
                 self.mv.price.FetchPrice()

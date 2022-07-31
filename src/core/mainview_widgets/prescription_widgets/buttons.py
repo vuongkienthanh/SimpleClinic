@@ -34,9 +34,10 @@ class DelDrugButton(wx.BitmapButton):
 
     def onClick(self, e: wx.CommandEvent):
         idx = self.parent.drug_list.GetFirstSelected()
-        self.parent.drug_list.pop(idx)
-        self.parent.parent.mv.state.warehouse = None
-        self.parent.parent.mv.price.FetchPrice()
+        if idx != -1:
+            self.parent.drug_list.pop(idx)
+            self.parent.parent.mv.state.warehouse = None
+            self.parent.parent.mv.price.FetchPrice()
 
 
 class ReuseDrugListButton(wx.Button):

@@ -1,4 +1,3 @@
-from core import other_func as otf
 from core.mainview_widgets import order_book
 from paths import plus_bm, minus_bm
 
@@ -13,11 +12,11 @@ class AddProcedureButton(wx.BitmapButton):
         self.mv = parent.mv
         self.Bind(wx.EVT_BUTTON, self.onClick)
 
-    def onClick(self, e):
+    def onClick(self, e: wx.CommandEvent):
         idx: int = self.parent.choice.GetSelection()
         if idx != wx.NOT_FOUND:
             pr = self.mv.state.procedurelist[idx]
-            self.parent.procedurelist.append(pr)
+            self.parent.procedurelistctrl.append(pr)
             self.mv.price.FetchPrice()
             self.parent.choice.SetSelection(-1)
 
@@ -31,7 +30,7 @@ class DelProcedureButton(wx.BitmapButton):
         self.Bind(wx.EVT_BUTTON, self.onClick)
 
     def onClick(self, e: wx.CommandEvent):
-        idx: int = self.parent.procedurelist.GetFirstSelected()
+        idx: int = self.parent.procedurelistctrl.GetFirstSelected()
         if idx != -1:
-            self.parent.procedurelist.pop(idx)
+            self.parent.procedurelistctrl.pop(idx)
             self.mv.price.FetchPrice()

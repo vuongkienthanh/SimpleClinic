@@ -145,7 +145,7 @@ class SaveBtn(wx.Button):
                         VALUES ({LineDrug.named_style_fields()})
                     """, insert_ld)
                     insert_lp = []
-                    for item in self.mv.order_book.page1.procedurelist.pr_list:
+                    for item in self.mv.order_book.page1.procedurelistctrl.pr_list:
                         insert_lp.append({
                             'procedure_id': item.pr_id,
                             'visit_id': vid,
@@ -225,7 +225,7 @@ class SaveBtn(wx.Button):
             insert_lp = [{
                 'procedure_id': pr.pr_id,
                 'visit_id': v.id
-            } for pr in self.mv.order_book.page1.procedurelist.pr_list]
+            } for pr in self.mv.order_book.page1.procedurelistctrl.pr_list]
 
             try:
                 with self.mv.con as con:

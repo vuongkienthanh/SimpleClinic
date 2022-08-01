@@ -35,7 +35,6 @@ class PatientListCtrl(wx.ListCtrl):
         super().__init__(parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
         self.parent = parent
         self.mv = parent.mv
-        _, _, w, _ = self.GetClientRect()
         self.AppendColumn('Mã BN')
         self.AppendColumn('Họ tên', width=size(0.1))
         self.AppendColumn('Giới')

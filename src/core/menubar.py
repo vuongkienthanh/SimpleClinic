@@ -212,7 +212,7 @@ class MyMenuBar(wx.MenuBar):
 
     def onPreview(self, e):
         mv: 'mainview.MainView' = self.GetFrame()
-        printout = PrintOut(mv)
+        printout = PrintOut(mv, preview=True)
         printdialogdata = wx.PrintDialogData(printdata)
         printpreview = wx.PrintPreview(printout, data=printdialogdata)
         printpreview.SetZoom(85)
@@ -254,6 +254,7 @@ class MyMenuBar(wx.MenuBar):
             t = '\n'.join((
                 dt.datetime.now().strftime('%d/%m/%Y, %H:%M'),
                 name,
+                gender,
                 bd,
                 diagnosis,
                 drug,

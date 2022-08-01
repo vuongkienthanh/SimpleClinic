@@ -144,5 +144,5 @@ options:
   --vacuum          Giảm kích thước database
   --version         Hiện thị phiên bản
 
-Dùng `python -OO` để tối ưu hóa
+Chạy app được tối ưu hóa bằng  `python -OO src/main.py`
 ```

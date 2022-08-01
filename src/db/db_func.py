@@ -55,14 +55,14 @@ class Connection():
         def f(s): return os.path.join(SAMPLE_DIR, s)
         for reader in [
             CSVReader(Warehouse, f('warehouse.csv')),
+            CSVReader(Procedure, f('procedures.csv')),
             CSVReader(Patient, f('patients.csv')),
             CSVReader(Visit, f('visits.csv')),
             CSVReader(LineDrug, f('linedrugs.csv')),
+            CSVReader(LineProcedure, f('lineprocedure.csv')),
             CSVReader(QueueList, f('queuelist.csv')),
             CSVReader(SamplePrescription, f('sampleprescription.csv')),
             CSVReader(LineSamplePrescription, f('linesampleprescription.csv')),
-            CSVReader(Procedure, f('procedures.csv')),
-            CSVReader(LineProcedure, f('lineprocedure.csv')),
         ]:
             with self.sqlcon as con:
                 con.executemany(f"""
@@ -79,7 +79,7 @@ class Connection():
             "weight": decimal.Decimal(10),
             "days": 2,
             "recheck": 2,
-            "patient_id": 1,
+            "patient_id": 6,
             "follow": "follow",
             "vnote": "dynamic created"
         })

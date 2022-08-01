@@ -10,7 +10,6 @@ from core.mainview_widgets import (
     PatientBook, VisitList, OrderBook
 )
 from core.menubar import MyMenuBar
-from core.accel import my_accel
 import wx
 from typing import Any
 
@@ -135,7 +134,6 @@ class MainView(wx.Frame):
         self.SetSizerAndFit(sizer)
 
         self.SetMenuBar(MyMenuBar())
-        self.SetAcceleratorTable(my_accel)
         self.Bind(wx.EVT_CLOSE, self.onClose)
         self.start()
 

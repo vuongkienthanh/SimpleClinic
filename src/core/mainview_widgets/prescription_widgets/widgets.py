@@ -67,12 +67,6 @@ class DrugListItem():
         )
 
     def expand(self) -> 'DrugListItem':
-        sale_unit = self.sale_unit or self.usage_unit
-        note = self.note or otf.get_usage_note_str(
-            usage=self.usage,
-            times=self.times,
-            dose=self.dose,
-            usage_unit=self.usage_unit)
         return DrugListItem(
             drug_id=self.drug_id,
             name=self.name,
@@ -81,9 +75,14 @@ class DrugListItem():
             quantity=self.quantity,
             usage=self.usage,
             usage_unit=self.usage_unit,
-            sale_unit=sale_unit,
+            sale_unit=self.sale_unit or self.usage_unit,
             sale_price=self.sale_price,
-            note=note
+            note=self.note or otf.get_usage_note_str(
+                usage=self.usage,
+                times=self.times,
+                dose=self.dose,
+                usage_unit=self.usage_unit
+            )
         )
 
 
@@ -132,28 +131,30 @@ class DrugList(wx.ListCtrl):
         append_list(item)
         append_ui(item)
 
-    def update(self, index: int, item: DrugListItem):
-        def update_list(index: int, item: DrugListItem):
-            self.d_list[index].name = item.name
-            self.d_list[index].times = item.times
-            self.d_list[index].dose = item.dose
-            self.d_list[index].quantity = item.quantity
-            self.d_list[index].usage = item.usage
-            self.d_list[index].usage_unit = item.usage_unit
-            self.d_list[index].sale_price = item.sale_price
-            self.d_list[index].sale_unit = item.sale_unit
-            self.d_list[index].note = item.note
+    def update(self, idx: int, item: DrugListItem):
+        def update_list(idx: int, item: DrugListItem):
+            self.d_list[idx].name = item.name
+            self.d_list[idx].times = item.times
+            self.d_list[idx].dose = item.dose
+            self.d_list[idx].quantity = item.quantity
+            self.d_list[idx].usage = item.usage
+            self.d_list[idx].usage_unit = item.usage_unit
+            self.d_list[idx].sale_price = item.sale_price
+            self.d_list[idx].sale_unit = item.sale_unit
+            self.d_list[idx].note = item.note
 
-        def update_ui(index: int, item: DrugListItem):
+        def update_ui(idx: int, item: DrugListItem):
             _item = item.expand()
             assert _item.sale_unit is not None
             assert _item.note is not None
-            self.SetItem(index, 2, str(_item.times))
-            self.SetItem(index, 3, _item.dose + ' ' + _item.usage_unit)
-            self.SetItem(index, 4, str(_item.quantity) + ' ' + _item.sale_unit)
-            self.SetItem(index, 5, _item.note)
-        update_list(index, item)
-        update_ui(index, item)
+            self.SetItem(idx, 2, str(_item.times))
+            self.SetItem(idx, 3, _item.dose + ' ' + _item.usage_unit)
+            self.SetItem(idx, 4, str(_item.quantity) + ' ' + _item.sale_unit)
+            self.SetItem(idx, 5, _item.note)
+
+        assert idx >= 0
+        update_list(idx, item)
+        update_ui(idx, item)
 
     def pop(self, idx: int):
         assert idx >= 0
@@ -167,6 +168,7 @@ class DrugList(wx.ListCtrl):
         item = self.d_list[idx]
         state = self.mv.state
         state.warehouse = state.get_wh_by_id(item.drug_id)
+        assert state.warehouse is not None
         self.parent.times.ChangeValue(str(item.times))
         self.parent.dose.ChangeValue(item.dose)
         self.parent.quantity.ChangeValue(str(item.quantity))

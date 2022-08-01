@@ -267,8 +267,8 @@ class State():
                 p.gender,
                 p.birthdate,
                 ql.added_datetime
-            FROM {Patient.table_name} AS p
-            JOIN {QueueList.table_name} AS ql
+            FROM {QueueList.table_name} AS ql
+            LEFT JOIN {Patient.table_name} AS p
             ON ql.patient_id = p.id
             ORDER BY ql.added_datetime ASC
         """).fetchall()

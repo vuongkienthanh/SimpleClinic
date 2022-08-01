@@ -1,6 +1,6 @@
 from core.mainview_widgets.prescription_widgets import *
 from core.mainview_widgets.procedure_widgets import *
-from core import mainview
+from core import mainview, other_func
 
 import wx
 
@@ -103,7 +103,10 @@ class ProcedurePage(wx.Panel):
         self.mv = parent.mv
 
         self.choice = wx.Choice(
-            self, choices=[pr.name for pr in self.mv.state.procedurelist])
+            self, choices=[
+                f"{pr.name} ({other_func.num_to_str(pr.price)})"
+                for pr in self.mv.state.procedurelist
+            ])
         self.addbtn = AddProcedureButton(self)
         self.delbtn = DelProcedureButton(self)
         self.procedurelistctrl = ProcedureListCtrl(self)

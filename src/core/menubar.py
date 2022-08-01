@@ -24,6 +24,7 @@ import sys
 import os
 import sqlite3
 import json
+import datetime as dt
 
 
 class MyMenuBar(wx.MenuBar):
@@ -229,7 +230,7 @@ class MyMenuBar(wx.MenuBar):
             bd = f"Ngày sinh: {mv.birthdate.GetValue()}"
             diagnosis = f"Chẩn đoán: {mv.diagnosis.GetValue()}"
             drug = f"Thuốc {mv.days.GetValue()} ngày:"
-            dl = '\n'.join(tuple(
+            dl = '\n'.join(
                 "{}/ {} {} ngày {} lần, lần {} {} = {} {}".format(
                     i + 1,
                     d.name,
@@ -240,21 +241,18 @@ class MyMenuBar(wx.MenuBar):
                     d.quantity,
                     d.sale_unit or d.usage_unit)
                 for i, d in enumerate(
-                    mv.order_book.page0.drug_list.d_list)))
-            prl = '\n'.join(tuple(
-                "{}/ {} x {}".format(
-                    i + 1,
-                    p[1],
-                    p[2]
-                )
+                    mv.order_book.page0.drug_list.d_list))
+            prl = '\n'.join(
+                "{}/ {} x {}".format(i + 1, p[1], p[2])
                 for i, p in enumerate(
-                    mv.order_book.page1.procedurelistctrl.summary())))
+                    mv.order_book.page1.procedurelistctrl.summary()))
             if prl != '':
                 prl = '\n'.join(["Thủ thuật", prl])
             recheck = f"Tái khám sau {mv.recheck.GetValue()} ngày"
             follow = f"Dặn dò: {mv.follow.GetFollow() or ''}"
             price = f"Tiền khám: {mv.price.GetValue()}"
-            t = '\n'.join([
+            t = '\n'.join((
+                dt.datetime.now().strftime('%d/%m/%Y, %H:%M'),
                 name,
                 bd,
                 diagnosis,
@@ -264,7 +262,7 @@ class MyMenuBar(wx.MenuBar):
                 recheck,
                 follow,
                 price
-            ])
+            ))
             cb.SetData(wx.TextDataObject(t))
             cb.Close()
 

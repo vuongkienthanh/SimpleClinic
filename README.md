@@ -130,6 +130,8 @@ Run Directly or Create shortcut to Desktop from `shortcuts/linux.sh`
 You may need to make it executable with `chmod +x linux.sh`
 </details>
 
+---
+
 ```sh
 $ python src/main.py --help
 usage: main.py [-h] [--reset-database] [--reset-config] [--sample] [--vacuum] [--version]

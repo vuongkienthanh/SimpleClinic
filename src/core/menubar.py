@@ -196,10 +196,11 @@ class MyMenuBar(wx.MenuBar):
             assert p is not None
             assert mv.patient_book.GetSelection() == 0
             try:
-                mv.con.execute(
-                    f"DELETE FROM {QueueList.table_name} WHERE patient_id = {p.id}")
-                wx.MessageBox("Xóa thành công", "OK")
-                mv.state.refresh()
+                with mv.con as con:
+                    con.execute(
+                        f"DELETE FROM {QueueList.table_name} WHERE patient_id = {p.id}")
+                    wx.MessageBox("Xóa thành công", "OK")
+                    mv.state.refresh()
             except Exception as error:
                 wx.MessageBox("Lỗi không xóa được\n" + str(error), "Lỗi")
 

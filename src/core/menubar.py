@@ -316,7 +316,7 @@ class MyMenuBar(wx.MenuBar):
 
         mv: 'mainview.MainView' = self.GetFrame()
         if mv.sample:
-            wx.MessageBox("Đã lưu cài đặt", "Cài đặt")
+            wx.MessageBox("Demo", "Cài đặt")
         else:
             while True:
                 openjson()

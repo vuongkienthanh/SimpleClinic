@@ -75,7 +75,7 @@ class DrugPopup(wx.ComboPopup):
         ])
 
     def check_min_quantity(self, item, index):
-        if item.quantity <= self.ComboCtrl.Parent.Parent.Parent.config["so_luong_thuoc_toi_thieu_de_bao_dong_do"]:
+        if item.quantity <= self.ComboCtrl.Parent.Parent.Parent.config["so_luong_thuoc_toi_thieu_de_bao_dong"]:
             self.lc.SetItemTextColour(index, wx.Colour(252, 3, 57))
 
     def OnPopup(self):

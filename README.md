@@ -1,4 +1,4 @@
-﻿# Phần mềm phòng mạch tư
+﻿# Phần mềm phòng khám tại nhà
 - Tác giả: BS Vương Kiến Thanh  
 - Email: thanhstardust@outlook.com
 

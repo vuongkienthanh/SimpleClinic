@@ -24,7 +24,7 @@ class SetupDialog(wx.Dialog):
         self.days = wx.SpinCtrl(
             self, initial=self.mv.config["so_ngay_toa_ve_mac_dinh"], name="Số ngày toa về mặc định")
         self.alert = wx.SpinCtrl(
-            self, initial=self.mv.config["so_luong_thuoc_toi_thieu_de_bao_dong_do"], max=10000, name="Lượng thuốc tối thiểu để báo động đỏ")
+            self, initial=self.mv.config["so_luong_thuoc_toi_thieu_de_bao_dong"], max=10000, name="Lượng thuốc tối thiểu để báo động")
         self.unit = adv.EditableListBox(
             self, label="Đơn vị bán", style=adv.EL_DEFAULT_STYLE | adv.EL_NO_REORDER, name="Thuốc bán một đơn vị")
         lc: wx.ListCtrl = self.unit.GetListCtrl()
@@ -84,7 +84,7 @@ class SetupDialog(wx.Dialog):
                 self.mv.config['in_gia_tien'] = self.display_price.Value
                 self.mv.config['cong_kham_benh'] = int(self.price.Value)
                 self.mv.config['so_ngay_toa_ve_mac_dinh'] = self.days.GetValue()
-                self.mv.config["so_luong_thuoc_toi_thieu_de_bao_dong_do"] = self.alert.GetValue(
+                self.mv.config["so_luong_thuoc_toi_thieu_de_bao_dong"] = self.alert.GetValue(
                 )
                 self.mv.config["thuoc_ban_mot_don_vi"] = [
                     lc.GetItemText(idx).strip()

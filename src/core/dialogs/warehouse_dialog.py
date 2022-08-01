@@ -131,7 +131,7 @@ class WarehouseDialog(wx.Dialog):
 
     def check_min_quantity(self, wh: Warehouse, idx: int):
         "conditional recolor"
-        if wh.quantity <= self.mv.config["so_luong_thuoc_toi_thieu_de_bao_dong_do"]:
+        if wh.quantity <= self.mv.config["so_luong_thuoc_toi_thieu_de_bao_dong"]:
             self.lc.SetItemTextColour(idx, wx.Colour(252, 3, 57))
 
     def onSearch(self, e: wx.CommandEvent):

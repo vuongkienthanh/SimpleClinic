@@ -54,7 +54,7 @@ class MainView(wx.Frame):
         self.order_book = OrderBook(self)
         self.recheck = RecheckCtrl(self, name="Số ngày tái khám:")
         self.norecheck = NoRecheckBtn(self)
-        self.price = otf.disable_text_ctrl(PriceCtrl(self, name="Giá tiền"))
+        self.price = otf.disable_text_ctrl(PriceCtrl(self, name="Giá tiền:"))
         self.follow = Follow(self, self.config['loi_dan_do'])
         self.newvisitbtn = NewVisitBtn(self)
         self.savebtn = SaveBtn(self)

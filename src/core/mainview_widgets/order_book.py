@@ -43,8 +43,8 @@ class PrescriptionPage(wx.Panel):
         def static(s):
             return (wx.StaticText(self, label=s), 0, wx.ALIGN_CENTER | wx.RIGHT, 2)
 
-        def widget(w, p=0):
-            return (w, p, wx.RIGHT, 2)
+        def widget(w, p=0, s=2):
+            return (w, p, wx.RIGHT, s)
 
         drug_row = wx.BoxSizer(wx.HORIZONTAL)
         drug_row.AddMany([
@@ -55,14 +55,14 @@ class PrescriptionPage(wx.Panel):
             static("lần, lần"),
             widget(self.dose),
             (self.usage_unit, 0, wx.ALIGN_CENTER | wx.RIGHT, 10),
-            static(u"\u21D2 Tổng cộng:"),
+            static(u"\u21D2"),
             widget(self.quantity),
             (self.sale_unit, 0, wx.ALIGN_CENTER | wx.RIGHT, 2),
         ])
         usage_row = wx.BoxSizer(wx.HORIZONTAL)
         usage_row.AddMany([
             static('Cách dùng:'),
-            widget(self.note, 1),
+            widget(self.note, 1, 5),
             widget(self.add_drug_btn),
             widget(self.del_drug_btn)
         ])

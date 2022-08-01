@@ -18,18 +18,17 @@ printdata.PaperId = wx.PAPER_A5
 
 class PrintOut(wx.Printout):
 
-    def __init__(self, mv: 'mv.MainView'):
+    def __init__(self, mv: 'mv.MainView', preview=False):
         super().__init__(title="Toa thuốc")
 
         self.mv = mv
-        self.num_of_ld = mv.config['so_muc_thuoc_1_toa']
-        self.d_list = self.mv.order_book.page0.drug_list.d_list
+        self.preview = preview
 
     def HasPage(self, page):
         "Relative to `num_of_ld`"
         x, y = divmod(
             self.mv.order_book.page0.drug_list.ItemCount,
-            self.num_of_ld
+            self.mv.config['so_muc_thuoc_1_toa']
         )
         if page <= (x + bool(y)):
             return True
@@ -45,18 +44,26 @@ class PrintOut(wx.Printout):
         else:
             x, y = divmod(
                 self.mv.order_book.page0.drug_list.ItemCount,
-                self.num_of_ld
+                self.mv.config['so_muc_thuoc_1_toa']
             )
         return (1, x + bool(y), 1, x + bool(y))
 
     def OnPrintPage(self, page):
-        dc: wx.DC = self.GetDC()
 
+        num_of_ld = self.mv.config['so_muc_thuoc_1_toa']
+        d_list = self.mv.order_book.page0.drug_list.d_list
         state = self.mv.state
         p = state.patient
         assert p is not None
 
+        dc: wx.DC = self.GetDC()
         dcx, dcy = dc.Size
+        if self.preview:
+            scale = self.mv.config['preview_scale']
+        else:
+            scale = self.mv.config['print_scale']
+        dcx, dcy = round(dcx * scale), round(dcy * scale)
+
         space = round(dcx * 0.002)
 
         # fonts
@@ -176,11 +183,11 @@ class PrintOut(wx.Printout):
 
             i = 0
             if first:
-                _list = self.d_list[:self.num_of_ld]
+                _list = d_list[:num_of_ld]
                 added = 0
             else:
-                _list = self.d_list[self.num_of_ld:]
-                added = self.num_of_ld
+                _list = d_list[num_of_ld:]
+                added = num_of_ld
             for dl in _list:
                 with wx.DCFontChanger(dc, list_num):
                     dc.DrawText(f"{i+1+added}/", atx(0.06), row(i))
@@ -200,7 +207,7 @@ class PrintOut(wx.Printout):
 
         if page == 1:
             draw_top()
-            if len(self.d_list) != 0:
+            if len(d_list) != 0:
                 draw_content(first=True)
             draw_bottom()
             if self.HasPage(2):

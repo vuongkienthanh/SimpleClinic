@@ -36,7 +36,7 @@ class MainView(wx.Frame):
         self.gender = otf.disable_text_ctrl(
             wx.TextCtrl(self, size=tsize(0.025), name="Giới:"))
         self.birthdate = otf.disable_text_ctrl(
-            DateTextCtrl(self, size=tsize(0.05), name="Ngày sinh:"))
+            DateTextCtrl(self, size=tsize(0.06), name="Ngày sinh:"))
         self.age = otf.disable_text_ctrl(
             AgeCtrl(self, size=tsize(0.055), name="Tuổi:"))
         self.address = otf.disable_text_ctrl(

@@ -88,6 +88,7 @@ def platform_settings():
         os.environ['GTK_THEME'] = "Default " + os.path.join(SRC_DIR, "main.py")
         pass
 
+
 def vacuum():
     print(f"Database file is at {MY_DATABASE_PATH}")
     print(f"Filesize before vacuum: {os.path.getsize(MY_DATABASE_PATH)} bytes")
@@ -95,6 +96,7 @@ def vacuum():
     con.execute("VACUUM")
     con.close()
     print(f"Filesize after vacuum: {os.path.getsize(MY_DATABASE_PATH)} bytes")
+
 
 if __name__ == "__main__":
 

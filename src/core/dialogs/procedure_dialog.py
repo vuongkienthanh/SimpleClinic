@@ -103,7 +103,8 @@ class DeleteBtn(wx.Button):
             if self.mv.order_book.page1.procedurelistctrl.ItemCount > 0:
                 for i in range(self.mv.order_book.page1.procedurelistctrl.ItemCount):
                     if self.mv.order_book.page1.procedurelistctrl.GetItemText(i, 0) == pr.name:
-                        self.mv.order_book.page1.procedurelistctrl.DeleteItem(i)
+                        self.mv.order_book.page1.procedurelistctrl.DeleteItem(
+                            i)
                 self.mv.price.FetchPrice()
         except Exception as error:
             wx.MessageBox(f"{error}", "Lỗi")

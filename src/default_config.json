@@ -17,5 +17,7 @@
         "Dấu hiệu nặng SXH": "Lừ đừ, bứt rứt - Lạnh tay chân khi trẻ đã hết sốt (thường vào ngày thứ 4, thứ 5 của bệnh) - Đau bụng - Ói nhiều - Chảy máu bất thường: Chảy máu răng, máu mũi, đi cầu phân đen, ói ra máu"
     },
     "in_gia_tien": true,
-    "so_muc_thuoc_1_toa": 8
+    "so_muc_thuoc_1_toa": 8,
+    "print_scale": 1,
+    "preview_scale": 1
 }

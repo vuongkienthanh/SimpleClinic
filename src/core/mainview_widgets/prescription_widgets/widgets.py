@@ -188,7 +188,6 @@ class DrugList(wx.ListCtrl):
             self.append(item)
 
 
-
 class Times(NumberTextCtrl):
     def __init__(self, parent: 'order_book.PrescriptionPage'):
         super().__init__(parent, size=tsize(0.03))

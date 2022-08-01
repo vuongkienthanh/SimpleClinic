@@ -129,3 +129,20 @@ cd src && poetry run python -OO main.py
 Run Directly or Create shortcut to Desktop from `shortcuts/linux.sh`  
 You may need to make it executable with `chmod +x linux.sh`
 </details>
+
+```sh
+$ python src/main.py --help
+usage: main.py [-h] [--reset-database] [--reset-config] [--sample] [--vacuum] [--version]
+
+Phần mềm phòng khám tại nhà
+
+options:
+  -h, --help        show this help message and exit
+  --reset-database  Sao lưu và làm trắng dữ liệu
+  --reset-config    Khôi phục cài đặt gốc
+  --sample          Chạy demo
+  --vacuum          Giảm kích thước database
+  --version         Hiện thị phiên bản
+
+Dùng `python -OO` để tối ưu hóa
+```

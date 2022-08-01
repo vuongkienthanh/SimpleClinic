@@ -223,25 +223,40 @@ class MyMenuBar(wx.MenuBar):
         cb: wx.Clipboard = wx.TheClipboard  # type:ignore
         mv: 'mainview.MainView' = self.GetFrame()
         if cb.Open():
-            name = mv.name.GetValue()
-            bd = mv.birthdate.GetValue()
-            diagnosis = mv.diagnosis.GetValue()
-            drug_list = mv.order_book.page0.drug_list
-            _list = []
-            for i, d in enumerate(drug_list.d_list):
-                _list.append(
-                    "{}/ {} {} ngày {} lần, lần {} {} = {} {}".format(
-                        i + 1,
-                        d.name,
-                        d.usage,
-                        d.times,
-                        d.dose,
-                        d.usage_unit,
-                        d.quantity,
-                        d.sale_unit or d.usage_unit
-                    ))
-            dl = '\n'.join(_list)
-            t = '\n'.join([name, bd, diagnosis, dl])
+            name = f"Tên: {mv.name.GetValue()}"
+            bd = f"Ngày sinh: {mv.birthdate.GetValue()}"
+            diagnosis = f"Chẩn đoán: {mv.diagnosis.GetValue()}"
+            dl = '\n'.join(tuple(
+                "{}/ {} {} ngày {} lần, lần {} {} = {} {}".format(
+                    i + 1,
+                    d.name,
+                    d.usage,
+                    d.times,
+                    d.dose,
+                    d.usage_unit,
+                    d.quantity,
+                    d.sale_unit or d.usage_unit)
+                for i, d in enumerate(
+                    mv.order_book.page0.drug_list.d_list)))
+            prl = '\n'.join(tuple(
+                "{}/ {} x {}".format(
+                    i + 1,
+                    p[1],
+                    p[2]
+                )
+                for i, p in enumerate(
+                    mv.order_book.page1.procedurelistctrl.summary())))
+            price = f"Tiền khám: {mv.price.GetValue()}"
+            t = '\n'.join([
+                name,
+                bd,
+                diagnosis,
+                "Thuốc:",
+                dl,
+                "Thủ thuật:",
+                prl,
+                price
+            ])
             cb.SetData(wx.TextDataObject(t))
             cb.Close()
 

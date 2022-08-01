@@ -5,10 +5,11 @@ import sqlite3
 
 
 class ProcedureListItem:
-    __slots__ = "pr_id", "price"
+    __slots__ = "pr_id", "name", "price"
 
-    def __init__(self, pr_id, price):
+    def __init__(self, pr_id, name, price):
         self.pr_id = pr_id
+        self.name = name
         self.price = price
 
 
@@ -26,11 +27,17 @@ class ProcedureListCtrl(wx.ListCtrl):
         self.clear()
         for lp in llp:
             self.Append((lp['name'], ))
-            self.pr_list.append(ProcedureListItem(lp['pr_id'], lp['price']))
+            self.pr_list.append(ProcedureListItem(
+                lp['pr_id'],
+                lp['name'],
+                lp['price']))
 
     def append(self, pr: Procedure):
         self.Append((pr.name,))
-        self.pr_list.append(ProcedureListItem(pr.id, pr.price))
+        self.pr_list.append(ProcedureListItem(
+            pr.id,
+            pr.name,
+            pr.price))
 
     def update(self, pr: Procedure):
         for i in range(len(self.pr_list)):
@@ -42,3 +49,21 @@ class ProcedureListCtrl(wx.ListCtrl):
         assert idx >= 0
         self.DeleteItem(idx)
         self.pr_list.pop(idx)
+
+    def summary(self) -> tuple[tuple[int, str, int]]:
+        count = dict()
+        name = dict()
+        for pr in self.pr_list:
+            if pr.pr_id not in count.keys():
+                count[pr.pr_id] = 1
+                name[pr.pr_id] = pr.name
+            else:
+                count[pr.pr_id] += 1
+        return tuple(
+            (
+                pr.pr_id,
+                name[pr.pr_id],
+                count[pr.pr_id],
+            )
+            for pr in self.pr_list
+        )

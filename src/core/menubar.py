@@ -225,8 +225,10 @@ class MyMenuBar(wx.MenuBar):
         mv: 'mainview.MainView' = self.GetFrame()
         if cb.Open():
             name = f"Tên: {mv.name.GetValue()}"
+            gender = f"Giới tính: {mv.gender.GetValue()}"
             bd = f"Ngày sinh: {mv.birthdate.GetValue()}"
             diagnosis = f"Chẩn đoán: {mv.diagnosis.GetValue()}"
+            drug = f"Thuốc {mv.days.GetValue()} ngày:"
             dl = '\n'.join(tuple(
                 "{}/ {} {} ngày {} lần, lần {} {} = {} {}".format(
                     i + 1,
@@ -247,15 +249,20 @@ class MyMenuBar(wx.MenuBar):
                 )
                 for i, p in enumerate(
                     mv.order_book.page1.procedurelistctrl.summary())))
+            if prl != '':
+                prl = '\n'.join(["Thủ thuật", prl])
+            recheck = f"Tái khám sau {mv.recheck.GetValue()} ngày"
+            follow = f"Dặn dò: {mv.follow.GetFollow() or ''}"
             price = f"Tiền khám: {mv.price.GetValue()}"
             t = '\n'.join([
                 name,
                 bd,
                 diagnosis,
-                "Thuốc:",
+                drug,
                 dl,
-                "Thủ thuật:",
                 prl,
+                recheck,
+                follow,
                 price
             ])
             cb.SetData(wx.TextDataObject(t))

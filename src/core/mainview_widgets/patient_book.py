@@ -61,7 +61,7 @@ class PatientListCtrl(wx.ListCtrl):
 
 
 class QueuingPatientList(PatientListCtrl):
-    """First page, set `state.patient` when selected"""
+    "First page, set `state.patient` when selected"
 
     def __init__(self, parent: PatientBook):
         super().__init__(parent)

@@ -2,7 +2,8 @@ from core.init import size
 from core import mainview
 import core.other_func as otf
 from core.dialogs.patient_dialog import EditPatientDialog
-from db.db_class import Patient, QueueList, QueueList
+from db.db_class import Patient, QueueList, QueueList, Visit
+from core.generic import DatePickerDialog
 import wx
 import sqlite3
 
@@ -118,6 +119,7 @@ class FindPatientDialog(wx.Dialog):
         self.nextbtn.Disable()
 
         self.allbtn = wx.Button(self, label="Danh sách toàn bộ bệnh nhân")
+        self.atdatebtn = wx.Button(self, label="Danh sách bệnh nhân theo ngày")
         self.addqueuebtn = wx.Button(self, label="Thêm vào danh sách chờ")
         self.editbtn = wx.Button(self, label="Cập nhật")
         self.delbtn = wx.Button(self, label="Xóa")
@@ -131,10 +133,15 @@ class FindPatientDialog(wx.Dialog):
         navi_sizer = wx.BoxSizer(wx.HORIZONTAL)
         navi_sizer.AddMany([
             (0, 0, 1),
-            widget(self.allbtn),
-            (0, 0, 1),
             widget(self.prevbtn),
             widget(self.nextbtn),
+            (0, 0, 1),
+        ])
+        opt_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        opt_sizer.AddMany([
+            (0, 0, 1),
+            widget(self.allbtn),
+            widget(self.atdatebtn),
             (0, 0, 1),
         ])
         btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -151,6 +158,7 @@ class FindPatientDialog(wx.Dialog):
             widget(wx.StaticText(self, label="Danh sách bệnh nhân")),
             widget(self.lc),
             widget(navi_sizer),
+            widget(opt_sizer),
             widget(btn_sizer),
         ])
         self.SetSizerAndFit(sizer)
@@ -160,6 +168,7 @@ class FindPatientDialog(wx.Dialog):
         self.lc.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onDeselect)
         self.lc.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onEdit)
         self.allbtn.Bind(wx.EVT_BUTTON, self.onAll)
+        self.atdatebtn.Bind(wx.EVT_BUTTON, self.onAtDate)
         self.nextbtn.Bind(wx.EVT_BUTTON, self.onNext)
         self.prevbtn.Bind(wx.EVT_BUTTON, self.onPrev)
         self.addqueuebtn.Bind(wx.EVT_BUTTON, self.onAddqueue)
@@ -168,22 +177,23 @@ class FindPatientDialog(wx.Dialog):
         self.Bind(wx.EVT_CLOSE, self.onClose)
 
     def onSearch(self, e: wx.CommandEvent):
-        """Enter (EVT_SEARCH) to activate"""
+        "Enter (EVT_SEARCH) to activate"
         s: str = e.GetString()
-        self.rebuild(s)
+        s = s.upper()
+        self.cur = self.mv.con.execute(f"""
+            SELECT id AS pid, name, gender, birthdate
+            FROM {Patient.table_name}
+            WHERE name LIKE ?
+        """, ('%' + s + '%',))
+        self.rebuild()
 
-    def rebuild(self, s: str):
+    def rebuild(self):
         self.lc.clear()
         self.prevbtn.Disable()
         self.nextbtn.Disable()
         self.addqueuebtn.Disable()
         self.editbtn.Disable()
         self.delbtn.Disable()
-        self.cur = self.mv.con.execute(f"""
-            SELECT id AS pid, name, gender, birthdate
-            FROM {Patient.table_name}
-            WHERE name LIKE ?
-        """, ('%' + s + '%',))
         self.build()
         self.next_prev_status_check()
 
@@ -233,7 +243,24 @@ class FindPatientDialog(wx.Dialog):
         e.Skip()
 
     def onAll(self, e: wx.CommandEvent):
-        self.rebuild('')
+        self.cur = self.mv.con.execute(f"""
+            SELECT id AS pid, name, gender, birthdate
+            FROM {Patient.table_name}
+        """)
+        self.rebuild()
+
+    def onAtDate(self, e: wx.CommandEvent):
+        dlg =DatePickerDialog(self.mv)
+        if dlg.ShowModal() == wx.ID_OK:
+            d = dlg.GetDate()
+            self.cur = self.mv.con.execute(f"""
+                SELECT p.id AS pid, name, gender, birthdate
+                FROM {Visit.table_name} as v
+                JOIN {Patient.table_name} as p
+                ON p.id = v.patient_id
+                WHERE DATE(v.exam_datetime) = '{d.strftime("%Y-%m-%d")}'
+            """)
+            self.rebuild()
 
     def onNext(self, e: wx.CommandEvent):
         if (not self.lc.is_done()) and self.lc.is_last():

@@ -9,12 +9,10 @@ from core.dialogs import (
     WarehouseDialog,
     SampleDialog,
     ProcedureDialog,
-    DatePickerDialog,
     DayReportDialog,
-    MonthPickerDialog,
     MonthReportDialog
 )
-
+from core.generic import MonthPickerDialog, DatePickerDialog
 from core.printer import printdata, PrintOut
 import subprocess
 import wx

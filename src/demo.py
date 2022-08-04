@@ -1,6 +1,7 @@
 from db.db_func import Connection
 from db.db_class import *
-from paths import SAMPLE_DIR, MY_DATABASE_PATH
+from paths import SAMPLE_DIR
+from main import mainloop
 
 import os
 import csv
@@ -57,9 +58,11 @@ class CSVReader(csv.DictReader):
 
 
 def make_sample():
+    con = Connection(':memory:')
+    con.make_db()
+
     def f(s): return os.path.join(SAMPLE_DIR, s)
 
-    con = Connection(MY_DATABASE_PATH)
     for reader in [
         CSVReader(Warehouse, f('warehouse.csv')),
         CSVReader(Procedure, f('procedures.csv')),
@@ -90,9 +93,12 @@ def make_sample():
         "follow": "follow",
         "vnote": "dynamic created"
     })
-    con.close()
     print('Sample populized')
+    return con
 
 
 if __name__ == '__main__':
-    make_sample()
+    con = make_sample()
+    mainloop(con)
+
+

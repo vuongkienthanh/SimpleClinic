@@ -85,7 +85,8 @@ sudo apt install -y build-essential gdb lcov pkg-config \
       libgtk-3-0 libgtk-3-bin libgtk-3-common libgtk-3-dev \
       libgstreamer1.0-dev libgstreamer-plugins-base1.0-0 \
       libgstreamer-plugins-base1.0-dev freeglut3 freeglut3-devA \
-      python3-dev python-dev
+      python3-dev python-dev libsdl-dev libtiff-dev libpng-dev \
+      libjpeg-dev
 ```
 Extract the downloaded source code and run
 ```sh
@@ -120,8 +121,3 @@ You may need to make it executable with `chmod +x linux.sh`
 </details>
 
 ---
-
-```sh
-
-
-```

@@ -1,6 +1,6 @@
 from core.init import size
 from core import mainview
-import core.other_func as otf
+import other_func as otf
 from core.dialogs.patient_dialog import EditPatientDialog
 from db.db_class import Patient, QueueList, QueueList, Visit
 from core.generic import DatePickerDialog

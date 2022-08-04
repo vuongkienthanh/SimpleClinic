@@ -1,6 +1,6 @@
 from core import mainview as mv
 import wx
-from core import other_func as otf
+import other_func as otf
 
 
 class DaysCtrl(wx.SpinCtrl):

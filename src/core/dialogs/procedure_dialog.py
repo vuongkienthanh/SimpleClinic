@@ -2,7 +2,7 @@ from core import mainview as mv
 from core.init import size, tsize
 from core.generic import NumberTextCtrl
 from db.db_class import Procedure
-from core import other_func as otf
+import other_func as otf
 import wx
 
 

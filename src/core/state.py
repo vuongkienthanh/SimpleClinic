@@ -1,6 +1,6 @@
 from db.db_class import *
 from core import mainview
-import core.other_func as otf
+import other_func as otf
 from core import menubar
 
 

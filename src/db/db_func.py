@@ -1,8 +1,4 @@
-import decimal
-from db.csv_helper import CSVReader
 from db.db_class import *
-from paths import SAMPLE_DIR, CREATE_TABLE_SQL
-from db.csv_helper import CSVReader
 import os.path
 import sqlite3
 from decimal import Decimal
@@ -10,6 +6,7 @@ from decimal import Decimal
 
 class Connection():
     def __init__(self, path: str):
+        self.path = path
         self.sqlcon = self._get_db_connection(path)
 
     def close(self):
@@ -46,43 +43,7 @@ class Connection():
         return con
 
     def make_db(self):
-        with self.sqlcon as con:
-            with open(CREATE_TABLE_SQL, 'r') as f:
-                sql = f.read()
-                con.executescript(sql)
-
-    def make_sample(self):
-        def f(s): return os.path.join(SAMPLE_DIR, s)
-        for reader in [
-            CSVReader(Warehouse, f('warehouse.csv')),
-            CSVReader(Procedure, f('procedures.csv')),
-            CSVReader(Patient, f('patients.csv')),
-            CSVReader(Visit, f('visits.csv')),
-            CSVReader(LineDrug, f('linedrugs.csv')),
-            CSVReader(LineProcedure, f('lineprocedure.csv')),
-            CSVReader(QueueList, f('queuelist.csv')),
-            CSVReader(SamplePrescription, f('sampleprescription.csv')),
-            CSVReader(LineSamplePrescription, f('linesampleprescription.csv')),
-        ]:
-            with self.sqlcon as con:
-                con.executemany(f"""
-                    INSERT INTO {reader.t.table_name} ({','.join(reader.fields)})
-                    VALUES ({','.join(['?']* len(reader.fields))})
-                """, (
-                    tuple(getattr(row, attr)
-                          for attr in reader.fields)
-                    for row in reader
-                ))
-            reader.close()
-        self.insert(Visit, {
-            "diagnosis": "Viêm ruột thừa",
-            "weight": decimal.Decimal(10),
-            "days": 2,
-            "recheck": 2,
-            "patient_id": 6,
-            "follow": "follow",
-            "vnote": "dynamic created"
-        })
+        self.sqlcon.executescript(create_table_sql)
 
     def __enter__(self):
         return self.sqlcon.__enter__()
@@ -135,3 +96,9 @@ class Connection():
             """,
                                base.into_qmark_style_params()
                                ).rowcount
+
+    def vacuum(self):
+        pre = os.path.getsize(self.path)
+        self.execute("VACUUM")
+        post = os.path.getsize(self.path)
+        return pre, post

@@ -1,5 +1,5 @@
 from core.init import k_number, k_special, k_tab, k_decimal, k_hash, k_slash
-import core.other_func as otf
+import other_func as otf
 from db.db_class import Gender
 import wx
 import wx.adv

@@ -1,7 +1,7 @@
 from core.generic import DatePicker
 from core import mainview as mv
 from db.db_class import LineDrug, LineProcedure, Visit, Warehouse, Procedure
-from core import other_func as otf
+import other_func as otf
 import wx
 import datetime as dt
 import sqlite3

@@ -1,6 +1,6 @@
 from paths import weight_bm, update_druglist_bm
 from db.db_class import LineProcedure, Visit, Patient, LineDrug
-import core.other_func as otf
+import other_func as otf
 from core import mainview as mv
 from core.printer import PrintOut, printdata
 

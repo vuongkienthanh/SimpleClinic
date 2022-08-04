@@ -21,7 +21,6 @@ import os.path
 import sys
 import os
 import sqlite3
-import json
 import datetime as dt
 
 
@@ -98,10 +97,8 @@ class MyMenuBar(wx.MenuBar):
         manageMenu.AppendSubMenu(menuReport, "Báo cáo")
 
         settingMenu = wx.Menu()
-        menuSetup: wx.MenuItem = settingMenu.Append(
+        menuSetupConfig: wx.MenuItem = settingMenu.Append(
             wx.ID_ANY, "Cài đặt hệ thống")
-        menuJSON: wx.MenuItem = settingMenu.Append(
-            wx.ID_ANY, "Cài đặt qua JSON")
         menuOpenConfig: wx.MenuItem = settingMenu.Append(
             wx.ID_ANY, "Mở folder cài đặt + dữ liệu")
 
@@ -130,8 +127,7 @@ class MyMenuBar(wx.MenuBar):
         self.Bind(wx.EVT_MENU, self.onProcedure, menuProcedure)
         self.Bind(wx.EVT_MENU, self.onDayReport, menuDayReport)
         self.Bind(wx.EVT_MENU, self.onMonthReport, menuMonthReport)
-        self.Bind(wx.EVT_MENU, self.onSetup, menuSetup)
-        self.Bind(wx.EVT_MENU, self.onMenuJSON, menuJSON)
+        self.Bind(wx.EVT_MENU, self.onSetup, menuSetupConfig)
         self.Bind(wx.EVT_MENU, self.onOpenConfig, menuOpenConfig)
 
     def onRefresh(self, e):
@@ -297,34 +293,6 @@ class MyMenuBar(wx.MenuBar):
     def onSetup(self, e):
         mv: 'mainview.MainView' = self.GetFrame()
         SetupDialog(mv).ShowModal()
-
-    def onMenuJSON(self, e):
-        def openjson():
-            if sys.platform == "win32":
-                os.startfile(CONFIG_PATH, "edit")
-            elif sys.platform == "linux":
-                prog = shutil.which("gedit") or \
-                    shutil.which("xed") or \
-                    shutil.which("kwrite") or \
-                    "xdg-open"
-                subprocess.run([prog, CONFIG_PATH])
-            elif sys.platform == "darwin":
-                subprocess.run(['open', '-e', CONFIG_PATH])
-
-        mv: 'mainview.MainView' = self.GetFrame()
-        if mv.sample:
-            wx.MessageBox("Demo", "Cài đặt")
-        else:
-            while True:
-                openjson()
-                mv: 'mainview.MainView' = self.GetFrame()
-                try:
-                    mv.config = json.load(
-                        open(CONFIG_PATH, "r", encoding="utf-8"))
-                    wx.MessageBox("Đã lưu cài đặt", "Cài đặt")
-                    break
-                except json.JSONDecodeError as error:
-                    wx.MessageBox(f"Lỗi JSON\n{error}", "Lỗi")
 
     def onOpenConfig(self, e):
         if sys.platform == "win32":

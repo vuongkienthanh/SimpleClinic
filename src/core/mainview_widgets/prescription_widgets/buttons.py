@@ -3,7 +3,7 @@ from core.mainview_widgets import prescription_widgets
 from db.db_class import Warehouse, LineSamplePrescription
 from paths import plus_bm, minus_bm
 from core.dialogs.sample_prescription_dialog import SampleDialog
-from core.other_func import calc_quantity
+from other_func import calc_quantity
 import wx
 
 

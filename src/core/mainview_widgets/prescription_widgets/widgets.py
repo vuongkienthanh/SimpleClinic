@@ -1,7 +1,7 @@
 from core import mainview as mv
 from core.mainview_widgets import order_book
 from core.init import k_tab, k_number, k_special, size, tsize
-import core.other_func as otf
+import other_func as otf
 from core.generic import NumberTextCtrl, DoseTextCtrl
 import wx
 import sqlite3

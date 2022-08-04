@@ -1,6 +1,6 @@
 from core.init import size
 from db.db_class import Warehouse
-import core.other_func as otf
+import other_func as otf
 from core import mainview
 from core.generic import DatePicker, NumberTextCtrl
 

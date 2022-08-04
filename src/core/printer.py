@@ -1,4 +1,4 @@
-import core.other_func as otf
+import other_func as otf
 from core import mainview as mv
 import textwrap as tw
 import wx

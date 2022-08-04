@@ -1,9 +1,22 @@
+from paths import DEFAULT_CONFIG_PATH, CONFIG_PATH, MY_DATABASE_PATH
 import wx
 import datetime as dt
 from fractions import Fraction
 from typing import Any, TypeVar
 from itertools import cycle
+import json
+from pathlib import Path
+import os
 
+
+def get_config() -> dict[str, Any]:
+    try:
+        with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+            config = json.load(f)
+    except json.JSONDecodeError:
+        with open(DEFAULT_CONFIG_PATH, "r", encoding="utf-8") as f:
+            config = json.load(f)
+    return config
 
 def bd_to_age(bd: dt.date):
     today = dt.date.today()

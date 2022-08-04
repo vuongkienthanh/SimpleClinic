@@ -1,6 +1,6 @@
 from db import db_func
 from core.init import background_color, tsize
-import core.other_func as otf
+import other_func as otf
 from core.state import State
 from core.generic import AgeCtrl, PhoneTextCtrl, DateTextCtrl, WeightCtrl
 from core.mainview_widgets import (

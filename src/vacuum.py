@@ -1,5 +1,6 @@
 from db.db_func import Connection
 from paths import MY_DATABASE_PATH
+import time
 
 
 def vacuum() -> tuple[int, int] | None:
@@ -18,3 +19,6 @@ if __name__ == '__main__':
         pre, post = res
         print(f"File size before vacuum: {pre}")
         print(f"File size after vacuum: {post}")
+    for i in range(5):
+        time.sleep(1)
+        print('closing in', 4-i)

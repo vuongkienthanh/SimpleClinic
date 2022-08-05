@@ -70,31 +70,28 @@ class SetupDialog(wx.Dialog):
         okbtn.Bind(wx.EVT_BUTTON, self.onOkBtn)
 
     def onOkBtn(self, e: wx.CommandEvent):
-        if self.mv.sample:
-            wx.MessageBox("Đã lưu cài đặt", "Cài đặt")
-            e.Skip()
-        else:
-            try:
-                lc: wx.ListCtrl = self.unit.GetListCtrl()
+        try:
+            lc: wx.ListCtrl = self.unit.GetListCtrl()
 
-                self.mv.config['ten_phong_kham'] = self.clinic.Value
-                self.mv.config['ky_ten_bac_si'] = self.doctor.Value
-                self.mv.config['dia_chi'] = self.address.Value
-                self.mv.config['so_dien_thoai'] = self.phone.Value
-                self.mv.config['in_gia_tien'] = self.display_price.Value
-                self.mv.config['cong_kham_benh'] = int(self.price.Value)
-                self.mv.config['so_ngay_toa_ve_mac_dinh'] = self.days.GetValue()
-                self.mv.config["so_luong_thuoc_toi_thieu_de_bao_dong"] = self.alert.GetValue(
-                )
-                self.mv.config["thuoc_ban_mot_don_vi"] = [
-                    lc.GetItemText(idx).strip()
-                    for idx in range(lc.ItemCount)
-                    if lc.GetItemText(idx).strip() != ''
-                ]
-                with open(CONFIG_PATH, mode='w', encoding="utf-8") as f:
-                    json.dump(self.mv.config, f, ensure_ascii=False, indent=4)
-                wx.MessageBox("Đã lưu cài đặt", "Cài đặt")
-                self.mv.price.FetchPrice()
-                e.Skip()
-            except Exception as error:
-                wx.MessageBox(f"Lỗi không lưu được\n{error}", "Lỗi")
+            self.mv.config['ten_phong_kham'] = self.clinic.Value
+            self.mv.config['ky_ten_bac_si'] = self.doctor.Value
+            self.mv.config['dia_chi'] = self.address.Value
+            self.mv.config['so_dien_thoai'] = self.phone.Value
+            self.mv.config['in_gia_tien'] = self.display_price.Value
+            self.mv.config['cong_kham_benh'] = int(self.price.Value)
+            self.mv.config['so_ngay_toa_ve_mac_dinh'] = self.days.GetValue()
+            self.mv.config["so_luong_thuoc_toi_thieu_de_bao_dong"] = self.alert.GetValue(
+            )
+            self.mv.config["thuoc_ban_mot_don_vi"] = [
+                lc.GetItemText(idx).strip()
+                for idx in range(lc.ItemCount)
+                if lc.GetItemText(idx).strip() != ''
+            ]
+            with open(CONFIG_PATH, mode='w', encoding="utf-8") as f:
+                json.dump(self.mv.config, f, ensure_ascii=False, indent=4)
+            wx.MessageBox("Đã lưu cài đặt", "Cài đặt")
+            self.mv.price.FetchPrice()
+            e.Skip()
+        except Exception as error:
+            wx.MessageBox(f"Lỗi không lưu được\n{error}", "Lỗi")
+

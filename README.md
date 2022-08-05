@@ -85,14 +85,20 @@ sudo apt install -y build-essential gdb lcov pkg-config \
       libgtk-3-0 libgtk-3-bin libgtk-3-common libgtk-3-dev \
       libgstreamer1.0-dev libgstreamer-plugins-base1.0-0 \
       libgstreamer-plugins-base1.0-dev freeglut3 freeglut3-devA \
-      python3-dev python-dev libsdl-dev libtiff-dev libpng-dev \
+      python3-dev libsdl-dev libtiff-dev libpng-dev \
       libjpeg-dev
 ```
 Extract the downloaded source code and run
 ```sh
-./configure --enable-loadable-sqlite-extensions --enable-optimizations
+./configure \
+  --enable-loadable-sqlite-extensions \
+  --enable-optimizations \
+  --enable-shared \ 
+  --prefix=/opt/python310 \
+  LDFLAGS="-Wl,-rpath=/opt/python310/lib"
 make
 sudo make altinstall
+echo "export PATH=/opt/python310/bin:\$PATH" | tee -a ~/.profile
 ```
 
 ### Install `poetry`

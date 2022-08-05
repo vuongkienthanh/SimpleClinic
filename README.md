@@ -97,6 +97,7 @@ sudo mkdir /opt/python310
 make
 sudo make altinstall
 echo "export PATH=/opt/python310/bin:\$PATH" | tee -a ~/.profile
+echo "export PATH=/opt/python310/bin:\$PATH" | tee -a ~/.bashrc
 ```
 
 ### Install `poetry`

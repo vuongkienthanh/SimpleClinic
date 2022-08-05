@@ -92,12 +92,8 @@ sudo apt install -y build-essential gdb lcov pkg-config \
 
 Extract `python` source code and install in `/opt/python310`
 ```sh
-./configure \
-  --enable-loadable-sqlite-extensions \
-  --enable-optimizations \
-  --enable-shared \ 
-  --prefix=/opt/python310 \
-  LDFLAGS="-Wl,-rpath=/opt/python310/lib"
+sudo mkdir /opt/python310
+./configure --enable-loadable-sqlite-extensions --enable-optimizations --enable-shared --prefix=/opt/python310 LDFLAGS="-Wl,-rpath=/opt/python310/lib"
 make
 sudo make altinstall
 echo "export PATH=/opt/python310/bin:\$PATH" | tee -a ~/.profile

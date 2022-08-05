@@ -2,15 +2,27 @@
 - Tác giả: BS Vương Kiến Thanh  
 - Email: thanhstardust@outlook.com
 
+Phần mềm by doctor for doctor, thích hợp cho mô hình phòng khám nhỏ.
+
 ## Chức năng:
 - Quản lý bệnh nhân và các lượt khám
+- Xem được các lượt khám cũ
 - Quản lý kho thuốc
-- In toa thuốc
-- Dùng database SQLite
+- Quản lý thủ thuật đơn giản
+- In toa thuốc (có hoặc không kèm giá tiền)
+- Toa mẫu
+- Dùng lại toa cũ
+- Copy thông tin lượt khám dạng text (dùng để đưa qua tin nhắn)
+- Báo cáo doanh thu theo ngày, tháng
+- Dùng database SQLite gọn nhẹ
+- Tương thích với Windows, Macos, Linux
+- Chỉ dùng được trên 1 máy, không có chức năng server
 
 ## Download demo
+https://github.com/vuongkienthanh/pmpktn2/releases/download/V2.0/demo.exe
 
-
+## Hướng dẫn cài đặt / yêu cầu chức năng
+Làm theo hướng dẫn phía dưới hoặc liên hệ hỗ trợ qua Email: thanhstardust@outlook.com
 
 ## Cài đặt:
 <details> <summary>Windows</summary>

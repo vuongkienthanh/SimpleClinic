@@ -85,7 +85,7 @@ sudo apt install -y build-essential gdb lcov pkg-config \
       lzma lzma-dev tk-dev uuid-dev zlib1g-dev python3-venv\
       libgtk-3-0 libgtk-3-bin libgtk-3-common libgtk-3-dev \
       libgstreamer1.0-dev libgstreamer-plugins-base1.0-0 \
-      libgstreamer-plugins-base1.0-dev freeglut3 freeglut3-devA \
+      libgstreamer-plugins-base1.0-dev freeglut3 freeglut3-dev \
       python3-dev libsdl-dev libtiff-dev libpng-dev \
       libjpeg-dev python-is-python3
 ```

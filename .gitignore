@@ -145,3 +145,4 @@ build/
 .idea/
 *.code-workspace
 .vscode/
+*.spec

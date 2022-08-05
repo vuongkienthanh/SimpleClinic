@@ -1,4 +1,4 @@
-from paths import APP_DIR, CONFIG_PATH
+from paths import APP_DIR, MY_DATABASE_PATH
 from db.db_class import *
 from core import mainview
 from core.dialogs import (
@@ -18,6 +18,7 @@ import subprocess
 import wx
 import shutil
 import os.path
+from pathlib import Path
 import sys
 import os
 import sqlite3
@@ -101,6 +102,10 @@ class MyMenuBar(wx.MenuBar):
             wx.ID_ANY, "Cài đặt hệ thống")
         menuOpenConfig: wx.MenuItem = settingMenu.Append(
             wx.ID_ANY, "Mở folder cài đặt + dữ liệu")
+        menuVacuum: wx.MenuItem = settingMenu.Append(
+            wx.ID_ANY, "Thu nhỏ kích thước dữ liệu")
+        menuBackup: wx.MenuItem = settingMenu.Append(
+            wx.ID_ANY, "Sao lưu dữ liệu")
 
         self.Append(homeMenu, "&Home")
         self.Append(editMenu, "&Khám bệnh")
@@ -129,6 +134,8 @@ class MyMenuBar(wx.MenuBar):
         self.Bind(wx.EVT_MENU, self.onMonthReport, menuMonthReport)
         self.Bind(wx.EVT_MENU, self.onSetup, menuSetupConfig)
         self.Bind(wx.EVT_MENU, self.onOpenConfig, menuOpenConfig)
+        self.Bind(wx.EVT_MENU, self.onVacuum, menuVacuum)
+        self.Bind(wx.EVT_MENU, self.onBackup, menuBackup)
 
     def onRefresh(self, e):
         mv: 'mainview.MainView' = self.GetFrame()
@@ -301,3 +308,20 @@ class MyMenuBar(wx.MenuBar):
             subprocess.run(["xdg-open", APP_DIR])
         elif sys.platform == "darwin":
             subprocess.run(["start", APP_DIR])
+
+    def onVacuum(self, e):
+        mv: 'mainview.MainView' = self.GetFrame()
+        pre, post = mv.con.vacuum()
+        wx.MessageBox(
+            f"Kích thước trước khi thu gọn: {pre} bytes\nKích thước sau khi thu gọn: {post} bytes",
+            "Thu gọn dữ liệu"
+        )
+
+    def onBackup(self, e):
+        bak = os.path.realpath(MY_DATABASE_PATH) + \
+            dt.datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + ".bak"
+        if Path(MY_DATABASE_PATH).exists():
+            shutil.copyfile(MY_DATABASE_PATH, bak)
+            wx.MessageBox(f"Sao lưu thành công tại {bak}", "Sao lưu dữ liệu")
+        else:
+            wx.MessageBox("Sao lưu không thành công", "Sao lưu dữ liệu")

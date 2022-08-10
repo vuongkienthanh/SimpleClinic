@@ -22,6 +22,7 @@ class MainView(wx.Frame):
             pos=(20, 20),
             title='PHẦN MỀM PHÒNG KHÁM TẠI NHÀ')
         self.SetBackgroundColour(mainview_background_color)
+        self.locale = wx.Locale(wx.LANGUAGE_VIETNAMESE)
 
         self.con = con
         self.state = State(self)

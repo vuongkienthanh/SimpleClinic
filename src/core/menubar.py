@@ -84,6 +84,7 @@ class MyMenuBar(wx.MenuBar):
         editMenu.AppendSeparator()
         self.menuCopyVisitInfo: wx.MenuItem = editMenu.Append(
             wx.ID_INFO, "Copy thông tin lượt khám vào Clipboard\tCTRL+SHIFT+C")
+        self.menuCopyVisitInfo.Enable(False)
 
         manageMenu = wx.Menu()
         menuWarehouse: wx.MenuItem = manageMenu.Append(

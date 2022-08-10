@@ -168,7 +168,7 @@ class PrintOut(wx.Printout):
                 if self.mv.recheck.GetValue() != 0:
                     dc.DrawText(
                         f"Tái khám sau {self.mv.recheck.GetValue()} ngày", atx(0.06), row(1))
-                follow = tw.wrap(self.mv.follow.Value, width=40)
+                follow = tw.wrap(self.mv.follow.full_value(), width=40)
                 for i, line in enumerate(follow):
                     dc.DrawText(line, atx(0.06), row(2) + row_y * i)
 

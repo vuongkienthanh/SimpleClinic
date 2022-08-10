@@ -2,15 +2,27 @@
 - Tác giả: BS Vương Kiến Thanh  
 - Email: thanhstardust@outlook.com
 
+Phần mềm by doctor for doctor, thích hợp cho mô hình phòng khám nhỏ.
+
 ## Chức năng:
 - Quản lý bệnh nhân và các lượt khám
+- Xem được các lượt khám cũ
 - Quản lý kho thuốc
-- In toa thuốc
-- Dùng database SQLite
+- Quản lý thủ thuật đơn giản
+- In toa thuốc (có hoặc không kèm giá tiền)
+- Toa mẫu
+- Dùng lại toa cũ
+- Copy thông tin lượt khám dạng text (dùng để đưa qua tin nhắn)
+- Báo cáo doanh thu theo ngày, tháng
+- Dùng database SQLite gọn nhẹ
+- Tương thích với Windows, Macos, Linux
+- Chỉ dùng được trên 1 máy, không có chức năng server
 
 ## Download demo
+https://github.com/vuongkienthanh/pmpktn2/releases/download/V2.0/demo.exe
 
-
+## Hướng dẫn cài đặt / yêu cầu chức năng
+Làm theo hướng dẫn phía dưới hoặc liên hệ hỗ trợ qua Email: thanhstardust@outlook.com
 
 ## Cài đặt:
 <details> <summary>Windows</summary>
@@ -73,22 +85,19 @@ sudo apt install -y build-essential gdb lcov pkg-config \
       lzma lzma-dev tk-dev uuid-dev zlib1g-dev python3-venv\
       libgtk-3-0 libgtk-3-bin libgtk-3-common libgtk-3-dev \
       libgstreamer1.0-dev libgstreamer-plugins-base1.0-0 \
-      libgstreamer-plugins-base1.0-dev freeglut3 freeglut3-devA \
+      libgstreamer-plugins-base1.0-dev freeglut3 freeglut3-dev \
       python3-dev libsdl-dev libtiff-dev libpng-dev \
       libjpeg-dev python-is-python3
 ```
 
 Extract `python` source code and install in `/opt/python310`
 ```sh
-./configure \
-  --enable-loadable-sqlite-extensions \
-  --enable-optimizations \
-  --enable-shared \ 
-  --prefix=/opt/python310 \
-  LDFLAGS="-Wl,-rpath=/opt/python310/lib"
+sudo mkdir /opt/python310
+./configure --enable-loadable-sqlite-extensions --enable-optimizations --enable-shared --prefix=/opt/python310 LDFLAGS="-Wl,-rpath=/opt/python310/lib"
 make
 sudo make altinstall
 echo "export PATH=/opt/python310/bin:\$PATH" | tee -a ~/.profile
+echo "export PATH=/opt/python310/bin:\$PATH" | tee -a ~/.bashrc
 ```
 
 ### Install `poetry`

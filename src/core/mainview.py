@@ -1,5 +1,5 @@
 from db import db_func
-from core.init import background_color, tsize
+from core.init import mainview_background_color, tsize
 import other_func as otf
 from core.state import State
 from core.generic import AgeCtrl, PhoneTextCtrl, DateTextCtrl, WeightCtrl
@@ -21,7 +21,7 @@ class MainView(wx.Frame):
             parent=None,
             pos=(20, 20),
             title='PHẦN MỀM PHÒNG KHÁM TẠI NHÀ')
-        self.SetBackgroundColour(background_color)
+        self.SetBackgroundColour(mainview_background_color)
 
         self.con = con
         self.state = State(self)

@@ -1,13 +1,13 @@
-# High DPI aware
-import ctypes
-import sys
-if sys.platform == 'win32':
-    ctypes.windll.shcore.SetProcessDpiAwareness(True)
-
+from other_func import get_config
 import wx
 
+config = get_config()
 
-background_color = wx.Colour(206, 219, 186)
+# mainview_background_color = wx.Colour(206, 219, 186)
+mainview_background_color = wx.Colour(
+    *config['mainview_background_color'])
+patient_list_background_color = wx.Colour(
+    *config['patient_list_background_color'])
 
 
 # some size

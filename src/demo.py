@@ -57,7 +57,7 @@ class CSVReader(csv.DictReader):
         self.csvfile.close()
 
 
-def make_sample():
+def sample_con():
     con = Connection(':memory:')
     con.make_db()
 
@@ -98,7 +98,7 @@ def make_sample():
 
 
 if __name__ == '__main__':
-    con = make_sample()
+    con = sample_con()
     mainloop(con)
 
 

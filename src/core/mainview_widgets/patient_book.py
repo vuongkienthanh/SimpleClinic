@@ -1,4 +1,4 @@
-from core.init import size
+from core.init import size, patient_list_background_color
 from core import mainview
 from db.db_class import Patient, Visit
 import wx
@@ -35,6 +35,7 @@ class PatientListCtrl(wx.ListCtrl):
         super().__init__(parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
         self.parent = parent
         self.mv = parent.mv
+        self.SetBackgroundColour(patient_list_background_color)
         self.AppendColumn('Mã BN')
         self.AppendColumn('Họ tên', width=size(0.1))
         self.AppendColumn('Giới')

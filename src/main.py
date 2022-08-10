@@ -7,6 +7,7 @@ import shutil
 import wx
 import os
 import sys
+import ctypes
 
 
 class App(wx.App):
@@ -39,7 +40,9 @@ def mainloop(con):
 
 
 def platform_settings():
-    if sys.platform == 'linux':
+    if sys.platform == 'win32':
+        ctypes.windll.shcore.SetProcessDpiAwareness(True)
+    elif sys.platform == 'linux':
         # light theme
         os.environ['GTK_THEME'] = "Default " + os.path.join(SRC_DIR, "main.py")
         pass

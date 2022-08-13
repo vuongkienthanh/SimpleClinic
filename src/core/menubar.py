@@ -1,4 +1,4 @@
-from paths import APP_DIR, MY_DATABASE_PATH
+from paths import APP_DIR, MY_DATABASE_PATH, DEFAULT_CONFIG_PATH, CONFIG_PATH
 from db.db_class import *
 from core import mainview
 from core.dialogs import (
@@ -107,6 +107,8 @@ class MyMenuBar(wx.MenuBar):
             wx.ID_ANY, "Thu nhỏ kích thước dữ liệu")
         menuBackup: wx.MenuItem = settingMenu.Append(
             wx.ID_ANY, "Sao lưu dữ liệu")
+        menuResetConfig: wx.MenuItem = settingMenu.Append(
+            wx.ID_ANY, "Khôi phục cài đặt gốc")
 
         self.Append(homeMenu, "&Home")
         self.Append(editMenu, "&Khám bệnh")
@@ -137,6 +139,7 @@ class MyMenuBar(wx.MenuBar):
         self.Bind(wx.EVT_MENU, self.onOpenConfig, menuOpenConfig)
         self.Bind(wx.EVT_MENU, self.onVacuum, menuVacuum)
         self.Bind(wx.EVT_MENU, self.onBackup, menuBackup)
+        self.Bind(wx.EVT_MENU, self.onResetConfig, menuResetConfig)
 
     def onRefresh(self, e):
         mv: 'mainview.MainView' = self.GetFrame()
@@ -326,3 +329,14 @@ class MyMenuBar(wx.MenuBar):
             wx.MessageBox(f"Sao lưu thành công tại {bak}", "Sao lưu dữ liệu")
         else:
             wx.MessageBox("Sao lưu không thành công", "Sao lưu dữ liệu")
+
+    def onResetConfig(self, e):
+        try:
+            bak = CONFIG_PATH + \
+                dt.datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + ".bak"
+            shutil.copyfile(CONFIG_PATH, bak)
+            shutil.copyfile(DEFAULT_CONFIG_PATH, CONFIG_PATH)
+            wx.MessageBox(
+                f"Khôi phục cài đặt gốc thành công\nConfig cũ lưu tại {bak}", "Khôi phục cài đặt gốc")
+        except Exception as error:
+            wx.MessageBox(f"Lỗi {error}", "Khôi phục cài đặt gốc")

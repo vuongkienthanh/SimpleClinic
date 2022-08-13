@@ -28,6 +28,9 @@ class MainView(wx.Frame):
         self.state = State(self)
         self.config = config
         self.sample = sample
+        
+        if self.config['maximize_at_start']:
+            self.Maximize()
 
         self.patient_book = PatientBook(self)
         self.visit_list = VisitList(self)

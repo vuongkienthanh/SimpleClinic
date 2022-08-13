@@ -1,7 +1,7 @@
 from db.db_func import Connection
 from db.db_class import *
 from paths import SAMPLE_DIR
-from main import mainloop
+from main import App
 
 import os
 import csv
@@ -99,6 +99,6 @@ def sample_con():
 
 if __name__ == '__main__':
     con = sample_con()
-    mainloop(con)
+    App(con)
 
 

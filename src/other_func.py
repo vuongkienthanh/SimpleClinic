@@ -6,16 +6,24 @@ from typing import Any, TypeVar
 from itertools import cycle
 import json
 from math import ceil
+import shutil
 
 
 def get_config() -> dict[str, Any]:
     try:
-        with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-            config = json.load(f)
+        with (
+            open(CONFIG_PATH, "r", encoding="utf-8") as f1,
+            open(DEFAULT_CONFIG_PATH, "r", encoding="utf-8") as f2
+        ):
+            return json.load(f1) | json.load(f2)
+    except FileNotFoundError:
+        with open(DEFAULT_CONFIG_PATH, "r", encoding="utf-8") as f:
+            shutil.copyfile(DEFAULT_CONFIG_PATH, CONFIG_PATH)
+            return json.load(f)
     except json.JSONDecodeError:
         with open(DEFAULT_CONFIG_PATH, "r", encoding="utf-8") as f:
-            config = json.load(f)
-    return config
+            return json.load(f)
+
 
 def bd_to_age(bd: dt.date):
     today = dt.date.today()

@@ -20,6 +20,7 @@
   "so_muc_thuoc_1_toa": 8,
   "print_scale": 1,
   "preview_scale": 1,
+  "maximize_at_start": false,
   "mainview_background_color": [
     206,
     219,

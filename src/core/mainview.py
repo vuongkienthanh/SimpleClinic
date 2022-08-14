@@ -1,5 +1,5 @@
 from db import db_func
-from core.init import mainview_background_color, tsize
+from core.init import mainview_background_color, tsize, diagnosis_background_color
 import other_func as otf
 from core.state import State
 from core.generic import AgeCtrl, PhoneTextCtrl, DateTextCtrl, WeightCtrl
@@ -28,7 +28,7 @@ class MainView(wx.Frame):
         self.state = State(self)
         self.config = config
         self.sample = sample
-        
+
         if self.config['maximize_at_start']:
             self.Maximize()
 
@@ -61,6 +61,8 @@ class MainView(wx.Frame):
         self.follow = Follow(self)
         self.newvisitbtn = NewVisitBtn(self)
         self.savebtn = SaveBtn(self)
+
+        self.diagnosis.SetBackgroundColour(diagnosis_background_color)
 
         def widget(w, p, r):
             return (w, p, wx.EXPAND | wx.RIGHT, r)

@@ -17,10 +17,10 @@ class SearchPatientList(wx.ListCtrl):
             style=wx.LC_REPORT | wx.LC_SINGLE_SEL,
             size=(-1, 26 * num_of_lines)
         )
-        self.AppendColumn('Mã BN')
+        self.AppendColumn('Mã BN', width=size(0.03))
         self.AppendColumn('Họ tên', width=size(0.1))
-        self.AppendColumn('Giới')
-        self.AppendColumn('Ngày sinh', width=size(0.05))
+        self.AppendColumn('Giới', width=size(0.03))
+        self.AppendColumn('Ngày sinh', width=size(0.06))
         self.num_of_lines = num_of_lines
         self.page_index: int = 0
         self.saved_pages: list[list] = []

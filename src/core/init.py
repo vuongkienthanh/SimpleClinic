@@ -8,14 +8,21 @@ mainview_background_color = wx.Colour(
     *config['mainview_background_color'])
 patient_list_background_color = wx.Colour(
     *config['patient_list_background_color'])
-
+visit_list_background_color = wx.Colour(
+    *config['visit_list_background_color'])
+diagnosis_background_color = wx.Colour(
+    *config['diagnosis_background_color'])
+drug_list_background_color = wx.Colour(
+    *config['drug_list_background_color'])
+procedure_list_background_color = wx.Colour(
+    *config['procedure_list_background_color'])
 
 # some size
 w: tuple[int, int] = wx.DisplaySize()[0]
 
 
 def size(p):
-    return round(w*p)
+    return round(w*p*config['listctrl_header_scale'])
 
 
 def tsize(p):

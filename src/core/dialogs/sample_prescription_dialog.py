@@ -230,8 +230,8 @@ class ItemList(wx.ListCtrl):
         self._list_id: list[int] = []
         self.AppendColumn("Tên thuốc", width=size(0.1))
         self.AppendColumn("Thành phần", width=size(0.1))
-        self.AppendColumn("Số cữ")
-        self.AppendColumn("Liều 1 cữ")
+        self.AppendColumn("Số cữ", width=size(0.05))
+        self.AppendColumn("Liều 1 cữ", width=size(0.05))
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onSelect)
         self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onDeselect)
 

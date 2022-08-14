@@ -1,6 +1,6 @@
 from core import mainview as mv
 from core.mainview_widgets import order_book
-from core.init import k_tab, k_number, k_special, size, tsize
+from core.init import k_tab, k_number, k_special, size, tsize, drug_list_background_color
 import other_func as otf
 from core.generic import NumberTextCtrl, DoseTextCtrl
 import wx
@@ -93,8 +93,9 @@ class DrugList(wx.ListCtrl):
         self.SetBackgroundColour(wx.Colour(220, 220, 220))
         self.parent = parent
         self.mv = parent.parent.mv
+        self.SetBackgroundColour(drug_list_background_color)
         self.d_list: list[DrugListItem] = []
-        self.AppendColumn('STT')
+        self.AppendColumn('STT',width=size(0.02))
         self.AppendColumn('Thuốc', width=size(0.1))
         self.AppendColumn('Số cữ', width=size(0.03))
         self.AppendColumn('Liều', width=size(0.03))

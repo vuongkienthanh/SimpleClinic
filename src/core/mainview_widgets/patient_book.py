@@ -36,9 +36,9 @@ class PatientListCtrl(wx.ListCtrl):
         self.parent = parent
         self.mv = parent.mv
         self.SetBackgroundColour(patient_list_background_color)
-        self.AppendColumn('Mã BN')
+        self.AppendColumn('Mã BN',width=size(0.03))
         self.AppendColumn('Họ tên', width=size(0.1))
-        self.AppendColumn('Giới')
+        self.AppendColumn('Giới',width=size(0.03))
         self.AppendColumn('Ngày sinh', width=size(0.05))
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onSelect)
         self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onDeselect)

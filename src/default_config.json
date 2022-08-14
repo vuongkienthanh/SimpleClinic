@@ -21,12 +21,33 @@
   "print_scale": 1,
   "preview_scale": 1,
   "maximize_at_start": false,
+  "listctrl_header_scale":1,
   "mainview_background_color": [
     206,
     219,
     186
   ],
   "patient_list_background_color": [
+    255,
+    255,
+    255
+  ],
+  "visit_list_background_color": [
+    255,
+    255,
+    255
+  ],
+  "diagnosis_background_color": [
+    255,
+    255,
+    255
+  ],
+  "drug_list_background_color": [
+    255,
+    255,
+    255
+  ],
+  "procedure_list_background_color": [
     255,
     255,
     255

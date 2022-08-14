@@ -39,7 +39,7 @@ class ProcedureList(wx.ListCtrl):
     def __init__(self, parent: ProcedureDialog):
         super().__init__(parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
         self.parent = parent
-        self.AppendColumn("Mã")
+        self.AppendColumn("Mã",width=size(0.02))
         self.AppendColumn("Tên thủ thuật", width=size(0.15))
         self.AppendColumn("Giá tiền", width=size(0.05))
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onSelect)

@@ -1,5 +1,5 @@
 from core import mainview as mv
-from core.init import size
+from core.init import size, visit_list_background_color
 from db.db_class import Visit
 import wx
 import sqlite3
@@ -11,6 +11,7 @@ class VisitList(wx.ListCtrl):
     def __init__(self, parent: 'mv.MainView'):
         super().__init__(parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
         self.mv = parent
+        self.SetBackgroundColour(visit_list_background_color)
         self.AppendColumn('Mã lượt khám', width=size(0.07))
         self.AppendColumn('Ngày giờ khám', width=size(0.075))
         self.AppendColumn('Chẩn đoán', width=size(0.15))

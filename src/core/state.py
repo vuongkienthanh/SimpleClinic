@@ -2,6 +2,7 @@ from db.db_class import *
 from core import mainview
 import other_func as otf
 from core import menubar
+from core.init import config
 
 
 import sqlite3
@@ -158,9 +159,9 @@ class State():
         self.mv.diagnosis.Clear()
         self.mv.vnote.Clear()
         self.mv.weight.SetValue(0)
-        self.mv.days.SetValue(self.mv.config['so_ngay_toa_ve_mac_dinh'])
+        self.mv.days.SetValue(config['so_ngay_toa_ve_mac_dinh'])
         self.mv.updatequantitybtn.Disable()
-        self.mv.recheck.SetValue(self.mv.config['so_ngay_toa_ve_mac_dinh'])
+        self.mv.recheck.SetValue(config['so_ngay_toa_ve_mac_dinh'])
         self.mv.follow.SetDefault()
         self.linedruglist = []
         self.lineprocedurelist = []

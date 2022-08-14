@@ -1,6 +1,13 @@
 from core import mainview as mv
-import wx
 import other_func as otf
+from core.init import (
+    config,
+    recheck_background_color,
+    days_background_color,
+    price_background_color,
+    follow_background_color
+)
+import wx
 
 
 class DaysCtrl(wx.SpinCtrl):
@@ -10,12 +17,13 @@ class DaysCtrl(wx.SpinCtrl):
         super().__init__(
             parent,
             style=wx.SP_ARROW_KEYS,
-            initial=parent.config["so_ngay_toa_ve_mac_dinh"],
+            initial=config["so_ngay_toa_ve_mac_dinh"],
             **kwargs
         )
         self.mv = parent
         self.SetRange(0, 100)
         self.Disable()
+        self.SetBackgroundColour(days_background_color)
         self.Bind(wx.EVT_SPINCTRL, self.onSpin)
 
     def onSpin(self, e: wx.SpinEvent):
@@ -30,9 +38,10 @@ class RecheckCtrl(wx.SpinCtrl):
 
     def __init__(self, parent: "mv.MainView", **kwargs):
         super().__init__(parent, style=wx.SP_ARROW_KEYS,
-                         initial=parent.config["so_ngay_toa_ve_mac_dinh"], **kwargs)
+                         initial=config["so_ngay_toa_ve_mac_dinh"], **kwargs)
         self.SetRange(0, 100)
         self.Disable()
+        self.SetBackgroundColour(recheck_background_color)
 
 
 class PriceCtrl(wx.TextCtrl):
@@ -42,10 +51,11 @@ class PriceCtrl(wx.TextCtrl):
         super().__init__(parent, **kwargs)
         self.mv = parent
         self.Clear()
+        self.SetBackgroundColour(price_background_color)
 
     def FetchPrice(self):
         """Display new price"""
-        price: int = self.mv.config['cong_kham_benh']
+        price: int = config['cong_kham_benh']
         price += sum(
             item.sale_price * item.quantity
             for item in self.mv.order_book.page0.drug_list.d_list
@@ -57,7 +67,7 @@ class PriceCtrl(wx.TextCtrl):
         self.ChangeValue(otf.num_to_str(price))
 
     def Clear(self):
-        self.ChangeValue(otf.num_to_str(self.mv.config['cong_kham_benh']))
+        self.ChangeValue(otf.num_to_str(config['cong_kham_benh']))
 
 
 class Follow(wx.ComboBox):
@@ -74,17 +84,18 @@ class Follow(wx.ComboBox):
         super().__init__(
             parent,
             style=wx.CB_DROPDOWN,
-            choices=list(parent.config['loi_dan_do'].keys()),
+            choices=list(config['loi_dan_do'].keys()),
             **kwargs
         )
         self.mv = parent
+        self.SetBackgroundColour(follow_background_color)
         self.SetDefault()
 
     def full_value(self) -> str:
         'return `key: value` from `key`'
         k = self.GetValue().strip()
-        if k in self.mv.config['loi_dan_do'].keys():
-            return f"{k}: {self.mv.config['loi_dan_do'][k]}"
+        if k in config['loi_dan_do'].keys():
+            return f"{k}: {config['loi_dan_do'][k]}"
         else:
             return k
 

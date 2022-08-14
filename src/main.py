@@ -1,5 +1,4 @@
 import db.db_func as dbf
-from other_func import get_config
 from paths import *
 import os.path
 import wx
@@ -11,8 +10,7 @@ class App(wx.App):
     def __init__(self, con: dbf.Connection):
         super().__init__()
         from core.mainview import MainView
-        config = get_config()
-        mv = MainView(con, config)
+        mv = MainView(con)
         self.SetTopWindow(mv)
         mv.Show()
         self.MainLoop()

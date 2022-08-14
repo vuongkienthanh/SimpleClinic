@@ -83,10 +83,3 @@ def num_to_str(price: int) -> str:
 
 
 TC = TypeVar('TC', bound=wx.TextCtrl)
-
-
-def disable_text_ctrl(w: TC) -> TC:
-    w.Disable()
-    w.SetBackgroundColour(wx.Colour(168, 168, 168))
-    w.SetForegroundColour(wx.Colour(0, 0, 0))
-    return w

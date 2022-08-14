@@ -2,6 +2,7 @@ from core.generic import DatePicker
 from core import mainview as mv
 from db.db_class import LineDrug, LineProcedure, Visit, Warehouse, Procedure
 import other_func as otf
+from core.init import config
 import wx
 import datetime as dt
 import sqlite3
@@ -39,7 +40,7 @@ class DayReportDialog(wx.Dialog):
         query = f"""
             SELECT
                 visit_count,
-                ({self.mv.config['cong_kham_benh']} * visit_count) + drug_sale + procedure AS revenue,
+                ({config['cong_kham_benh']} * visit_count) + drug_sale + procedure AS revenue,
                 drug_purchase,
                 drug_sale,
                 (drug_sale - drug_purchase) AS profit_from_drug,

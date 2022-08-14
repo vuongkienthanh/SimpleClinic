@@ -1,6 +1,18 @@
 from db import db_func
-from core.init import mainview_background_color, tsize, diagnosis_background_color
-import other_func as otf
+from core.init import (
+    config,
+    mainview_background_color,
+    tsize,
+    diagnosis_background_color,
+    name_background_color,
+    gender_background_color,
+    age_background_color,
+    address_background_color,
+    phone_background_color,
+    birthdate_background_color,
+    past_history_background_color,
+    visit_note_background_color,
+)
 from core.state import State
 from core.generic import AgeCtrl, PhoneTextCtrl, DateTextCtrl, WeightCtrl
 from core.mainview_widgets import (
@@ -11,12 +23,11 @@ from core.mainview_widgets import (
 )
 from core.menubar import MyMenuBar
 import wx
-from typing import Any
 
 
 class MainView(wx.Frame):
 
-    def __init__(self, con: 'db_func.Connection', config: dict[str, Any], sample: bool = False):
+    def __init__(self, con: 'db_func.Connection', sample: bool = False):
         super().__init__(
             parent=None,
             pos=(20, 20),
@@ -26,26 +37,20 @@ class MainView(wx.Frame):
 
         self.con = con
         self.state = State(self)
-        self.config = config
         self.sample = sample
 
-        if self.config['maximize_at_start']:
+        if config['maximize_at_start']:
             self.Maximize()
 
         self.patient_book = PatientBook(self)
         self.visit_list = VisitList(self)
-        self.name = otf.disable_text_ctrl(
-            wx.TextCtrl(self, size=tsize(0.1), name="Họ tên:"))
-        self.gender = otf.disable_text_ctrl(
-            wx.TextCtrl(self, size=tsize(0.025), name="Giới:"))
-        self.birthdate = otf.disable_text_ctrl(
-            DateTextCtrl(self, size=tsize(0.06), name="Ngày sinh:"))
-        self.age = otf.disable_text_ctrl(
-            AgeCtrl(self, size=tsize(0.055), name="Tuổi:"))
-        self.address = otf.disable_text_ctrl(
-            wx.TextCtrl(self, name="Địa chỉ:"))
-        self.phone = otf.disable_text_ctrl(
-            PhoneTextCtrl(self, size=tsize(0.055), name="Điện thoại:"))
+        self.name = wx.TextCtrl(self, size=tsize(0.1), name="Họ tên:")
+        self.gender = wx.TextCtrl(self, size=tsize(0.025), name="Giới:")
+        self.birthdate = DateTextCtrl(
+            self, size=tsize(0.06), name="Ngày sinh:")
+        self.age = AgeCtrl(self, size=tsize(0.055), name="Tuổi:")
+        self.address = wx.TextCtrl(self, name="Địa chỉ:")
+        self.phone = PhoneTextCtrl(self, size=tsize(0.055), name="Điện thoại:")
         self.past_history = wx.TextCtrl(
             self, style=wx.TE_MULTILINE, name="Bệnh nền, dị ứng:")
         self.diagnosis = wx.TextCtrl(self, name="Chẩn đoán:")
@@ -57,12 +62,26 @@ class MainView(wx.Frame):
         self.order_book = OrderBook(self)
         self.recheck = RecheckCtrl(self, name="Số ngày tái khám:")
         self.norecheck = NoRecheckBtn(self)
-        self.price = otf.disable_text_ctrl(PriceCtrl(self, name="Giá tiền:"))
+        self.price = PriceCtrl(self, name="Giá tiền:")
         self.follow = Follow(self)
         self.newvisitbtn = NewVisitBtn(self)
         self.savebtn = SaveBtn(self)
 
+        self.name.Disable()
+        self.gender.Disable()
+        self.birthdate.Disable()
+        self.age.Disable()
+        self.address.Disable()
+        self.phone.Disable()
+        self.name.SetBackgroundColour(name_background_color)
+        self.gender.SetBackgroundColour(gender_background_color)
+        self.birthdate.SetBackgroundColour(birthdate_background_color)
+        self.age.SetBackgroundColour(age_background_color)
+        self.address.SetBackgroundColour(address_background_color)
+        self.phone.SetBackgroundColour(phone_background_color)
         self.diagnosis.SetBackgroundColour(diagnosis_background_color)
+        self.past_history.SetBackgroundColour(past_history_background_color)
+        self.vnote.SetBackgroundColour(visit_note_background_color)
 
         def widget(w, p, r):
             return (w, p, wx.EXPAND | wx.RIGHT, r)

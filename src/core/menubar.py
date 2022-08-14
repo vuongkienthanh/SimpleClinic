@@ -117,7 +117,7 @@ class MyMenuBar(wx.MenuBar):
 
         self.Bind(wx.EVT_MENU, self.onRefresh, id=wx.ID_REFRESH)
         self.Bind(wx.EVT_MENU, self.onAbout, id=wx.ID_ABOUT)
-        self.Bind(wx.EVT_MENU, lambda e: self.Parent.Close(), id=wx.ID_EXIT)
+        self.Bind(wx.EVT_MENU, self.onExit, id=wx.ID_EXIT)
         self.Bind(wx.EVT_MENU, self.onNewPatient, id=wx.ID_NEW)
         self.Bind(wx.EVT_MENU, self.onFindPatient, id=wx.ID_OPEN)
         self.Bind(wx.EVT_MENU, self.onEditPatient, id=wx.ID_EDIT)
@@ -149,6 +149,10 @@ class MyMenuBar(wx.MenuBar):
         wx.MessageBox(
             "Phần mềm phòng khám tại nhà\nTác giả: Vương Kiến Thanh\nEmail: thanhstardust@outlook.com",
             style=wx.OK | wx.CENTRE | wx.ICON_NONE)
+
+    def onExit(self, e):
+        mv: 'mainview.MainView' = self.GetFrame()
+        mv.Close()
 
     def onNewPatient(self, e):
         mv: 'mainview.MainView' = self.GetFrame()

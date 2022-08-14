@@ -21,7 +21,7 @@
   "print_scale": 1,
   "preview_scale": 1,
   "maximize_at_start": false,
-  "listctrl_header_scale":1,
+  "listctrl_header_scale": 1,
   "mainview_background_color": [
     206,
     219,
@@ -37,7 +37,42 @@
     255,
     255
   ],
+  "name_background_color": [
+    200,
+    200,
+    200
+  ],
+  "gender_background_color": [
+    200,
+    200,
+    200
+  ],
+  "birthdate_background_color": [
+    200,
+    200,
+    200
+  ],
+  "age_background_color": [
+    200,
+    200,
+    200
+  ],
+  "address_background_color": [
+    200,
+    200,
+    200
+  ],
+  "phone_background_color": [
+    200,
+    200,
+    200
+  ],
   "diagnosis_background_color": [
+    255,
+    255,
+    255
+  ],
+  "price_background_color": [
     255,
     255,
     255
@@ -48,6 +83,66 @@
     255
   ],
   "procedure_list_background_color": [
+    255,
+    255,
+    255
+  ],
+  "past_history_background_color": [
+    255,
+    255,
+    255
+  ],
+  "visit_note_background_color": [
+    255,
+    255,
+    255
+  ],
+  "weight_background_color": [
+    255,
+    255,
+    255
+  ],
+  "days_background_color": [
+    255,
+    255,
+    255
+  ],
+  "drug_picker_background_color": [
+    255,
+    255,
+    255
+  ],
+  "drug_times_background_color": [
+    255,
+    255,
+    255
+  ],
+  "drug_dose_background_color": [
+    255,
+    255,
+    255
+  ],
+  "drug_quantity_background_color": [
+    255,
+    255,
+    255
+  ],
+  "drug_note_background_color": [
+    255,
+    255,
+    255
+  ],
+  "recheck_background_color": [
+    255,
+    255,
+    255
+  ],
+  "follow_background_color": [
+    255,
+    255,
+    255
+  ],
+  "procedure_picker_background_color": [
     255,
     255,
     255

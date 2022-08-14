@@ -1,6 +1,7 @@
 from core.mainview_widgets.prescription_widgets import *
 from core.mainview_widgets.procedure_widgets import *
 from core import mainview
+from core.init import procedure_picker_background_color
 import other_func as otf
 
 import wx
@@ -111,6 +112,8 @@ class ProcedurePage(wx.Panel):
         self.addbtn = AddProcedureButton(self)
         self.delbtn = DelProcedureButton(self)
         self.procedurelistctrl = ProcedureListCtrl(self)
+
+        self.choice.SetBackgroundColour(procedure_picker_background_color)
 
         choice_row = wx.BoxSizer(wx.HORIZONTAL)
         choice_row.AddMany([

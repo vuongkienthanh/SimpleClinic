@@ -55,7 +55,7 @@ class SetupDialog(wx.Dialog):
         ])
         btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
         btn_sizer.AddMany([
-            (wx.StaticText(self, label="**Chỉnh sửa thêm trong file JSON"),
+            (wx.StaticText(self, label="**Còn nhiều tùy chọn trong file JSON"),
              0, wx.ALIGN_CENTER),
             (0, 0, 1),
             (cancelbtn, 0, wx.ALL, 5),

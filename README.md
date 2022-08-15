@@ -19,7 +19,7 @@ Phần mềm by doctor for doctor, thích hợp cho mô hình phòng khám nhỏ
 - Chỉ dùng được trên 1 máy, không có chức năng server
 
 ## Download demo
-https://github.com/vuongkienthanh/pmpktn2/releases/download/V2.0/demo.exe
+https://github.com/vuongkienthanh/pmpktn2/releases/download/V2.1/demo.exe
 
 ## Hướng dẫn cài đặt / yêu cầu chức năng
 Làm theo hướng dẫn phía dưới hoặc liên hệ hỗ trợ qua Email: thanhstardust@outlook.com

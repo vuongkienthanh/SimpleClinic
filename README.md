@@ -171,155 +171,32 @@ Default configuration
   // Phải chỉnh lại độ dài các thanh header của app
   "listctrl_header_scale": 1,
   // Tùy chỉnh màu sắc
-  // Nền chính của app
-  "mainview_background_color": [
-    206,
-    219,
-    186
-  ],
-  // Danh sách bệnh nhân
-  "patient_list_background_color": [
-    255,
-    255,
-    255
-  ],
-  // Danh sách các lượt khám
-  "visit_list_background_color": [
-    255,
-    255,
-    255
-  ],
-  // Tên
-  "name_background_color": [
-    200,
-    200,
-    200
-  ],
-  // Giới tính
-  "gender_background_color": [
-    200,
-    200,
-    200
-  ],
-  // Ngày sinh
-  "birthdate_background_color": [
-    200,
-    200,
-    200
-  ],
-  // Tuổi
-  "age_background_color": [
-    200,
-    200,
-    200
-  ],
-  // Địa chỉ
-  "address_background_color": [
-    200,
-    200,
-    200
-  ],
-  // Điện thoại
-  "phone_background_color": [
-    200,
-    200,
-    200
-  ],
-  // Chẩn đoán
-  "diagnosis_background_color": [
-    255,
-    255,
-    255
-  ],
-  // Giá tiền
-  "price_background_color": [
-    255,
-    255,
-    255
-  ],
-  // Danh sách thuốc
-  "drug_list_background_color": [
-    255,
-    255,
-    255
-  ],
-  // Danh sách thủ thuật
-  "procedure_list_background_color": [
-    255,
-    255,
-    255
-  ],
-  // Tiền căn
-  "past_history_background_color": [
-    255,
-    255,
-    255
-  ],
-  // Bệnh sử
-  "visit_note_background_color": [
-    255,
-    255,
-    255
-  ],
-  // Cân năng
-  "weight_background_color": [
-    255,
-    255,
-    255
-  ],
-  // Số ngày cho toa về
-  "days_background_color": [
-    255,
-    255,
-    255
-  ],
-  // Danh mục chọn thuốc
-  "drug_picker_background_color": [
-    255,
-    255,
-    255
-  ],
-  // Số lần dùng của thuốc
-  "drug_times_background_color": [
-    255,
-    255,
-    255
-  ],
-  // Liều thuốc
-  "drug_dose_background_color": [
-    255,
-    255,
-    255
-  ],
-  // Số lượng thuốc
-  "drug_quantity_background_color": [
-    255,
-    255,
-    255
-  ],
-  // Cách dùng thuốc
-  "drug_note_background_color": [
-    255,
-    255,
-    255
-  ],
-  // Số ngày tái khám
-  "recheck_background_color": [
-    255,
-    255,
-    255
-  ],
-  // Lời dặn dò
-  "follow_background_color": [
-    255,
-    255,
-    255
-  ],
-  // Danh mục chọn thủ thuật
-  "procedure_picker_background_color": [
-    255,
-    255,
-    255
-  ]
+  "background_color":{
+    "mainview": [ 206, 219, 186 ], // Nền chính của app
+    "patient_list": [ 255, 255, 255 ], // Danh sách bệnh nhân
+    "visit_list": [ 255, 255, 255 ], // Danh sách các lượt khám
+    "name": [ 200, 200, 200 ], // Tên
+    "gender": [ 200, 200, 200 ], // Giới tính
+    "birthdate": [ 200, 200, 200 ], // Ngày sinh
+    "age": [ 200, 200, 200 ], // Tuổi
+    "address": [ 200, 200, 200 ], // Địa chỉ
+    "phone": [ 200, 200, 200 ], // Điện thoại
+    "diagnosis": [ 255, 255, 255 ], // Chẩn đoán
+    "price": [ 255, 255, 255 ], // Giá tiền
+    "drug_list": [ 255, 255, 255 ], // Danh sách thuốc
+    "procedure_list": [ 255, 255, 255 ], // Danh sách thủ thuật
+    "past_history": [ 255, 255, 255 ], // Tiền căn
+    "visit_note": [ 255, 255, 255 ], // Bệnh sử
+    "weight": [ 255, 255, 255 ], // Cân năng
+    "days": [ 255, 255, 255 ], // Số ngày cho toa về
+    "drug_picker": [ 255, 255, 255 ], // Danh mục chọn thuốc
+    "drug_times": [ 255, 255, 255 ], // Số lần dùng của thuốc
+    "drug_dose": [ 255, 255, 255 ], // Liều thuốc
+    "drug_quantity": [ 255, 255, 255 ], // Số lượng thuốc
+    "drug_note": [ 255, 255, 255 ], // Cách dùng thuốc
+    "recheck": [ 255, 255, 255 ], // Số ngày tái khám
+    "follow": [ 255, 255, 255 ], // Lời dặn dò
+    "procedure_picker": [ 255, 255, 255 ] // Danh mục chọn thủ thuật
+  }
 }
 ```

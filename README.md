@@ -87,7 +87,7 @@ sudo apt install -y build-essential gdb lcov pkg-config \
       libgstreamer1.0-dev libgstreamer-plugins-base1.0-0 \
       libgstreamer-plugins-base1.0-dev freeglut3 freeglut3-dev \
       python3-dev libsdl-dev libtiff-dev libpng-dev \
-      libjpeg-dev
+      libjpeg-dev libwebkit2gtk-4.0-dev libsdl2-dev
 ```
 
 Extract `python` source code and install in `/opt/python310`

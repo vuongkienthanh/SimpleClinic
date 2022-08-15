@@ -119,6 +119,8 @@ poetry install --no-dev
 
 ---
 
+## Hướng dẫn sử dụng
+ 
 Run app
 ```sh
 poetry run python -OO main.py
@@ -128,11 +130,12 @@ Shortcuts to run app for each platform are available at `shortcuts` folder.
 
 Config and database are located at:
 - Windows: `%USERPROFILE%\.pmpktn\`
-- Macos/Linux: $HOME/.pmpktn/
+- MacOS/Linux: `$HOME/.pmpktn/`
 
 ---
 
-Default configuration
+## Default configuration
+
 ```sh
 {
   // Tên phòng khám, được in trong toa

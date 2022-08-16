@@ -1,5 +1,5 @@
 from paths import CONFIG_PATH
-from core.init import config
+from core.init import config, tsize
 from core import mainview
 import wx
 import wx.adv as adv
@@ -10,24 +10,28 @@ class SetupDialog(wx.Dialog):
     def __init__(self, parent: 'mainview.MainView'):
         super().__init__(parent, title="Cài đặt hệ thống")
         self.mv = parent
+        self.scroll = wx.ScrolledWindow(
+            self,
+            style=wx.VSCROLL | wx.ALWAYS_SHOW_SB,
+            size=(-1, round(wx.DisplaySize()[1]*0.5)))
         self.clinic = wx.TextCtrl(
-            self, value=config['clinic_name'], name="Tên phòng khám")
+            self.scroll, value=config['clinic_name'], name="Tên phòng khám")
         self.address = wx.TextCtrl(
-            self, value=config['clinic_address'], name="Địa chỉ")
+            self.scroll, value=config['clinic_address'], name="Địa chỉ")
         self.phone = wx.TextCtrl(
-            self, value=config['clinic_phone_number'], name="Số điện thoại")
+            self.scroll, value=config['clinic_phone_number'], name="Số điện thoại")
         self.doctor = wx.TextCtrl(
-            self, value=config['doctor_name'], name="Ký tên bác sĩ")
+            self.scroll, value=config['doctor_name'], name="Tên bác sĩ")
         self.price = wx.TextCtrl(
-            self, value=str(config["initial_price"]), name="Công khám bệnh")
-        self.display_price = wx.CheckBox(self, name="In giá tiền")
+            self.scroll, value=str(config["initial_price"]), name="Công khám bệnh")
+        self.display_price = wx.CheckBox(self.scroll, name="In giá tiền")
         self.display_price.SetValue(config['print_price'])
         self.days = wx.SpinCtrl(
-            self, initial=config["default_days_for_prescription"], name="Số ngày toa về mặc định")
+            self.scroll, initial=config["default_days_for_prescription"], name="Số ngày toa về mặc định")
         self.alert = wx.SpinCtrl(
-            self, initial=config["minumum_drug_quantity_alert"], max=10000, name="Lượng thuốc tối thiểu để báo động")
+            self.scroll, initial=config["minimum_drug_quantity_alert"], max=10000, name="Lượng thuốc tối thiểu để báo động")
         self.unit = adv.EditableListBox(
-            self, label="Đơn vị bán", style=adv.EL_DEFAULT_STYLE | adv.EL_NO_REORDER, name="Thuốc bán một đơn vị")
+            self.scroll, label="Đơn vị bán", style=adv.EL_DEFAULT_STYLE | adv.EL_NO_REORDER, name="Thuốc bán một đơn vị")
         lc: wx.ListCtrl = self.unit.GetListCtrl()
         lc.DeleteAllItems()
         for item in config["single_sale_units"]:
@@ -39,7 +43,7 @@ class SetupDialog(wx.Dialog):
 
         def widget(w: wx.Window):
             s: str = w.GetName()
-            return (wx.StaticText(self, label=s), 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5), (w, 1, wx.EXPAND | wx.ALL, 5)
+            return (wx.StaticText(self.scroll, label=s), 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5), (w, 1, wx.EXPAND | wx.ALL, 5)
 
         entry_sizer = wx.FlexGridSizer(11, 2, 5, 5)
         entry_sizer.AddMany([
@@ -53,6 +57,7 @@ class SetupDialog(wx.Dialog):
             *widget(self.alert),
             *widget(self.unit),
         ])
+        self.scroll.SetSizer(entry_sizer)
         btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
         btn_sizer.AddMany([
             (wx.StaticText(self, label="**Còn nhiều tùy chọn trong file JSON"),
@@ -63,10 +68,11 @@ class SetupDialog(wx.Dialog):
         ])
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.AddMany([
-            (entry_sizer, 0, wx.EXPAND),
+            (self.scroll, 0, wx.EXPAND),
             (btn_sizer, 0, wx.EXPAND),
         ])
         self.SetSizerAndFit(sizer)
+        self.scroll.SetScrollbars(0, 20, 0, 1000)
 
         okbtn.Bind(wx.EVT_BUTTON, self.onOkBtn)
 
@@ -81,7 +87,7 @@ class SetupDialog(wx.Dialog):
             config['print_price'] = self.display_price.Value
             config['initial_price'] = int(self.price.Value)
             config['default_days_for_prescription'] = self.days.GetValue()
-            config["minumum_drug_quantity_alert"] = self.alert.GetValue(
+            config["minimum_drug_quantity_alert"] = self.alert.GetValue(
             )
             config["single_sale_units"] = [
                 lc.GetItemText(idx).strip()

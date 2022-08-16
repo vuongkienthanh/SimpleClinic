@@ -11,7 +11,10 @@ def get_config() -> dict[str, Any]:
             open(CONFIG_PATH, "r", encoding="utf-8") as f1,
             open(DEFAULT_CONFIG_PATH, "r", encoding="utf-8") as f2
         ):
-            return json.load(f2) | json.load(f1)
+            config = json.load(f1)
+            default = json.load(f2)
+            config = {k: v for k, v in config.items() if k in default.keys()}
+            return default | config
     except FileNotFoundError:
         with open(DEFAULT_CONFIG_PATH, "r", encoding="utf-8") as f:
             shutil.copyfile(DEFAULT_CONFIG_PATH, CONFIG_PATH)

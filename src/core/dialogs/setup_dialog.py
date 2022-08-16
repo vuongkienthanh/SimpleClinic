@@ -297,7 +297,8 @@ class SetupDialog(wx.Dialog):
             config['number_of_drugs_in_one_page'] = self.num_of_ld.GetValue()
             config['display_recent_visit_count'] = self.visit_count.GetValue()
             config['maximize_at_start'] = self.maximize_at_start.Value
-            def set_color(name, widget):
+
+            def set_color(name: str, widget: wx.ColourPickerCtrl):
                 config['background_color'][name] = widget.Colour.GetIM()[:3]
             set_color('mainview', self.mainview_color)
             set_color('patient_list', self.patient_list_color)

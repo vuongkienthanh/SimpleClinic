@@ -117,7 +117,7 @@ class AgeCtrl(wx.TextCtrl):
     """Used in MainView and patient dialogs"""
 
     def __init__(self, parent: wx.Window, **kwargs):
-        super().__init__(parent, style=wx.TE_READONLY, **kwargs)
+        super().__init__(parent, **kwargs)
 
     def SetBirthdate(self, bd: dt.date):
         """Change value based on `bd`"""

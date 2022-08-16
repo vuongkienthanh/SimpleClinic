@@ -24,9 +24,7 @@ class BasePatientDialog(wx.Dialog):
             wx.DateTime.Today() - wx.DateSpan(years=100),
             wx.DateTime.Today()
         )
-        # self.age = otf.disable_text_ctrl(AgeCtrl(self, name="Tuổi"))
-        self.age = AgeCtrl(self, name="Tuổi")
-        self.age.Disable()
+        self.age = AgeCtrl(self, name="Tuổi", style=wx.TE_READONLY)
         self.address = wx.TextCtrl(self, style=wx.TE_MULTILINE, name="Địa chỉ")
         self.phone = PhoneTextCtrl(self, name="Điện thoại")
         self.past_history = wx.TextCtrl(

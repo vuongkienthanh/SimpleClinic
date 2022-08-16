@@ -31,13 +31,17 @@ class MainView(wx.Frame):
 
         self.patient_book = PatientBook(self)
         self.visit_list = VisitList(self)
-        self.name = wx.TextCtrl(self, size=tsize(0.1), name="Họ tên:")
-        self.gender = wx.TextCtrl(self, size=tsize(0.025), name="Giới:")
+        self.name = wx.TextCtrl(self, size=tsize(
+            0.1), name="Họ tên:", style=wx.TE_READONLY)
+        self.gender = wx.TextCtrl(self, size=tsize(
+            0.025), name="Giới:", style=wx.TE_READONLY)
         self.birthdate = DateTextCtrl(
-            self, size=tsize(0.06), name="Ngày sinh:")
-        self.age = AgeCtrl(self, size=tsize(0.055), name="Tuổi:")
-        self.address = wx.TextCtrl(self, name="Địa chỉ:")
-        self.phone = PhoneTextCtrl(self, size=tsize(0.055), name="Điện thoại:")
+            self, size=tsize(0.06), name="Ngày sinh:", style=wx.TE_READONLY)
+        self.age = AgeCtrl(self, size=tsize(
+            0.055), name="Tuổi:", style=wx.TE_READONLY)
+        self.address = wx.TextCtrl(self, name="Địa chỉ:", style=wx.TE_READONLY)
+        self.phone = PhoneTextCtrl(self, size=tsize(
+            0.055), name="Điện thoại:", style=wx.TE_READONLY)
         self.past_history = wx.TextCtrl(
             self, style=wx.TE_MULTILINE, name="Bệnh nền, dị ứng:")
         self.diagnosis = wx.TextCtrl(self, name="Chẩn đoán:")
@@ -54,24 +58,17 @@ class MainView(wx.Frame):
         self.newvisitbtn = NewVisitBtn(self)
         self.savebtn = SaveBtn(self)
 
-        self.name.Disable()
-        self.gender.Disable()
-        self.birthdate.Disable()
-        self.age.Disable()
-        self.address.Disable()
-        self.phone.Disable()
-        self.name.SetBackgroundColour(otf.get_background_color('name'))
-        self.gender.SetBackgroundColour(otf.get_background_color('gender'))
-        self.birthdate.SetBackgroundColour(
-            otf.get_background_color('birthdate'))
-        self.age.SetBackgroundColour(otf.get_background_color('age'))
-        self.address.SetBackgroundColour(otf.get_background_color('address'))
-        self.phone.SetBackgroundColour(otf.get_background_color('phone'))
-        self.diagnosis.SetBackgroundColour(
-            otf.get_background_color('diagnosis'))
-        self.past_history.SetBackgroundColour(
-            otf.get_background_color('past_history'))
-        self.vnote.SetBackgroundColour(otf.get_background_color('visit_note'))
+        def set_color(widget: wx.Window, name: str):
+            widget.SetBackgroundColour(otf.get_background_color(name))
+        set_color(self.name, 'name')
+        set_color(self.gender, 'gender')
+        set_color(self.birthdate, 'birthdate')
+        set_color(self.age, 'age')
+        set_color(self.address, 'address')
+        set_color(self.phone, 'phone')
+        set_color(self.diagnosis, 'diagnosis')
+        set_color(self.past_history, 'past_history')
+        set_color(self.vnote, 'visit_note')
 
         def widget(w, p, r):
             return (w, p, wx.EXPAND | wx.RIGHT, r)

@@ -7,9 +7,12 @@ import wx
 
 
 class ProcedureDialog(wx.Dialog):
-    def __init__(self, parent: 'mv.MainView'):
-        super().__init__(parent=parent, title="Thủ thuật",
-                         style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
+    def __init__(self, parent: "mv.MainView"):
+        super().__init__(
+            parent=parent,
+            title="Thủ thuật",
+            style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER,
+        )
         self.mv = parent
 
         self.procedurelist = ProcedureList(self)
@@ -18,18 +21,22 @@ class ProcedureDialog(wx.Dialog):
         self.deletebtn = DeleteBtn(self)
 
         btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        btn_sizer.AddMany([
-            (self.addbtn, 0, wx.ALL, 5),
-            (self.updatebtn, 0, wx.ALL, 5),
-            (self.deletebtn, 0, wx.ALL, 5),
-            (0, 0, 1),
-            (self.CreateStdDialogButtonSizer(wx.OK), 0, wx.ALL, 5)
-        ])
+        btn_sizer.AddMany(
+            [
+                (self.addbtn, 0, wx.ALL, 5),
+                (self.updatebtn, 0, wx.ALL, 5),
+                (self.deletebtn, 0, wx.ALL, 5),
+                (0, 0, 1),
+                (self.CreateStdDialogButtonSizer(wx.OK), 0, wx.ALL, 5),
+            ]
+        )
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.AddMany([
-            (self.procedurelist, 1, wx.EXPAND | wx.ALL, 5),
-            (btn_sizer, 0, wx.EXPAND | wx.ALL, 5)
-        ])
+        sizer.AddMany(
+            [
+                (self.procedurelist, 1, wx.EXPAND | wx.ALL, 5),
+                (btn_sizer, 0, wx.EXPAND | wx.ALL, 5),
+            ]
+        )
         self.SetSizerAndFit(sizer)
         for pr in self.mv.state.procedurelist:
             self.procedurelist.append(pr)
@@ -102,9 +109,11 @@ class DeleteBtn(wx.Button):
             self.mv.order_book.page1.choice.Delete(idx)
             if self.mv.order_book.page1.procedurelistctrl.ItemCount > 0:
                 for i in range(self.mv.order_book.page1.procedurelistctrl.ItemCount):
-                    if self.mv.order_book.page1.procedurelistctrl.GetItemText(i, 0) == pr.name:
-                        self.mv.order_book.page1.procedurelistctrl.DeleteItem(
-                            i)
+                    if (
+                        self.mv.order_book.page1.procedurelistctrl.GetItemText(i, 0)
+                        == pr.name
+                    ):
+                        self.mv.order_book.page1.procedurelistctrl.DeleteItem(i)
                 self.mv.price.FetchPrice()
         except Exception as error:
             wx.MessageBox(f"{error}", "Lỗi")
@@ -121,28 +130,32 @@ class BaseDialog(wx.Dialog):
         self.okbtn = wx.Button(self, id=wx.ID_OK)
 
         def widget(w):
-            return (wx.StaticText(self, label=w.Name), 0, wx.ALIGN_CENTER | wx.ALL, 5), (w, 1, wx.EXPAND | wx.ALL, 5)
+            return (
+                wx.StaticText(self, label=w.Name),
+                0,
+                wx.ALIGN_CENTER | wx.ALL,
+                5,
+            ), (w, 1, wx.EXPAND | wx.ALL, 5)
+
         entry_sizer = wx.FlexGridSizer(2, 2, 5, 5)
-        entry_sizer.AddMany([
-            *widget(self.name),
-            *widget(self.price)
-        ])
+        entry_sizer.AddMany([*widget(self.name), *widget(self.price)])
         btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        btn_sizer.AddMany([
-            (0, 0, 1),
-            (self.cancelbtn, 0, wx.ALL, 5),
-            (self.okbtn, 0, wx.ALL, 5)
-        ])
+        btn_sizer.AddMany(
+            [(0, 0, 1), (self.cancelbtn, 0, wx.ALL, 5), (self.okbtn, 0, wx.ALL, 5)]
+        )
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.AddMany([
-            (entry_sizer, 0, wx.EXPAND | wx.ALL, 5),
-            (btn_sizer, 0, wx.EXPAND | wx.ALL, 5)
-        ])
+        sizer.AddMany(
+            [
+                (entry_sizer, 0, wx.EXPAND | wx.ALL, 5),
+                (btn_sizer, 0, wx.EXPAND | wx.ALL, 5),
+            ]
+        )
         self.SetSizerAndFit(sizer)
 
         self.okbtn.Bind(wx.EVT_BUTTON, self.onClick)
 
-    def onClick(self, e): ...
+    def onClick(self, e):
+        ...
 
 
 class AddDialog(BaseDialog):
@@ -153,10 +166,7 @@ class AddDialog(BaseDialog):
         try:
             name = self.name.Value.strip()
             price = int(self.price.Value.strip())
-            lastrowid = self.mv.con.insert(Procedure, {
-                'name': name,
-                'price': price
-            })
+            lastrowid = self.mv.con.insert(Procedure, {"name": name, "price": price})
             assert lastrowid is not None
             new_pr = Procedure(lastrowid, name, price)
             self.parent.procedurelist.append(new_pr)

@@ -6,23 +6,21 @@ import wx
 
 
 class DrugPopup(wx.ComboPopup):
-
     def __init__(self):
         super().__init__()
         self._list = []
 
     def Create(self, parent):
         self.lc = wx.ListCtrl(
-            parent,
-            style=wx.LC_REPORT | wx.LC_SINGLE_SEL | wx.SIMPLE_BORDER
+            parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL | wx.SIMPLE_BORDER
         )
-        self.lc.AppendColumn('Thuốc', width=size(0.08))
-        self.lc.AppendColumn('Thành phần', width=size(0.08))
-        self.lc.AppendColumn('Số lượng', width=size(0.035))
-        self.lc.AppendColumn('Đơn vị', width=size(0.03))
-        self.lc.AppendColumn('Đơn giá', width=size(0.03))
-        self.lc.AppendColumn('Cách dùng', width=size(0.04))
-        self.lc.AppendColumn('Hạn sử dụng', width=size(0.055))
+        self.lc.AppendColumn("Thuốc", width=size(0.08))
+        self.lc.AppendColumn("Thành phần", width=size(0.08))
+        self.lc.AppendColumn("Số lượng", width=size(0.035))
+        self.lc.AppendColumn("Đơn vị", width=size(0.03))
+        self.lc.AppendColumn("Đơn giá", width=size(0.03))
+        self.lc.AppendColumn("Cách dùng", width=size(0.04))
+        self.lc.AppendColumn("Hạn sử dụng", width=size(0.055))
         self.lc.Bind(wx.EVT_MOTION, self.OnMotion)
         self.lc.Bind(wx.EVT_LEFT_DOWN, self.OnLeftDown)
         self.lc.Bind(wx.EVT_CHAR, self.onChar)
@@ -49,11 +47,13 @@ class DrugPopup(wx.ComboPopup):
     def fetch_list(self, s: str):
         s = s.casefold()
         cc: DrugPicker = self.GetComboCtrl()
-        self._list = list(filter(
-            lambda item: (s in item.name.casefold()) or (
-                s in item.element.casefold()),
-            cc.parent.parent.mv.state.warehouselist
-        ))
+        self._list = list(
+            filter(
+                lambda item: (s in item.name.casefold())
+                or (s in item.element.casefold()),
+                cc.parent.parent.mv.state.warehouselist,
+            )
+        )
 
     def build(self):
         for index, item in enumerate(self._list):
@@ -62,18 +62,20 @@ class DrugPopup(wx.ComboPopup):
 
     def append_ui(self, item: Warehouse):
         if item.expire_date is None:
-            expire_date = ''
+            expire_date = ""
         else:
             expire_date = item.expire_date.strftime("%d/%m/%Y")
-        self.lc.Append([
-            item.name,
-            item.element,
-            str(item.quantity),
-            item.usage_unit,
-            int(item.sale_price),
-            item.usage,
-            expire_date
-        ])
+        self.lc.Append(
+            [
+                item.name,
+                item.element,
+                str(item.quantity),
+                item.usage_unit,
+                int(item.sale_price),
+                item.usage,
+                expire_date,
+            ]
+        )
 
     def check_min_quantity(self, item, index):
         if item.quantity <= config["minimum_drug_quantity_alert"]:
@@ -134,11 +136,10 @@ class DrugPopup(wx.ComboPopup):
 
 
 class DrugPicker(wx.ComboCtrl):
-
-    def __init__(self, parent: 'order_book.PrescriptionPage'):
+    def __init__(self, parent: "order_book.PrescriptionPage"):
         super().__init__(parent, style=wx.TE_PROCESS_ENTER)
         self.parent = parent
-        self.SetBackgroundColour(otf.get_background_color('drug_picker'))
+        self.SetBackgroundColour(otf.get_background_color("drug_picker"))
         self.SetPopupControl(DrugPopup())
         self.Bind(wx.EVT_CHAR, self.onChar)
         self.Bind(wx.EVT_TEXT, self.onText)
@@ -151,7 +152,7 @@ class DrugPicker(wx.ComboCtrl):
             e.Skip()
 
     def onText(self, e: wx.CommandEvent):
-        if self.GetValue() == '':
+        if self.GetValue() == "":
             self.parent.parent.mv.state.warehouse = None
         else:
             e.Skip()

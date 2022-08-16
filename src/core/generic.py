@@ -1,6 +1,4 @@
-from core.init import (
-    k_number, k_special, k_tab, k_decimal, k_hash, k_slash
-)
+from core.init import k_number, k_special, k_tab, k_decimal, k_hash, k_slash
 import other_func as otf
 from db.db_class import Gender
 import wx
@@ -11,10 +9,7 @@ from decimal import Decimal
 
 class GenderChoice(wx.Choice):
     def __init__(self, parent: wx.Window, **kwargs):
-        super().__init__(parent, choices=[
-            str(Gender(0)),
-            str(Gender(1))
-        ], **kwargs)
+        super().__init__(parent, choices=[str(Gender(0)), str(Gender(1))], **kwargs)
         self.Selection = 0
 
     def GetGender(self) -> Gender:
@@ -29,7 +24,7 @@ class WeightCtrl(wx.SpinCtrlDouble):
         super().__init__(parent, **kwargs)
         self.SetDigits(1)
         self.Disable()
-        self.SetBackgroundColour(otf.get_background_color('weight'))
+        self.SetBackgroundColour(otf.get_background_color("weight"))
 
     def GetWeight(self) -> Decimal:
         return Decimal(self.GetValue())
@@ -45,8 +40,11 @@ class DatePicker(wx.adv.CalendarCtrl):
     """
 
     def __init__(self, parent: wx.Window, **kwargs):
-        super().__init__(parent, style=wx.adv.CAL_MONDAY_FIRST |
-                         wx.adv.CAL_SHOW_SURROUNDING_WEEKS, **kwargs)
+        super().__init__(
+            parent,
+            style=wx.adv.CAL_MONDAY_FIRST | wx.adv.CAL_SHOW_SURROUNDING_WEEKS,
+            **kwargs
+        )
 
     def GetDate(self) -> dt.date:
         return wx.wxdate2pydate(super().GetDate()).date()
@@ -91,7 +89,7 @@ class DateTextCtrl(wx.TextCtrl):
             e.Skip()
         elif kc in k_number + k_slash and len(s) < 10:
             if kc == k_slash:
-                if s.count('/') < 2:
+                if s.count("/") < 2:
                     e.Skip()
             else:
                 e.Skip()
@@ -125,7 +123,7 @@ class AgeCtrl(wx.TextCtrl):
 
 
 class NumberTextCtrl(wx.TextCtrl):
-    """ A TextCtrl which allows number"""
+    """A TextCtrl which allows number"""
 
     def __init__(self, parent: wx.Window, **kwargs):
         super().__init__(parent, **kwargs)
@@ -158,7 +156,7 @@ class DoseTextCtrl(NumberTextCtrl):
     def key_list(self):
         s: str = self.Value
         ret = super().key_list()
-        if '/' not in s and '.' not in s:
+        if "/" not in s and "." not in s:
             ret = ret + k_slash + k_decimal
         return ret
 
@@ -169,11 +167,17 @@ class DatePickerDialog(wx.Dialog):
         self.datepicker = DatePicker(self)
 
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.AddMany([
-            (self.datepicker, 0, wx.EXPAND | wx.ALL, 10),
-            (self.CreateStdDialogButtonSizer(
-                wx.OK | wx.CANCEL), 0, wx.EXPAND | wx.ALL, 10)
-        ])
+        sizer.AddMany(
+            [
+                (self.datepicker, 0, wx.EXPAND | wx.ALL, 10),
+                (
+                    self.CreateStdDialogButtonSizer(wx.OK | wx.CANCEL),
+                    0,
+                    wx.EXPAND | wx.ALL,
+                    10,
+                ),
+            ]
+        )
         self.SetSizerAndFit(sizer)
 
     def GetDate(self) -> dt.date:
@@ -184,25 +188,33 @@ class MonthPickerDialog(wx.Dialog):
     def __init__(self, parent: wx.Window):
         super().__init__(parent, title="Chọn tháng")
         self.month = wx.SpinCtrl(
-            self, min=1, max=12, initial=dt.date.today().month, name="Tháng:")
-        self.year = NumberTextCtrl(self, value=str(
-            dt.date.today().year), name="Năm:")
+            self, min=1, max=12, initial=dt.date.today().month, name="Tháng:"
+        )
+        self.year = NumberTextCtrl(self, value=str(dt.date.today().year), name="Năm:")
         self.year.SetHint("YYYY")
 
         def widget(w):
-            return (wx.StaticText(self, label=w.Name), 0, wx.EXPAND | wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5), (w, 0, wx.EXPAND | wx.ALL, 5)
+            return (
+                wx.StaticText(self, label=w.Name),
+                0,
+                wx.EXPAND | wx.ALL | wx.ALIGN_CENTER_VERTICAL,
+                5,
+            ), (w, 0, wx.EXPAND | wx.ALL, 5)
 
         entry_sizer = wx.FlexGridSizer(2, 2, 5, 5)
-        entry_sizer.AddMany([
-            *widget(self.month),
-            *widget(self.year)
-        ])
+        entry_sizer.AddMany([*widget(self.month), *widget(self.year)])
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.AddMany([
-            (entry_sizer, 0, wx.EXPAND | wx.ALL, 5),
-            (self.CreateStdDialogButtonSizer(
-                wx.OK | wx.CANCEL), 0, wx.EXPAND | wx.ALL, 10)
-        ])
+        sizer.AddMany(
+            [
+                (entry_sizer, 0, wx.EXPAND | wx.ALL, 5),
+                (
+                    self.CreateStdDialogButtonSizer(wx.OK | wx.CANCEL),
+                    0,
+                    wx.EXPAND | wx.ALL,
+                    10,
+                ),
+            ]
+        )
         self.SetSizerAndFit(sizer)
 
     def GetMonth(self) -> int:

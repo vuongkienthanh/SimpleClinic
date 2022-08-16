@@ -20,12 +20,12 @@ DEFAULT_CONFIG_PATH = os.path.join(SRC_DIR, "default_config.json")
 CONFIG_PATH = os.path.join(APP_DIR, "config.json")
 
 # sample dir
-SAMPLE_DIR = os.path.join(SRC_DIR, 'sample')
+SAMPLE_DIR = os.path.join(SRC_DIR, "sample")
 
 
 # bitmaps
-BITMAPS_DIR = os.path.join(SRC_DIR, 'bitmaps')
-plus_bm = os.path.join(BITMAPS_DIR, 'plus.png')
-minus_bm = os.path.join(BITMAPS_DIR, 'minus.png')
-weight_bm = os.path.join(BITMAPS_DIR, 'weight.png')
-update_druglist_bm = os.path.join(BITMAPS_DIR, 'update_druglist.png')
+BITMAPS_DIR = os.path.join(SRC_DIR, "bitmaps")
+plus_bm = os.path.join(BITMAPS_DIR, "plus.png")
+minus_bm = os.path.join(BITMAPS_DIR, "minus.png")
+weight_bm = os.path.join(BITMAPS_DIR, "weight.png")
+update_druglist_bm = os.path.join(BITMAPS_DIR, "update_druglist.png")

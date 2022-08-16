@@ -8,12 +8,15 @@ import wx
 
 
 class WarehouseDialog(wx.Dialog):
-    def __init__(self, parent: 'mainview.MainView'):
+    def __init__(self, parent: "mainview.MainView"):
         """
         `_list`: internal list to keep track of filtered Warehouse in dialog
         """
-        super().__init__(parent=parent, title="Kho thuốc",
-                         style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.MAXIMIZE_BOX)
+        super().__init__(
+            parent=parent,
+            title="Kho thuốc",
+            style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.MAXIMIZE_BOX,
+        )
         self.mv = parent
         self._list: list[Warehouse] = []
 
@@ -41,24 +44,30 @@ class WarehouseDialog(wx.Dialog):
         self.delbtn.Disable()
 
         search_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        search_sizer.AddMany([
-            (wx.StaticText(self, label="Tìm kiếm"), 0, wx.ALL | wx.ALIGN_CENTER, 5),
-            (self.search, 1, wx.ALL, 5),
-        ])
+        search_sizer.AddMany(
+            [
+                (wx.StaticText(self, label="Tìm kiếm"), 0, wx.ALL | wx.ALIGN_CENTER, 5),
+                (self.search, 1, wx.ALL, 5),
+            ]
+        )
         btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        btn_sizer.AddMany([
-            (0, 0, 1),
-            (self.newbtn, 0, wx.RIGHT, 5),
-            (self.editbtn, 0, wx.RIGHT, 5),
-            (self.delbtn, 0, wx.RIGHT, 5),
-            (cancelbtn, 0, wx.RIGHT, 5)
-        ])
+        btn_sizer.AddMany(
+            [
+                (0, 0, 1),
+                (self.newbtn, 0, wx.RIGHT, 5),
+                (self.editbtn, 0, wx.RIGHT, 5),
+                (self.delbtn, 0, wx.RIGHT, 5),
+                (cancelbtn, 0, wx.RIGHT, 5),
+            ]
+        )
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.AddMany([
-            (search_sizer, 0, wx.EXPAND),
-            (self.lc, 1, wx.EXPAND | wx.ALL, 5),
-            (btn_sizer, 0, wx.EXPAND | wx.ALL, 5)
-        ])
+        sizer.AddMany(
+            [
+                (search_sizer, 0, wx.EXPAND),
+                (self.lc, 1, wx.EXPAND | wx.ALL, 5),
+                (btn_sizer, 0, wx.EXPAND | wx.ALL, 5),
+            ]
+        )
         self.SetSizerAndFit(sizer)
 
         self.search.Bind(wx.EVT_SEARCH, self.onSearch)
@@ -89,12 +98,11 @@ class WarehouseDialog(wx.Dialog):
         else:
             return False
 
-    def rebuild(self, s: str = ''):
+    def rebuild(self, s: str = ""):
         "filter and build"
         self.clear()
         for wh in filter(
-                lambda wh: self.check_search_str_to_wh(wh, s),
-                self.mv.state.warehouselist
+            lambda wh: self.check_search_str_to_wh(wh, s), self.mv.state.warehouselist
         ):
             self.append(wh)
 
@@ -107,21 +115,24 @@ class WarehouseDialog(wx.Dialog):
     def append(self, wh: Warehouse):
         "append to internal list and ui, also conditional recolor"
         self._list.append(wh)
-        self.lc.Append([
-            str(wh.id),
-            wh.name,
-            wh.element,
-            str(wh.quantity),
-            wh.usage_unit,
-            wh.usage,
-            str(wh.purchase_price),
-            str(wh.sale_price),
-            wh.sale_unit if wh.sale_unit is not None else wh.usage_unit,
-            wh.expire_date.strftime(
-                "%d/%m/%Y") if wh.expire_date is not None else '',
-            otf.check_none(wh.made_by),
-            otf.check_none(wh.note)
-        ])
+        self.lc.Append(
+            [
+                str(wh.id),
+                wh.name,
+                wh.element,
+                str(wh.quantity),
+                wh.usage_unit,
+                wh.usage,
+                str(wh.purchase_price),
+                str(wh.sale_price),
+                wh.sale_unit if wh.sale_unit is not None else wh.usage_unit,
+                wh.expire_date.strftime("%d/%m/%Y")
+                if wh.expire_date is not None
+                else "",
+                otf.check_none(wh.made_by),
+                otf.check_none(wh.note),
+            ]
+        )
         self.check_min_quantity(wh, len(self._list) - 1)
 
     def delete(self, idx: int):
@@ -183,7 +194,9 @@ class WarehouseDialog(wx.Dialog):
 
 class BaseDialog(wx.Dialog):
     def __init__(self, parent: WarehouseDialog, title: str):
-        super().__init__(parent, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER, title=title)
+        super().__init__(
+            parent, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER, title=title
+        )
         self.parent = parent
         self.mv = parent.mv
         self.title = title
@@ -209,55 +222,70 @@ class BaseDialog(wx.Dialog):
             self.usage_unit,
             self.usage,
             self.purchase_price,
-            self.sale_price
+            self.sale_price,
         )
 
         def widget(w):
             s: str = w.Name
             if w in self.mandatory:
-                s += '*'
-            return (wx.StaticText(self, label=s), 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 3), (w, 1, wx.EXPAND | wx.ALL, 3)
+                s += "*"
+            return (
+                wx.StaticText(self, label=s),
+                0,
+                wx.ALIGN_CENTER_VERTICAL | wx.ALL,
+                3,
+            ), (w, 1, wx.EXPAND | wx.ALL, 3)
+
         btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        btn_sizer.AddMany([
-            (0, 0, 1),
-            (self.cancelbtn, 0, wx.ALL, 5),
-            (self.okbtn, 0, wx.ALL, 5)
-        ])
+        btn_sizer.AddMany(
+            [(0, 0, 1), (self.cancelbtn, 0, wx.ALL, 5), (self.okbtn, 0, wx.ALL, 5)]
+        )
         entry_sizer = wx.FlexGridSizer(11, 2, 3, 3)
         entry_sizer.AddGrowableCol(1, 3)
         entry_sizer.AddGrowableRow(10, 2)
-        entry_sizer.AddMany([
-            *widget(self.name),
-            *widget(self.element),
-            *widget(self.quantity),
-            *widget(self.usage_unit),
-            *widget(self.usage),
-            *widget(self.purchase_price),
-            *widget(self.sale_price),
-            *widget(self.sale_unit),
-            *widget(self.expire_date),
-            *widget(self.made_by),
-            *widget(self.note),
-        ])
+        entry_sizer.AddMany(
+            [
+                *widget(self.name),
+                *widget(self.element),
+                *widget(self.quantity),
+                *widget(self.usage_unit),
+                *widget(self.usage),
+                *widget(self.purchase_price),
+                *widget(self.sale_price),
+                *widget(self.sale_unit),
+                *widget(self.expire_date),
+                *widget(self.made_by),
+                *widget(self.note),
+            ]
+        )
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.AddMany([
-            (entry_sizer, 1, wx.EXPAND | wx.ALL, 5),
-            (wx.StaticText(self, label="* là bắt buộc; Không có hạn sử dụng thì để hôm nay"),
-             0, wx.EXPAND | wx.ALL, 5),
-            (btn_sizer, 0, wx.EXPAND | wx.ALL, 5)
-        ])
+        sizer.AddMany(
+            [
+                (entry_sizer, 1, wx.EXPAND | wx.ALL, 5),
+                (
+                    wx.StaticText(
+                        self, label="* là bắt buộc; Không có hạn sử dụng thì để hôm nay"
+                    ),
+                    0,
+                    wx.EXPAND | wx.ALL,
+                    5,
+                ),
+                (btn_sizer, 0, wx.EXPAND | wx.ALL, 5),
+            ]
+        )
         self.SetSizerAndFit(sizer)
 
         self.okbtn.Bind(wx.EVT_BUTTON, self.onOkBtn)
 
-    def onOkBtn(self, e: wx.CommandEvent): ...
+    def onOkBtn(self, e: wx.CommandEvent):
+        ...
 
     def is_valid(self) -> bool:
         "valid when all fields in mandatory are filled"
         for widget in self.mandatory:
             val: str = widget.GetValue()
             name: str = widget.GetName()
-            if val.strip() == '':
+            if val.strip() == "":
                 wx.MessageBox(f"Chưa nhập đủ thông tin\n{name}", self.title)
                 return False
         else:
@@ -270,7 +298,7 @@ class BaseDialog(wx.Dialog):
         usage_unit: str = self.usage_unit.GetValue()
         usage_unit = usage_unit.strip()
 
-        if (sale_unit == '') or (sale_unit == usage_unit):
+        if (sale_unit == "") or (sale_unit == usage_unit):
             return None
         else:
             return sale_unit
@@ -284,17 +312,17 @@ class NewDialog(BaseDialog):
         "sql insert, append to state.warehouselist, rebuild with search str"
         if self.is_valid():
             wh = {
-                'name': self.name.Value.strip(),
-                'element': self.element.Value.strip(),
-                'quantity': int(self.quantity.Value.strip()),
-                'usage_unit': self.usage_unit.Value.strip(),
-                'usage': self.usage.Value.strip(),
-                'purchase_price': int(self.purchase_price.Value.strip()),
-                'sale_price': int(self.sale_price.Value.strip()),
-                'sale_unit': self.get_sale_unit(),
-                'expire_date': self.expire_date.checked_GetDate(),
-                'made_by': otf.check_blank(self.made_by.Value),
-                'note': otf.check_blank(self.note.Value)
+                "name": self.name.Value.strip(),
+                "element": self.element.Value.strip(),
+                "quantity": int(self.quantity.Value.strip()),
+                "usage_unit": self.usage_unit.Value.strip(),
+                "usage": self.usage.Value.strip(),
+                "purchase_price": int(self.purchase_price.Value.strip()),
+                "sale_price": int(self.sale_price.Value.strip()),
+                "sale_unit": self.get_sale_unit(),
+                "expire_date": self.expire_date.checked_GetDate(),
+                "made_by": otf.check_blank(self.made_by.Value),
+                "note": otf.check_blank(self.note.Value),
             }
             try:
                 lastrowid = self.mv.con.insert(Warehouse, wh)
@@ -302,7 +330,9 @@ class NewDialog(BaseDialog):
                 wx.MessageBox("Thêm mới thành công", "Thêm mới")
                 new_wh = Warehouse(id=lastrowid, **wh)
                 self.mv.state.warehouselist.append(new_wh)
-                if self.parent.check_search_str_to_wh(new_wh, self.parent.get_search_value()):
+                if self.parent.check_search_str_to_wh(
+                    new_wh, self.parent.get_search_value()
+                ):
                     self.parent.append(new_wh)
                 e.Skip()
             except Exception as error:

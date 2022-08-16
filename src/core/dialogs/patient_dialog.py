@@ -8,27 +8,25 @@ import wx.adv as adv
 
 
 class BasePatientDialog(wx.Dialog):
-    def __init__(self, parent: 'mainview.MainView', title):
+    def __init__(self, parent: "mainview.MainView", title):
         super().__init__(
-            parent,
-            title=title,
-            style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
+            parent, title=title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
         )
         self.mv = parent
 
         self.name = wx.TextCtrl(self, size=(300, -1), name="Họ tên")
         self.gender = GenderChoice(self, name="Giới tính")
         self.birthdate_text = DateTextCtrl(self, name="Ngày sinh")
-        self.birthdate = DatePicker(self, name='')
+        self.birthdate = DatePicker(self, name="")
         self.birthdate.SetDateRange(
-            wx.DateTime.Today() - wx.DateSpan(years=100),
-            wx.DateTime.Today()
+            wx.DateTime.Today() - wx.DateSpan(years=100), wx.DateTime.Today()
         )
         self.age = AgeCtrl(self, name="Tuổi", style=wx.TE_READONLY)
         self.address = wx.TextCtrl(self, style=wx.TE_MULTILINE, name="Địa chỉ")
         self.phone = PhoneTextCtrl(self, name="Điện thoại")
         self.past_history = wx.TextCtrl(
-            self, style=wx.TE_MULTILINE, name="Bệnh nền, dị ứng")
+            self, style=wx.TE_MULTILINE, name="Bệnh nền, dị ứng"
+        )
 
         self.mandatory: tuple = (
             self.name,
@@ -45,43 +43,54 @@ class BasePatientDialog(wx.Dialog):
         self.okbtn.Bind(wx.EVT_BUTTON, self.onOkBtn)
 
     def _setSizer(self):
-
         def widget(w: wx.Window):
             name: str = w.GetName()
             if w in self.mandatory:
                 name += "*"
-            return (wx.StaticText(self, label=name), 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 3), (w, 1, wx.EXPAND | wx.ALL, 3)
+            return (
+                wx.StaticText(self, label=name),
+                0,
+                wx.ALIGN_CENTER_VERTICAL | wx.ALL,
+                3,
+            ), (w, 1, wx.EXPAND | wx.ALL, 3)
+
         entry = wx.FlexGridSizer(rows=8, cols=2, vgap=5, hgap=2)
         entry.AddGrowableCol(1, 1)
         entry.AddGrowableRow(5, 1)
         entry.AddGrowableRow(7, 1)
-        entry.AddMany([
-            *widget(self.name),
-            *widget(self.gender),
-            *widget(self.birthdate_text),
-            *widget(self.age),
-            *widget(self.birthdate),
-            *widget(self.address),
-            *widget(self.phone),
-            *widget(self.past_history),
-        ])
+        entry.AddMany(
+            [
+                *widget(self.name),
+                *widget(self.gender),
+                *widget(self.birthdate_text),
+                *widget(self.age),
+                *widget(self.birthdate),
+                *widget(self.address),
+                *widget(self.phone),
+                *widget(self.past_history),
+            ]
+        )
         btn = wx.BoxSizer(wx.HORIZONTAL)
-        btn.AddMany([
-            (0, 0, 1),
-            (self.cancelbtn, 0, wx.ALL ^ wx.RIGHT, 10),
-            (self.okbtn, 0, wx.ALL, 10),
-        ])
+        btn.AddMany(
+            [
+                (0, 0, 1),
+                (self.cancelbtn, 0, wx.ALL ^ wx.RIGHT, 10),
+                (self.okbtn, 0, wx.ALL, 10),
+            ]
+        )
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.AddMany([
-            (entry, 6, wx.ALL | wx.EXPAND, 10),
-            (wx.StaticText(self, label="* là bắt buộc"), 0, wx.ALL, 5),
-            (btn, 0, wx.EXPAND),
-        ])
+        sizer.AddMany(
+            [
+                (entry, 6, wx.ALL | wx.EXPAND, 10),
+                (wx.StaticText(self, label="* là bắt buộc"), 0, wx.ALL, 5),
+                (btn, 0, wx.EXPAND),
+            ]
+        )
         self.SetSizerAndFit(sizer)
 
     def is_valid(self) -> bool:
         name: str = self.name.Value
-        if name.strip() == '':
+        if name.strip() == "":
             wx.MessageBox("Chưa nhập tên bệnh nhân", "Lỗi")
             return False
         elif not self.birthdate_text.is_valid():
@@ -90,7 +99,8 @@ class BasePatientDialog(wx.Dialog):
         else:
             return True
 
-    def onOkBtn(self, e: wx.CommandEvent) -> None: ...
+    def onOkBtn(self, e: wx.CommandEvent) -> None:
+        ...
 
     def onBirthdateText(self, e: wx.CommandEvent):
         s = e.GetString()
@@ -110,49 +120,48 @@ class BasePatientDialog(wx.Dialog):
 
 
 class NewPatientDialog(BasePatientDialog):
-
-    def __init__(self, parent: 'mainview.MainView'):
+    def __init__(self, parent: "mainview.MainView"):
         super().__init__(parent, title="Bệnh nhân mới")
 
     def onOkBtn(self, e):
         if self.is_valid():
             try:
                 name: str = self.name.Value
-                lastrowid = self.mv.con.insert(Patient, {
-                    'name': name.strip().upper(),
-                    'gender': self.gender.GetGender(),
-                    'birthdate': self.birthdate.GetDate(),
-                    'address': otf.check_blank(self.address.Value),
-                    'phone': otf.check_blank(self.phone.Value),
-                    'past_history': otf.check_blank(self.past_history.Value)
-                })
+                lastrowid = self.mv.con.insert(
+                    Patient,
+                    {
+                        "name": name.strip().upper(),
+                        "gender": self.gender.GetGender(),
+                        "birthdate": self.birthdate.GetDate(),
+                        "address": otf.check_blank(self.address.Value),
+                        "phone": otf.check_blank(self.phone.Value),
+                        "past_history": otf.check_blank(self.past_history.Value),
+                    },
+                )
                 assert lastrowid is not None
-                wx.MessageBox("Đã thêm bệnh nhân mới thành công",
-                              "Bệnh nhân mới")
+                wx.MessageBox("Đã thêm bệnh nhân mới thành công", "Bệnh nhân mới")
                 try:
-                    if wx.MessageDialog(
-                        self,
-                        message="Thêm bệnh nhân mới vào danh sách chờ khám?",
-                        caption="Danh sách chờ khám",
-                        style=wx.OK_DEFAULT | wx.CANCEL
-                    ).ShowModal() == wx.ID_OK:
-                        self.mv.con.insert(
-                            QueueList, {'patient_id': lastrowid})
-                        wx.MessageBox(
-                            "Thêm vào danh sách chờ thành công", "OK")
+                    if (
+                        wx.MessageDialog(
+                            self,
+                            message="Thêm bệnh nhân mới vào danh sách chờ khám?",
+                            caption="Danh sách chờ khám",
+                            style=wx.OK_DEFAULT | wx.CANCEL,
+                        ).ShowModal()
+                        == wx.ID_OK
+                    ):
+                        self.mv.con.insert(QueueList, {"patient_id": lastrowid})
+                        wx.MessageBox("Thêm vào danh sách chờ thành công", "OK")
                         self.mv.state.queuelist = self.mv.state.get_queuelist()
                 except sqlite3.IntegrityError as error:
-                    wx.MessageBox(
-                        f"Đã có tên trong danh sách chờ.\n{error}", "Lỗi")
+                    wx.MessageBox(f"Đã có tên trong danh sách chờ.\n{error}", "Lỗi")
                 e.Skip()
             except Exception as error:
-                wx.MessageBox(
-                    f"Lỗi không thêm bệnh nhân mới được\n{error}", "Lỗi")
+                wx.MessageBox(f"Lỗi không thêm bệnh nhân mới được\n{error}", "Lỗi")
 
 
 class EditPatientDialog(BasePatientDialog):
-
-    def __init__(self, parent: 'mainview.MainView'):
+    def __init__(self, parent: "mainview.MainView"):
         super().__init__(parent, title="Cập nhật thông tin bệnh nhân")
         self.mv = parent
         self.build(self.get_patient())

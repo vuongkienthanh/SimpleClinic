@@ -12,14 +12,13 @@ printdata.Colour = False
 printdata.Duplex = wx.DUPLEX_SIMPLEX
 printdata.NoCopies = 1
 printdata.Orientation = wx.PORTRAIT
-printdata.PrinterName = ''
+printdata.PrinterName = ""
 printdata.Quality = wx.PRINT_QUALITY_LOW
 printdata.PaperId = wx.PAPER_A5
 
 
 class PrintOut(wx.Printout):
-
-    def __init__(self, mv: 'mv.MainView', preview=False):
+    def __init__(self, mv: "mv.MainView", preview=False):
         super().__init__(title="Toa thuốc")
 
         self.mv = mv
@@ -29,7 +28,7 @@ class PrintOut(wx.Printout):
         "Relative to `num_of_ld`"
         x, y = divmod(
             self.mv.order_book.page0.drug_list.ItemCount,
-            config['number_of_drugs_in_one_page']
+            config["number_of_drugs_in_one_page"],
         )
         if page <= (x + bool(y)):
             return True
@@ -45,13 +44,13 @@ class PrintOut(wx.Printout):
         else:
             x, y = divmod(
                 self.mv.order_book.page0.drug_list.ItemCount,
-                config['number_of_drugs_in_one_page']
+                config["number_of_drugs_in_one_page"],
             )
         return (1, x + bool(y), 1, x + bool(y))
 
     def OnPrintPage(self, page):
 
-        num_of_ld = config['number_of_drugs_in_one_page']
+        num_of_ld = config["number_of_drugs_in_one_page"]
         d_list = self.mv.order_book.page0.drug_list.d_list
         state = self.mv.state
         p = state.patient
@@ -60,9 +59,9 @@ class PrintOut(wx.Printout):
         dc: wx.DC = self.GetDC()
         dcx, dcy = dc.Size
         if self.preview:
-            scale = config['preview_scale']
+            scale = config["preview_scale"]
         else:
-            scale = config['print_scale']
+            scale = config["print_scale"]
         dcx, dcy = round(dcx * scale), round(dcy * scale)
 
         space = round(dcx * 0.002)
@@ -97,17 +96,16 @@ class PrintOut(wx.Printout):
             row_y = round(dcy * 0.017)
             y = aty(0.05)
 
-            def row(i): return y + row_y * i
+            def row(i):
+                return y + row_y * i
 
             with wx.DCFontChanger(dc, heading):
                 x = atx(0.085)
-                dc.DrawText(config['clinic_name'], x, row(0))
-                dc.DrawText("Địa chỉ: " + config['clinic_address'], x, row(1))
-                dc.DrawText(
-                    "SĐT: " + config['clinic_phone_number'], x, row(2))
+                dc.DrawText(config["clinic_name"], x, row(0))
+                dc.DrawText("Địa chỉ: " + config["clinic_address"], x, row(1))
+                dc.DrawText("SĐT: " + config["clinic_phone_number"], x, row(2))
             with wx.DCFontChanger(dc, title):
-                draw_centered_text('ĐƠN THUỐC', round(
-                    dcx / 2), row(3))
+                draw_centered_text("ĐƠN THUỐC", round(dcx / 2), row(3))
 
             row_y = round(dcy * 0.026)
             y = round(dcy * 0.14)
@@ -123,52 +121,51 @@ class PrintOut(wx.Printout):
                 dc.DrawText(s4, atx(0.3), row(1))
                 dc.DrawText(s5, atx(0.06), row(2))
             with wx.DCFontChanger(dc, info_italic):
-                dc.DrawText(
-                    p.name,
-                    atx(0.06) + get_text_x(s1) + space,
-                    row(0))
+                dc.DrawText(p.name, atx(0.06) + get_text_x(s1) + space, row(0))
                 dc.DrawText(
                     str(self.mv.weight.Value) + " kg",
                     atx(0.7) + get_text_x(s2) + space,
-                    row(0))
-                dc.DrawText(
-                    str(p.gender),
-                    atx(0.06) + get_text_x(s3) + space,
-                    row(1))
+                    row(0),
+                )
+                dc.DrawText(str(p.gender), atx(0.06) + get_text_x(s3) + space, row(1))
                 dc.DrawText(
                     p.birthdate.strftime("%d/%m/%Y"),
                     atx(0.3) + get_text_x(s4) + space,
-                    row(1))
-                dc.DrawText(
-                    otf.bd_to_age(p.birthdate),
-                    atx(0.7),
-                    row(1))
-                diagnosis = tw.wrap(self.mv.diagnosis.Value,
-                                    60, initial_indent=" " * 19)
+                    row(1),
+                )
+                dc.DrawText(otf.bd_to_age(p.birthdate), atx(0.7), row(1))
+                diagnosis = tw.wrap(
+                    self.mv.diagnosis.Value, 60, initial_indent=" " * 19
+                )
                 if len(diagnosis) > 3:
                     diagnosis = diagnosis[:3]
-                    diagnosis[-1] = diagnosis[-1][:-3] + '...'
+                    diagnosis[-1] = diagnosis[-1][:-3] + "..."
                 for i, line in enumerate(diagnosis):
                     dc.DrawText(line, atx(0.06), i * row_y + row(2))
 
         def draw_bottom():
             with wx.DCFontChanger(dc, info):
                 dc.DrawText("Bác sĩ khám bệnh", atx(0.63), aty(0.735))
-                draw_centered_text(
-                    config['doctor_name'], atx(0.75), aty(0.865))
+                draw_centered_text(config["doctor_name"], atx(0.75), aty(0.865))
 
             row_y = round(dcy * 0.02)
             y = aty(0.72)
-            def row(i): return y + row_y * i
+
+            def row(i):
+                return y + row_y * i
+
             with wx.DCFontChanger(dc, heading):
-                if config['print_price']:
+                if config["print_price"]:
                     t = f"Tổng cộng: {self.mv.price.GetValue()}"
                     if self.mv.order_book.page1.procedurelistctrl.ItemCount > 0:
                         t += " (đã gồm tiền thủ thuật)"
                     dc.DrawText(t, atx(0.06), row(0))
                 if self.mv.recheck.GetValue() != 0:
                     dc.DrawText(
-                        f"Tái khám sau {self.mv.recheck.GetValue()} ngày", atx(0.06), row(1))
+                        f"Tái khám sau {self.mv.recheck.GetValue()} ngày",
+                        atx(0.06),
+                        row(1),
+                    )
                 follow = tw.wrap(self.mv.follow.full_value(), width=40)
                 for i, line in enumerate(follow):
                     dc.DrawText(line, atx(0.06), row(2) + row_y * i)
@@ -182,7 +179,8 @@ class PrintOut(wx.Printout):
             row_y = round(dcy * 0.055)
             y = aty(0.28)
 
-            def row(i): return y + row_y * i
+            def row(i):
+                return y + row_y * i
 
             i = 0
             if first:
@@ -200,10 +198,7 @@ class PrintOut(wx.Printout):
                     dc.DrawText(t, atx(0.7), row(i))
                 with wx.DCFontChanger(dc, info_italic):
                     t = dl.note or otf.get_usage_note_str(
-                        dl.usage,
-                        str(dl.times),
-                        dl.dose,
-                        dl.usage_unit
+                        dl.usage, str(dl.times), dl.dose, dl.usage_unit
                     )
                     dc.DrawText(t, atx(0.12), row(i) + round(row_y / 2))
                 i += 1

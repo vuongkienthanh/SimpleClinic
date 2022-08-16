@@ -9,10 +9,10 @@ import sqlite3
 import wx
 
 
-class State():
-    '''Manager data, appearance and button state'''
+class State:
+    """Manager data, appearance and button state"""
 
-    def __init__(self, mv: 'mainview.MainView') -> None:
+    def __init__(self, mv: "mainview.MainView") -> None:
         self.mv = mv
         self.Init()
 
@@ -25,12 +25,11 @@ class State():
         self._lineprocedurelist: list[sqlite3.Row] = []
         self._queuelist: list[sqlite3.Row] = self.get_queuelist()
         self._todaylist: list[sqlite3.Row] = self.get_todaylist()
-        self.warehouselist: list[Warehouse] = self.mv.con.selectall(
-            Warehouse)
+        self.warehouselist: list[Warehouse] = self.mv.con.selectall(Warehouse)
         self.sampleprescriptionlist: list[SamplePrescription] = self.mv.con.selectall(
-            SamplePrescription)
-        self.procedurelist: list[Procedure] = self.mv.con.selectall(
-            Procedure)
+            SamplePrescription
+        )
+        self.procedurelist: list[Procedure] = self.mv.con.selectall(Procedure)
 
     def refresh(self) -> None:
         self.patient = None
@@ -63,9 +62,9 @@ class State():
         self.mv.gender.ChangeValue(str(p.gender))
         self.mv.birthdate.ChangeValue(p.birthdate.strftime("%d/%m/%Y"))
         self.mv.age.ChangeValue(otf.bd_to_age(p.birthdate))
-        self.mv.address.ChangeValue(p.address or '')
-        self.mv.phone.ChangeValue(p.phone or '')
-        self.mv.past_history.ChangeValue(p.past_history or '')
+        self.mv.address.ChangeValue(p.address or "")
+        self.mv.phone.ChangeValue(p.phone or "")
+        self.mv.past_history.ChangeValue(p.past_history or "")
         self.mv.savebtn.SetLabel("Lưu")
         self.mv.savebtn.Enable()
         self.mv.weight.Enable()
@@ -83,7 +82,7 @@ class State():
         idx: int = self.mv.patient_book.Selection
         page: wx.ListCtrl = self.mv.patient_book.GetPage(idx)
 
-        menubar: 'menubar.MyMenuBar' = self.mv.GetMenuBar()
+        menubar: "menubar.MyMenuBar" = self.mv.GetMenuBar()
         menubar.menuUpdatePatient.Enable()
         menubar.menuInsertVisit.Enable()
         if idx == 0:
@@ -131,7 +130,7 @@ class State():
 
     def onVisitSelect(self, v: Visit) -> None:
         self.mv.diagnosis.ChangeValue(v.diagnosis)
-        self.mv.vnote.ChangeValue(v.vnote or '')
+        self.mv.vnote.ChangeValue(v.vnote or "")
         self.mv.weight.SetValue(v.weight)
         self.mv.days.SetValue(v.days)
         self.mv.recheck.SetValue(v.recheck)
@@ -159,9 +158,9 @@ class State():
         self.mv.diagnosis.Clear()
         self.mv.vnote.Clear()
         self.mv.weight.SetValue(0)
-        self.mv.days.SetValue(config['default_days_for_prescription'])
+        self.mv.days.SetValue(config["default_days_for_prescription"])
         self.mv.updatequantitybtn.Disable()
-        self.mv.recheck.SetValue(config['default_days_for_prescription'])
+        self.mv.recheck.SetValue(config["default_days_for_prescription"])
         self.mv.follow.SetDefault()
         self.linedruglist = []
         self.lineprocedurelist = []
@@ -201,10 +200,10 @@ class State():
 
     def onWarehouseDeselect(self) -> None:
         pg = self.mv.order_book.page0
-        pg.drug_picker.ChangeValue('')
+        pg.drug_picker.ChangeValue("")
         pg.usage.SetLabel("{Cách dùng}")
-        pg.usage_unit.SetLabel('{Đơn vị}')
-        pg.sale_unit.SetLabel('{Đơn vị}')
+        pg.usage_unit.SetLabel("{Đơn vị}")
+        pg.sale_unit.SetLabel("{Đơn vị}")
         pg.times.Clear()
         pg.dose.Clear()
         pg.quantity.Clear()
@@ -261,7 +260,8 @@ class State():
                 return wh
 
     def get_queuelist(self) -> list[sqlite3.Row]:
-        return self.mv.con.execute(f"""
+        return self.mv.con.execute(
+            f"""
             SELECT
                 p.id AS pid,
                 p.name,
@@ -272,10 +272,12 @@ class State():
             JOIN {Patient.table_name} AS p
             ON ql.patient_id = p.id
             ORDER BY ql.added_datetime ASC
-        """).fetchall()
+        """
+        ).fetchall()
 
     def get_todaylist(self) -> list[sqlite3.Row]:
-        return self.mv.con.execute(f"""
+        return self.mv.con.execute(
+            f"""
             SELECT
                 p.id AS pid,
                 p.name,
@@ -289,7 +291,8 @@ class State():
                 WHERE date(exam_datetime) = date('now', 'localtime')
             ) AS v
             ON v.patient_id = p.id
-        """).fetchall()
+        """
+        ).fetchall()
 
     def get_visits_by_patient_id(self, pid) -> list[sqlite3.Row]:
         query = f"""
@@ -298,7 +301,7 @@ class State():
             WHERE {Visit.table_name}.patient_id = {pid}
             ORDER BY exam_datetime DESC
         """
-        if config['display_recent_visit_count'] >= 0:
+        if config["display_recent_visit_count"] >= 0:
             query += f"""
                 LIMIT {config['display_recent_visit_count']}
             """

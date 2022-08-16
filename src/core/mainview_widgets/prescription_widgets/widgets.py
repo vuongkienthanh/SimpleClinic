@@ -1,29 +1,39 @@
 from core import mainview as mv
 from core.mainview_widgets import order_book
-from core.init import (
-    k_tab, k_number, k_special, size, tsize
-)
+from core.init import k_tab, k_number, k_special, size, tsize
 import other_func as otf
 from core.generic import NumberTextCtrl, DoseTextCtrl
 import wx
 import sqlite3
 
 
-class DrugListItem():
-    __slots__ = ["drug_id", "times", "dose", "quantity", "name",
-                 "note", "usage", "usage_unit", "sale_unit", "sale_price"]
+class DrugListItem:
+    __slots__ = [
+        "drug_id",
+        "times",
+        "dose",
+        "quantity",
+        "name",
+        "note",
+        "usage",
+        "usage_unit",
+        "sale_unit",
+        "sale_price",
+    ]
 
-    def __init__(self,
-                 drug_id: int,
-                 times: int,
-                 dose: str,
-                 quantity: int,
-                 name: str,
-                 note: str | None,
-                 usage: str,
-                 usage_unit: str,
-                 sale_unit: str | None,
-                 sale_price: int):
+    def __init__(
+        self,
+        drug_id: int,
+        times: int,
+        dose: str,
+        quantity: int,
+        name: str,
+        note: str | None,
+        usage: str,
+        usage_unit: str,
+        sale_unit: str | None,
+        sale_price: int,
+    ):
         self.drug_id = drug_id
         self.times = times
         self.dose = dose
@@ -36,22 +46,22 @@ class DrugListItem():
         self.sale_price = sale_price
 
     @classmethod
-    def from_row(cls, row: sqlite3.Row) -> 'DrugListItem':
+    def from_row(cls, row: sqlite3.Row) -> "DrugListItem":
         return cls(
-            drug_id=int(row['drug_id']),
-            times=int(row['times']),
-            dose=row['dose'],
-            quantity=int(row['quantity']),
-            name=row['name'],
-            note=row['note'],
-            usage=row['usage'],
-            usage_unit=row['usage_unit'],
-            sale_unit=row['sale_unit'],
-            sale_price=int(row['sale_price']),
+            drug_id=int(row["drug_id"]),
+            times=int(row["times"]),
+            dose=row["dose"],
+            quantity=int(row["quantity"]),
+            name=row["name"],
+            note=row["note"],
+            usage=row["usage"],
+            usage_unit=row["usage_unit"],
+            sale_unit=row["sale_unit"],
+            sale_price=int(row["sale_price"]),
         )
 
     @classmethod
-    def from_mv(cls, mv: 'mv.MainView') -> 'DrugListItem':
+    def from_mv(cls, mv: "mv.MainView") -> "DrugListItem":
         wh = mv.state.warehouse
         page = mv.order_book.page0
         assert wh is not None
@@ -65,10 +75,10 @@ class DrugListItem():
             usage_unit=wh.usage_unit,
             sale_unit=wh.sale_unit,
             sale_price=wh.sale_price,
-            note=page.note.GetNote()
+            note=page.note.GetNote(),
         )
 
-    def expand(self) -> 'DrugListItem':
+    def expand(self) -> "DrugListItem":
         return DrugListItem(
             drug_id=self.drug_id,
             name=self.name,
@@ -79,30 +89,30 @@ class DrugListItem():
             usage_unit=self.usage_unit,
             sale_unit=self.sale_unit or self.usage_unit,
             sale_price=self.sale_price,
-            note=self.note or otf.get_usage_note_str(
+            note=self.note
+            or otf.get_usage_note_str(
                 usage=self.usage,
                 times=self.times,
                 dose=self.dose,
-                usage_unit=self.usage_unit
-            )
+                usage_unit=self.usage_unit,
+            ),
         )
 
 
 class DrugList(wx.ListCtrl):
-
-    def __init__(self, parent: 'order_book.PrescriptionPage'):
+    def __init__(self, parent: "order_book.PrescriptionPage"):
         super().__init__(parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
         self.SetBackgroundColour(wx.Colour(220, 220, 220))
         self.parent = parent
         self.mv = parent.parent.mv
-        self.SetBackgroundColour(otf.get_background_color('drug_list'))
+        self.SetBackgroundColour(otf.get_background_color("drug_list"))
         self.d_list: list[DrugListItem] = []
-        self.AppendColumn('STT', width=size(0.02))
-        self.AppendColumn('Thuốc', width=size(0.1))
-        self.AppendColumn('Số cữ', width=size(0.03))
-        self.AppendColumn('Liều', width=size(0.03))
-        self.AppendColumn('Tổng cộng', width=size(0.05))
-        self.AppendColumn('Cách dùng', width=size(0.15))
+        self.AppendColumn("STT", width=size(0.02))
+        self.AppendColumn("Thuốc", width=size(0.1))
+        self.AppendColumn("Số cữ", width=size(0.03))
+        self.AppendColumn("Liều", width=size(0.03))
+        self.AppendColumn("Tổng cộng", width=size(0.05))
+        self.AppendColumn("Cách dùng", width=size(0.15))
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onSelect)
         self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onDeselect)
 
@@ -123,14 +133,17 @@ class DrugList(wx.ListCtrl):
             _item = item.expand()
             assert _item.sale_unit is not None
             assert _item.note is not None
-            self.Append([
-                self.ItemCount + 1,
-                _item.name,
-                str(_item.times),
-                _item.dose + ' ' + _item.usage_unit,
-                str(_item.quantity) + ' ' + _item.sale_unit,
-                _item.note
-            ])
+            self.Append(
+                [
+                    self.ItemCount + 1,
+                    _item.name,
+                    str(_item.times),
+                    _item.dose + " " + _item.usage_unit,
+                    str(_item.quantity) + " " + _item.sale_unit,
+                    _item.note,
+                ]
+            )
+
         append_list(item)
         append_ui(item)
 
@@ -151,8 +164,8 @@ class DrugList(wx.ListCtrl):
             assert _item.sale_unit is not None
             assert _item.note is not None
             self.SetItem(idx, 2, str(_item.times))
-            self.SetItem(idx, 3, _item.dose + ' ' + _item.usage_unit)
-            self.SetItem(idx, 4, str(_item.quantity) + ' ' + _item.sale_unit)
+            self.SetItem(idx, 3, _item.dose + " " + _item.usage_unit)
+            self.SetItem(idx, 4, str(_item.quantity) + " " + _item.sale_unit)
             self.SetItem(idx, 5, _item.note)
 
         assert idx >= 0
@@ -194,11 +207,11 @@ class DrugList(wx.ListCtrl):
 
 
 class Times(NumberTextCtrl):
-    def __init__(self, parent: 'order_book.PrescriptionPage'):
+    def __init__(self, parent: "order_book.PrescriptionPage"):
         super().__init__(parent, size=tsize(0.03))
         self.parent = parent
-        self.SetHint('lần')
-        self.SetBackgroundColour(otf.get_background_color('drug_times'))
+        self.SetHint("lần")
+        self.SetBackgroundColour(otf.get_background_color("drug_times"))
         self.Bind(wx.EVT_TEXT, self.onText)
 
     def onText(self, e):
@@ -208,11 +221,11 @@ class Times(NumberTextCtrl):
 
 
 class Dose(DoseTextCtrl):
-    def __init__(self, parent: 'order_book.PrescriptionPage'):
+    def __init__(self, parent: "order_book.PrescriptionPage"):
         super().__init__(parent, size=tsize(0.03))
         self.parent = parent
-        self.SetHint('liều')
-        self.SetBackgroundColour(otf.get_background_color('drug_dose'))
+        self.SetHint("liều")
+        self.SetBackgroundColour(otf.get_background_color("drug_dose"))
         self.Bind(wx.EVT_TEXT, self.onText)
 
     def onText(self, e):
@@ -222,12 +235,11 @@ class Dose(DoseTextCtrl):
 
 
 class Quantity(NumberTextCtrl):
-
-    def __init__(self, parent: 'order_book.PrescriptionPage'):
+    def __init__(self, parent: "order_book.PrescriptionPage"):
         super().__init__(parent, size=tsize(0.03), style=wx.TE_PROCESS_TAB)
         self.parent = parent
-        self.SetHint('Enter')
-        self.SetBackgroundColour(otf.get_background_color('drug_quantity'))
+        self.SetHint("Enter")
+        self.SetBackgroundColour(otf.get_background_color("drug_quantity"))
         self.Bind(wx.EVT_CHAR, self.onChar)
 
     def FetchQuantity(self):
@@ -241,7 +253,7 @@ class Quantity(NumberTextCtrl):
         if res is not None:
             self.SetValue(str(res))
         else:
-            self.SetValue('')
+            self.SetValue("")
 
     def onChar(self, e: wx.KeyEvent):
         kc = e.KeyCode
@@ -256,11 +268,11 @@ class Quantity(NumberTextCtrl):
 
 
 class Note(wx.TextCtrl):
-    def __init__(self, parent: 'order_book.PrescriptionPage'):
+    def __init__(self, parent: "order_book.PrescriptionPage"):
         super().__init__(parent, style=wx.TE_PROCESS_ENTER)
         self.parent = parent
         self.Bind(wx.EVT_CHAR, self.onChar)
-        self.SetBackgroundColour(otf.get_background_color('drug_note'))
+        self.SetBackgroundColour(otf.get_background_color("drug_note"))
 
     def onChar(self, e: wx.KeyEvent):
         if e.KeyCode in (wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER):
@@ -273,12 +285,14 @@ class Note(wx.TextCtrl):
     def FetchNote(self):
         wh = self.parent.parent.mv.state.warehouse
         assert wh is not None
-        self.ChangeValue(otf.get_usage_note_str(
-            usage=wh.usage,
-            times=self.parent.times.GetValue(),
-            dose=self.parent.dose.GetValue(),
-            usage_unit=wh.usage_unit
-        ))
+        self.ChangeValue(
+            otf.get_usage_note_str(
+                usage=wh.usage,
+                times=self.parent.times.GetValue(),
+                dose=self.parent.dose.GetValue(),
+                usage_unit=wh.usage_unit,
+            )
+        )
 
     def SetNote(self, s: str | None):
         if s is None:
@@ -288,7 +302,7 @@ class Note(wx.TextCtrl):
                 usage=wh.usage,
                 times=self.parent.times.Value,
                 dose=self.parent.dose.Value,
-                usage_unit=wh.usage_unit
+                usage_unit=wh.usage_unit,
             )
         self.ChangeValue(s)
 
@@ -297,11 +311,11 @@ class Note(wx.TextCtrl):
         s = _s.strip()
         wh = self.parent.parent.mv.state.warehouse
         assert wh is not None
-        if s == '' or s == otf.get_usage_note_str(
+        if s == "" or s == otf.get_usage_note_str(
             usage=wh.usage,
             times=self.parent.times.Value,
             dose=self.parent.dose.Value,
-            usage_unit=wh.usage_unit
+            usage_unit=wh.usage_unit,
         ):
             return None
         else:

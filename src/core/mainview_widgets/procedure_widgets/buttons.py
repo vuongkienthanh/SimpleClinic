@@ -5,9 +5,8 @@ import wx
 
 
 class AddProcedureButton(wx.BitmapButton):
-    def __init__(self, parent: 'order_book.ProcedurePage'):
-        super().__init__(parent,
-                         bitmap=wx.Bitmap(plus_bm))
+    def __init__(self, parent: "order_book.ProcedurePage"):
+        super().__init__(parent, bitmap=wx.Bitmap(plus_bm))
         self.parent = parent
         self.mv = parent.mv
         self.Bind(wx.EVT_BUTTON, self.onClick)
@@ -22,9 +21,8 @@ class AddProcedureButton(wx.BitmapButton):
 
 
 class DelProcedureButton(wx.BitmapButton):
-    def __init__(self, parent: 'order_book.ProcedurePage'):
-        super().__init__(parent,
-                         bitmap=wx.Bitmap(minus_bm))
+    def __init__(self, parent: "order_book.ProcedurePage"):
+        super().__init__(parent, bitmap=wx.Bitmap(minus_bm))
         self.parent = parent
         self.mv = parent.mv
         self.Bind(wx.EVT_BUTTON, self.onClick)

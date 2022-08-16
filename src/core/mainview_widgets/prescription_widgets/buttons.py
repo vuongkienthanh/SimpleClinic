@@ -8,9 +8,8 @@ import wx
 
 
 class AddDrugButton(wx.BitmapButton):
-    def __init__(self, parent: 'order_book.PrescriptionPage'):
-        super().__init__(parent,
-                         bitmap=wx.Bitmap(plus_bm))
+    def __init__(self, parent: "order_book.PrescriptionPage"):
+        super().__init__(parent, bitmap=wx.Bitmap(plus_bm))
         self.parent = parent
         self.Bind(wx.EVT_BUTTON, self.onClick)
 
@@ -26,9 +25,8 @@ class AddDrugButton(wx.BitmapButton):
 
 
 class DelDrugButton(wx.BitmapButton):
-    def __init__(self, parent: 'order_book.PrescriptionPage'):
-        super().__init__(parent,
-                         bitmap=wx.Bitmap(minus_bm))
+    def __init__(self, parent: "order_book.PrescriptionPage"):
+        super().__init__(parent, bitmap=wx.Bitmap(minus_bm))
         self.parent = parent
         self.Bind(wx.EVT_BUTTON, self.onClick)
 
@@ -41,9 +39,8 @@ class DelDrugButton(wx.BitmapButton):
 
 
 class ReuseDrugListButton(wx.Button):
-    def __init__(self, parent: 'order_book.PrescriptionPage'):
-        super().__init__(parent,
-                         label='Lượt khám mới với toa cũ này')
+    def __init__(self, parent: "order_book.PrescriptionPage"):
+        super().__init__(parent, label="Lượt khám mới với toa cũ này")
         self.parent = parent
         self.mv = parent.parent.mv
         self.Disable()
@@ -59,7 +56,7 @@ class ReuseDrugListButton(wx.Button):
 
 
 class UseSamplePrescriptionBtn(wx.Button):
-    def __init__(self, parent: 'order_book.PrescriptionPage'):
+    def __init__(self, parent: "order_book.PrescriptionPage"):
         super().__init__(parent, label="Sử dụng toa mẫu")
         self.parent = parent
         self.mv = parent.parent.mv
@@ -73,7 +70,8 @@ class UseSamplePrescriptionBtn(wx.Button):
             if idx != -1:
                 self.parent.drug_list.DeleteAllItems()
                 sp = self.mv.state.sampleprescriptionlist[idx]
-                llsp = self.mv.con.execute(f"""
+                llsp = self.mv.con.execute(
+                    f"""
                     SELECT lsp.drug_id, wh.name, lsp.times, lsp.dose, wh.usage, wh.usage_unit, wh.sale_unit, wh.sale_price
                     FROM (
                         SELECT * FROM {LineSamplePrescription.table_name} 
@@ -81,21 +79,25 @@ class UseSamplePrescriptionBtn(wx.Button):
                     ) AS lsp
                     JOIN {Warehouse.table_name} as wh
                     ON wh.id = lsp.drug_id
-                """).fetchall()
+                """
+                ).fetchall()
                 for lsp in llsp:
-                    q = calc_quantity(lsp['times'], lsp['dose'], self.mv.days.Value,
-                                      lsp['sale_unit'])
+                    q = calc_quantity(
+                        lsp["times"], lsp["dose"], self.mv.days.Value, lsp["sale_unit"]
+                    )
                     assert q is not None
-                    self.parent.drug_list.append(prescription_widgets.DrugListItem(
-                        drug_id=lsp['drug_id'],
-                        times=lsp['times'],
-                        dose=lsp['dose'],
-                        quantity=q,
-                        name=lsp['name'],
-                        note=None,
-                        usage=lsp['usage'],
-                        usage_unit=lsp['usage_unit'],
-                        sale_unit=lsp['sale_unit'],
-                        sale_price=lsp['sale_price'],
-                    ))
+                    self.parent.drug_list.append(
+                        prescription_widgets.DrugListItem(
+                            drug_id=lsp["drug_id"],
+                            times=lsp["times"],
+                            dose=lsp["dose"],
+                            quantity=q,
+                            name=lsp["name"],
+                            note=None,
+                            usage=lsp["usage"],
+                            usage_unit=lsp["usage_unit"],
+                            sale_unit=lsp["sale_unit"],
+                            sale_price=lsp["sale_price"],
+                        )
+                    )
                     self.mv.price.FetchPrice()

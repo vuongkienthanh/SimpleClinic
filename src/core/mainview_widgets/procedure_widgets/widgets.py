@@ -17,7 +17,7 @@ class ProcedureListItem:
 class ProcedureListCtrl(wx.ListCtrl):
     def __init__(self, parent):
         super().__init__(parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
-        self.SetBackgroundColour(otf.get_background_color('procedure_list'))
+        self.SetBackgroundColour(otf.get_background_color("procedure_list"))
         self.AppendColumn("Tên thủ thuật", width=size(0.2))
         self.pr_list: list[ProcedureListItem] = []
 
@@ -28,18 +28,12 @@ class ProcedureListCtrl(wx.ListCtrl):
     def rebuild(self, llp: list[sqlite3.Row]):
         self.clear()
         for lp in llp:
-            self.Append((lp['name'], ))
-            self.pr_list.append(ProcedureListItem(
-                lp['pr_id'],
-                lp['name'],
-                lp['price']))
+            self.Append((lp["name"],))
+            self.pr_list.append(ProcedureListItem(lp["pr_id"], lp["name"], lp["price"]))
 
     def append(self, pr: Procedure):
         self.Append((pr.name,))
-        self.pr_list.append(ProcedureListItem(
-            pr.id,
-            pr.name,
-            pr.price))
+        self.pr_list.append(ProcedureListItem(pr.id, pr.name, pr.price))
 
     def update(self, pr: Procedure):
         for i in range(len(self.pr_list)):

@@ -21,13 +21,17 @@ class GetWeightBtn(wx.BitmapButton):
     def onClick(self, e: wx.CommandEvent):
         visit_count = self.mv.visit_list.GetItemCount()
         if self.mv.state.patient and (visit_count > 0):
-            self.mv.weight.SetWeight(self.mv.con.execute(f"""
+            self.mv.weight.SetWeight(
+                self.mv.con.execute(
+                    f"""
                 SELECT weight
                 FROM {Visit.table_name}
                 WHERE (patient_id) = {self.mv.state.patient.id}
                 ORDER BY exam_datetime DESC
                 LIMIT 1
-            """).fetchone()['weight'])
+            """
+                ).fetchone()["weight"]
+            )
 
 
 class NoRecheckBtn(wx.Button):
@@ -64,12 +68,11 @@ class UpdateQuantityBtn(wx.BitmapButton):
                 times=item.times,
                 dose=item.dose,
                 days=self.mv.days.GetValue(),
-                sale_unit=item.sale_unit
+                sale_unit=item.sale_unit,
             )
             assert q is not None
             item.quantity = q
-            drug_list.SetItem(
-                idx, 4, f"{q} {item.sale_unit or item.usage_unit}")
+            drug_list.SetItem(idx, 4, f"{q} {item.sale_unit or item.usage_unit}")
         self.mv.price.FetchPrice()
         self.Disable()
 
@@ -110,64 +113,81 @@ class SaveBtn(wx.Button):
             assert p is not None
             past_history = otf.check_blank(self.mv.past_history.GetValue())
             v = {
-                'diagnosis': diagnosis.strip(),
-                'weight': self.mv.weight.GetWeight(),
-                'days': self.mv.days.GetValue(),
-                'recheck': self.mv.recheck.GetValue(),
-                'patient_id': p.id,
-                'vnote': otf.check_blank(self.mv.vnote.GetValue()),
-                'follow': self.mv.follow.GetFollow(),
+                "diagnosis": diagnosis.strip(),
+                "weight": self.mv.weight.GetWeight(),
+                "days": self.mv.days.GetValue(),
+                "recheck": self.mv.recheck.GetValue(),
+                "patient_id": p.id,
+                "vnote": otf.check_blank(self.mv.vnote.GetValue()),
+                "follow": self.mv.follow.GetFollow(),
             }
             try:
                 with self.mv.con as con:
-                    con.execute(f"""
+                    con.execute(
+                        f"""
                         UPDATE {Patient.table_name} SET past_history = ?
                         WHERE id = {p.id}
-                    """, (past_history,))
-                    vid = con.execute(f"""
+                    """,
+                        (past_history,),
+                    )
+                    vid = con.execute(
+                        f"""
                         INSERT INTO {Visit.table_name} ({Visit.commna_joined_fields()})
                         VALUES ({Visit.named_style_fields()})
-                    """, v).lastrowid
+                    """,
+                        v,
+                    ).lastrowid
                     assert vid is not None
                     insert_ld = []
                     for item in self.mv.order_book.page0.drug_list.d_list:
-                        insert_ld.append({
-                            'drug_id': item.drug_id,
-                            'dose': item.dose,
-                            'times': item.times,
-                            'quantity': item.quantity,
-                            'visit_id': vid,
-                            'note': item.note,
-                        })
-                    con.executemany(f"""
+                        insert_ld.append(
+                            {
+                                "drug_id": item.drug_id,
+                                "dose": item.dose,
+                                "times": item.times,
+                                "quantity": item.quantity,
+                                "visit_id": vid,
+                                "note": item.note,
+                            }
+                        )
+                    con.executemany(
+                        f"""
                         INSERT INTO {LineDrug.table_name} ({LineDrug.commna_joined_fields()})
                         VALUES ({LineDrug.named_style_fields()})
-                    """, insert_ld)
+                    """,
+                        insert_ld,
+                    )
                     insert_lp = []
                     for item in self.mv.order_book.page1.procedurelistctrl.pr_list:
-                        insert_lp.append({
-                            'procedure_id': item.pr_id,
-                            'visit_id': vid,
-                        })
-                    con.executemany(f"""
+                        insert_lp.append(
+                            {
+                                "procedure_id": item.pr_id,
+                                "visit_id": vid,
+                            }
+                        )
+                    con.executemany(
+                        f"""
                         INSERT INTO {LineProcedure.table_name} ({LineProcedure.commna_joined_fields()})
                         VALUES ({LineProcedure.named_style_fields()})
-                    """, insert_lp)
-                    wx.MessageBox("Lưu lượt khám mới thành công",
-                                  "Lưu lượt khám mới")
-                    if wx.MessageBox("In toa về?", "In toa", style=wx.YES | wx.NO) == wx.YES:
+                    """,
+                        insert_lp,
+                    )
+                    wx.MessageBox("Lưu lượt khám mới thành công", "Lưu lượt khám mới")
+                    if (
+                        wx.MessageBox("In toa về?", "In toa", style=wx.YES | wx.NO)
+                        == wx.YES
+                    ):
                         printout = PrintOut(self.mv)
-                        wx.Printer(
-                            wx.PrintDialogData(printdata)
-                        ).Print(self, printout, False)
+                        wx.Printer(wx.PrintDialogData(printdata)).Print(
+                            self, printout, False
+                        )
                     self.mv.state.refresh()
             except sqlite3.IntegrityError as error:
                 for a in error.args:
                     if a == "CHECK constraint failed: shortage":
                         wx.MessageBox("Lỗi hết thuốc trong kho", "Lỗi")
                     else:
-                        wx.MessageBox(
-                            f"Lỗi không lưu lượt khám được\n{error}", "Lỗi")
+                        wx.MessageBox(f"Lỗi không lưu lượt khám được\n{error}", "Lỗi")
             except Exception as error:
                 wx.MessageBox(f"Lỗi không lưu lượt khám được\n{error}", "Lỗi")
 
@@ -195,80 +215,102 @@ class SaveBtn(wx.Button):
             # update same drug_id
             for drug in drug_list:
                 for origin in lld:
-                    if drug.drug_id == origin['drug_id']:
-                        update_ld.append((
-                            drug.dose,
-                            drug.times,
-                            drug.quantity,
-                            drug.note,
-                            origin['id'],
-                        ))
-                        update_ld_id.append(origin['id'])
-                        update_drug_id.append(origin['drug_id'])
+                    if drug.drug_id == origin["drug_id"]:
+                        update_ld.append(
+                            (
+                                drug.dose,
+                                drug.times,
+                                drug.quantity,
+                                drug.note,
+                                origin["id"],
+                            )
+                        )
+                        update_ld_id.append(origin["id"])
+                        update_drug_id.append(origin["drug_id"])
             # delete those in lld but not in update
             for origin in lld:
-                if origin['id'] not in update_ld_id:
-                    delete_ld.append((origin['id'],))
+                if origin["id"] not in update_ld_id:
+                    delete_ld.append((origin["id"],))
             # insert those in drug_list but not in update
             for drug in drug_list:
                 if drug.drug_id not in update_drug_id:
-                    insert_ld.append({
-                        'drug_id': drug.drug_id,
-                        'dose': drug.dose,
-                        'times': drug.times,
-                        'quantity': drug.quantity,
-                        'visit_id': v.id,
-                        'note': drug.note,
-                    })
+                    insert_ld.append(
+                        {
+                            "drug_id": drug.drug_id,
+                            "dose": drug.dose,
+                            "times": drug.times,
+                            "quantity": drug.quantity,
+                            "visit_id": v.id,
+                            "note": drug.note,
+                        }
+                    )
 
-            insert_lp = [{
-                'procedure_id': pr.pr_id,
-                'visit_id': v.id
-            } for pr in self.mv.order_book.page1.procedurelistctrl.pr_list]
+            insert_lp = [
+                {"procedure_id": pr.pr_id, "visit_id": v.id}
+                for pr in self.mv.order_book.page1.procedurelistctrl.pr_list
+            ]
 
             try:
                 with self.mv.con as con:
-                    con.execute(f"""
+                    con.execute(
+                        f"""
                         UPDATE {Patient.table_name} SET past_history = ?
                         WHERE id = {p.id}
-                    """, (past_history,))
-                    con.execute(f"""
+                    """,
+                        (past_history,),
+                    )
+                    con.execute(
+                        f"""
                         UPDATE {Visit.table_name} SET ({Visit.commna_joined_fields()})
                         = ({Visit.qmark_style_fields()})
                         WHERE id = {v.id}
-                    """, v.into_qmark_style_params())
-                    con.executemany(f"""
+                    """,
+                        v.into_qmark_style_params(),
+                    )
+                    con.executemany(
+                        f"""
                         UPDATE {LineDrug.table_name}
                         SET (dose, times, quantity, note) = (?,?,?,?)
                         WHERE id=?
-                    """, update_ld)
+                    """,
+                        update_ld,
+                    )
                     con.executemany(
-                        f"DELETE FROM {LineDrug.table_name} WHERE id = ?",
-                        delete_ld)
-                    con.executemany(f"""
+                        f"DELETE FROM {LineDrug.table_name} WHERE id = ?", delete_ld
+                    )
+                    con.executemany(
+                        f"""
                         INSERT INTO {LineDrug.table_name} ({LineDrug.commna_joined_fields()})
                         VALUES ({LineDrug.named_style_fields()})
-                    """, insert_ld)
+                    """,
+                        insert_ld,
+                    )
                     con.execute(
                         f"DELETE FROM {LineProcedure.table_name} WHERE visit_id = ?",
-                        (v.id,))
-                    con.executemany(f"""
+                        (v.id,),
+                    )
+                    con.executemany(
+                        f"""
                         INSERT INTO {LineProcedure.table_name} ({LineProcedure.commna_joined_fields()})
                         VALUES ({LineProcedure.named_style_fields()})
-                    """, insert_lp)
-                wx.MessageBox("Cập nhật lượt khám thành công",
-                              "Cập nhật lượt khám")
-                if wx.MessageBox("In toa về?", "In toa", style=wx.YES | wx.NO) == wx.YES:
+                    """,
+                        insert_lp,
+                    )
+                wx.MessageBox("Cập nhật lượt khám thành công", "Cập nhật lượt khám")
+                if (
+                    wx.MessageBox("In toa về?", "In toa", style=wx.YES | wx.NO)
+                    == wx.YES
+                ):
                     printout = PrintOut(self.mv)
-                    wx.Printer(wx.PrintDialogData(printdata)
-                               ).Print(self, printout, False)
+                    wx.Printer(wx.PrintDialogData(printdata)).Print(
+                        self, printout, False
+                    )
                 self.mv.state.refresh()
             except sqlite3.IntegrityError as error:
                 for a in error.args:
                     if a == "CHECK constraint failed: shortage":
                         wx.MessageBox("Lỗi hết thuốc trong kho", "Lỗi")
                     else:
-                        wx.MessageBox(
-                            f"Lỗi không lưu lượt khám được\n{error}", "Lỗi")
+                        wx.MessageBox(f"Lỗi không lưu lượt khám được\n{error}", "Lỗi")
             except Exception as error:
                 wx.MessageBox(f"Lỗi không lưu lượt khám được\n{error}", "Lỗi")

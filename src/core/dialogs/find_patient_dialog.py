@@ -11,16 +11,14 @@ import sqlite3
 class SearchPatientList(wx.ListCtrl):
     """Listctrl with next,prev button, fetch cursor when needed"""
 
-    def __init__(self, parent: 'FindPatientDialog', num_of_lines: int):
+    def __init__(self, parent: "FindPatientDialog", num_of_lines: int):
         super().__init__(
-            parent,
-            style=wx.LC_REPORT | wx.LC_SINGLE_SEL,
-            size=(-1, 26 * num_of_lines)
+            parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL, size=(-1, 26 * num_of_lines)
         )
-        self.AppendColumn('Mã BN', width=size(0.03))
-        self.AppendColumn('Họ tên', width=size(0.1))
-        self.AppendColumn('Giới', width=size(0.03))
-        self.AppendColumn('Ngày sinh', width=size(0.06))
+        self.AppendColumn("Mã BN", width=size(0.03))
+        self.AppendColumn("Họ tên", width=size(0.1))
+        self.AppendColumn("Giới", width=size(0.03))
+        self.AppendColumn("Ngày sinh", width=size(0.06))
         self.num_of_lines = num_of_lines
         self.page_index: int = 0
         self.saved_pages: list[list] = []
@@ -42,12 +40,14 @@ class SearchPatientList(wx.ListCtrl):
         e.Skip()
 
     def append_ui(self, row: sqlite3.Row):
-        self.Append([
-            row['pid'],
-            row['name'],
-            str(row['gender']),
-            row['birthdate'].strftime("%d/%m/%Y")
-        ])
+        self.Append(
+            [
+                row["pid"],
+                row["name"],
+                str(row["gender"]),
+                row["birthdate"].strftime("%d/%m/%Y"),
+            ]
+        )
 
     def new_page(self):
         self.saved_pages.append(self.cur_page)
@@ -104,7 +104,7 @@ class SearchPatientList(wx.ListCtrl):
 
 
 class FindPatientDialog(wx.Dialog):
-    def __init__(self, parent: 'mainview.MainView'):
+    def __init__(self, parent: "mainview.MainView"):
         super().__init__(parent, title="Tìm bệnh nhân")
         self.mv = parent
         self.cur = None
@@ -128,39 +128,48 @@ class FindPatientDialog(wx.Dialog):
         self.editbtn.Disable()
         self.delbtn.Disable()
 
-        def widget(w): return (w, 0, wx.EXPAND | wx.ALL, 5)
+        def widget(w):
+            return (w, 0, wx.EXPAND | wx.ALL, 5)
 
         navi_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        navi_sizer.AddMany([
-            (0, 0, 1),
-            widget(self.prevbtn),
-            widget(self.nextbtn),
-            (0, 0, 1),
-        ])
+        navi_sizer.AddMany(
+            [
+                (0, 0, 1),
+                widget(self.prevbtn),
+                widget(self.nextbtn),
+                (0, 0, 1),
+            ]
+        )
         opt_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        opt_sizer.AddMany([
-            (0, 0, 1),
-            widget(self.allbtn),
-            widget(self.atdatebtn),
-            (0, 0, 1),
-        ])
+        opt_sizer.AddMany(
+            [
+                (0, 0, 1),
+                widget(self.allbtn),
+                widget(self.atdatebtn),
+                (0, 0, 1),
+            ]
+        )
         btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        btn_sizer.AddMany([
-            (0, 0, 1),
-            widget(self.addqueuebtn),
-            widget(self.editbtn),
-            widget(self.delbtn),
-            widget(self.cancelbtn),
-        ])
+        btn_sizer.AddMany(
+            [
+                (0, 0, 1),
+                widget(self.addqueuebtn),
+                widget(self.editbtn),
+                widget(self.delbtn),
+                widget(self.cancelbtn),
+            ]
+        )
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.AddMany([
-            widget(self.search),
-            widget(wx.StaticText(self, label="Danh sách bệnh nhân")),
-            widget(self.lc),
-            widget(navi_sizer),
-            widget(opt_sizer),
-            widget(btn_sizer),
-        ])
+        sizer.AddMany(
+            [
+                widget(self.search),
+                widget(wx.StaticText(self, label="Danh sách bệnh nhân")),
+                widget(self.lc),
+                widget(navi_sizer),
+                widget(opt_sizer),
+                widget(btn_sizer),
+            ]
+        )
         self.SetSizerAndFit(sizer)
 
         self.search.Bind(wx.EVT_SEARCH, self.onSearch)
@@ -180,11 +189,14 @@ class FindPatientDialog(wx.Dialog):
         "Enter (EVT_SEARCH) to activate"
         s: str = e.GetString()
         s = s.upper()
-        self.cur = self.mv.con.execute(f"""
+        self.cur = self.mv.con.execute(
+            f"""
             SELECT id AS pid, name, gender, birthdate
             FROM {Patient.table_name}
             WHERE name LIKE ?
-        """, ('%' + s + '%',))
+        """,
+            ("%" + s + "%",),
+        )
         self.rebuild()
 
     def rebuild(self):
@@ -243,23 +255,27 @@ class FindPatientDialog(wx.Dialog):
         e.Skip()
 
     def onAll(self, e: wx.CommandEvent):
-        self.cur = self.mv.con.execute(f"""
+        self.cur = self.mv.con.execute(
+            f"""
             SELECT id AS pid, name, gender, birthdate
             FROM {Patient.table_name}
-        """)
+        """
+        )
         self.rebuild()
 
     def onAtDate(self, e: wx.CommandEvent):
         dlg = DatePickerDialog(self.mv)
         if dlg.ShowModal() == wx.ID_OK:
             d = dlg.GetDate()
-            self.cur = self.mv.con.execute(f"""
+            self.cur = self.mv.con.execute(
+                f"""
                 SELECT p.id AS pid, name, gender, birthdate
                 FROM {Visit.table_name} as v
                 JOIN {Patient.table_name} as p
                 ON p.id = v.patient_id
                 WHERE DATE(v.exam_datetime) = '{d.strftime("%Y-%m-%d")}'
-            """)
+            """
+            )
             self.rebuild()
 
     def onNext(self, e: wx.CommandEvent):
@@ -277,7 +293,7 @@ class FindPatientDialog(wx.Dialog):
         pid = self.lc.pid
         assert pid is not None
         try:
-            self.mv.con.insert(QueueList, {'patient_id': pid})
+            self.mv.con.insert(QueueList, {"patient_id": pid})
             wx.MessageBox("Thêm vào danh sách chờ thành công", "OK")
             self.mv.state.queuelist = self.mv.state.get_queuelist()
         except sqlite3.IntegrityError as error:
@@ -293,7 +309,14 @@ class FindPatientDialog(wx.Dialog):
         EditFindPatientDialog(self).ShowModal()
 
     def onDelete(self, e: wx.CommandEvent):
-        if wx.MessageBox("Xác nhận?", "Xóa bệnh nhân", style=wx.YES_NO | wx.NO_DEFAULT | wx.CENTRE) == wx.YES:
+        if (
+            wx.MessageBox(
+                "Xác nhận?",
+                "Xóa bệnh nhân",
+                style=wx.YES_NO | wx.NO_DEFAULT | wx.CENTRE,
+            )
+            == wx.YES
+        ):
             pid = self.lc.pid
             assert pid is not None
             try:

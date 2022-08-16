@@ -4,7 +4,7 @@ import sqlite3
 from decimal import Decimal
 
 
-class Connection():
+class Connection:
     def __init__(self, path: str):
         self.path = path
         self.sqlcon = self._get_db_connection(path)
@@ -20,6 +20,7 @@ class Connection():
 
             def convert(b: bytes) -> Decimal:
                 return Decimal(b.decode())
+
             sqlite3.register_adapter(Decimal, adapt)
             sqlite3.register_converter("DECIMAL", convert)
 
@@ -29,6 +30,7 @@ class Connection():
 
             def convert(b: bytes) -> Gender:
                 return Gender(int(b))
+
             sqlite3.register_adapter(Gender, adapt)
             sqlite3.register_converter("GENDER", convert)
 
@@ -56,12 +58,13 @@ class Connection():
 
     def insert(self, t: type[BASE], base: dict) -> int | None:
         with self.sqlcon as con:
-            cur = con.execute(f"""
+            cur = con.execute(
+                f"""
                 INSERT INTO {t.table_name} ({t.commna_joined_fields()})
                 VALUES ({t.named_style_fields()})
             """,
-                              base
-                              )
+                base,
+            )
             assert cur.lastrowid is not None
             return cur.lastrowid
 
@@ -75,27 +78,24 @@ class Connection():
             return t.parse(row)
 
     def selectall(self, t: type[T]) -> list[T]:
-        rows = self.execute(
-            f"SELECT * FROM {t.table_name}"
-        ).fetchall()
+        rows = self.execute(f"SELECT * FROM {t.table_name}").fetchall()
         return [t.parse(row) for row in rows]
 
     def delete(self, t: type[BASE], id: int) -> int | None:
         with self.sqlcon as con:
-            return con.execute(
-                f"DELETE FROM {t.table_name} WHERE id = {id}"
-            ).rowcount
+            return con.execute(f"DELETE FROM {t.table_name} WHERE id = {id}").rowcount
 
     def update(self, base: BASE) -> int | None:
         t = type(base)
         with self.sqlcon as con:
-            return con.execute(f"""
+            return con.execute(
+                f"""
                 UPDATE {t.table_name} SET ({t.commna_joined_fields()})
                 = ({t.qmark_style_fields()})
                 WHERE id = {base.id}
             """,
-                               base.into_qmark_style_params()
-                               ).rowcount
+                base.into_qmark_style_params(),
+            ).rowcount
 
     def vacuum(self):
         pre = os.path.getsize(self.path)

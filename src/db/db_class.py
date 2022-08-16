@@ -17,12 +17,13 @@ class Gender(enum.Enum):
 
 
 @dataclass
-class BASE():
+class BASE:
     """
     Base Abstract Class for derived sql table
     - `table_name`: name of table in sqlite database
-    - `not_in_fields`: names of fields that are not returned by classmethod fields() 
+    - `not_in_fields`: names of fields that are not returned by classmethod fields()
     """
+
     table_name: ClassVar[str]
     not_in_fields: ClassVar[list[str]]
     id: int
@@ -39,14 +40,16 @@ class BASE():
         """
         Return fields used in sql insert & update string
         """
-        return tuple((f.name for f in dataclasses.fields(cls) if f.name not in cls.not_in_fields))
+        return tuple(
+            (f.name for f in dataclasses.fields(cls) if f.name not in cls.not_in_fields)
+        )
 
     @classmethod
     def commna_joined_fields(cls) -> str:
         """
         Return comma-joined fields
         """
-        return ','.join(cls.fields())
+        return ",".join(cls.fields())
 
     @classmethod
     def qmark_style_fields(cls) -> str:
@@ -54,14 +57,14 @@ class BASE():
         Return qmark-style placeholders
         """
         num_of_qmark = len(cls.fields())
-        return ','.join(['?'] * num_of_qmark)
+        return ",".join(["?"] * num_of_qmark)
 
     @classmethod
     def named_style_fields(cls) -> str:
         """
         Return named-style placeholders
         """
-        return ','.join([f":{f}" for f in cls.fields()])
+        return ",".join([f":{f}" for f in cls.fields()])
 
     def into_qmark_style_params(self) -> tuple:
         """
@@ -78,7 +81,7 @@ class BASE():
 
 @dataclass
 class Patient(BASE):
-    """ Bệnh nhân
+    """Bệnh nhân
     - `name`: Tên
     - `gender`: Giới tính
     - `birthdate`: Ngày tháng năm sinh
@@ -86,8 +89,9 @@ class Patient(BASE):
     - `phone`: Số điện thoại
     - `past_history`: Tiền căn, dị ứng
     """
-    table_name = 'patients'
-    not_in_fields = ['id']
+
+    table_name = "patients"
+    not_in_fields = ["id"]
     id: int
     name: str
     gender: Gender
@@ -99,12 +103,13 @@ class Patient(BASE):
 
 @dataclass
 class QueueList(BASE):
-    """ Lượt chờ khám
+    """Lượt chờ khám
     - `added_datetime`: Giờ đăng ký
     - `patient_id`: Mã bệnh nhân
     """
-    table_name = 'queuelist'
-    not_in_fields = ['id', 'added_datetime']
+
+    table_name = "queuelist"
+    not_in_fields = ["id", "added_datetime"]
     id: int
     added_datetime: dt.datetime
     patient_id: int
@@ -122,8 +127,9 @@ class Visit(BASE):
     - `follow`: Lời dặn dò
     - `vnote`: Bệnh sử
     """
-    table_name = 'visits'
-    not_in_fields = ['id', 'exam_datetime']
+
+    table_name = "visits"
+    not_in_fields = ["id", "exam_datetime"]
     id: int
     exam_datetime: dt.datetime
     diagnosis: str
@@ -144,8 +150,9 @@ class LineDrug(BASE):
     - `quantity`: Số lượng
     - `visit_id`: Mã lượt khám
     """
-    table_name = 'linedrugs'
-    not_in_fields = ['id']
+
+    table_name = "linedrugs"
+    not_in_fields = ["id"]
     id: int
     drug_id: int
     dose: str
@@ -170,8 +177,9 @@ class Warehouse(BASE):
     - `made_by`: Xuất xứ
     - `note`: Ghi chú
     """
-    table_name = 'warehouse'
-    not_in_fields = ['id']
+
+    table_name = "warehouse"
+    not_in_fields = ["id"]
     id: int
     name: str
     element: str
@@ -191,8 +199,9 @@ class SamplePrescription(BASE):
     """Toa mẫu
     - `name`: Tên toa mẫu
     """
-    table_name = 'sampleprescription'
-    not_in_fields = ['id']
+
+    table_name = "sampleprescription"
+    not_in_fields = ["id"]
     id: int
     name: str
 
@@ -205,8 +214,9 @@ class LineSamplePrescription(BASE):
     - `times`: Liều một cữ
     - `dose`: Số cữ
     """
-    table_name = 'linesampleprescription'
-    not_in_fields = ['id']
+
+    table_name = "linesampleprescription"
+    not_in_fields = ["id"]
     id: int
     drug_id: int
     sample_id: int
@@ -219,8 +229,9 @@ class Procedure(BASE):
     """Thủ thuật
     - `name`: tên
     - `price`: giá"""
-    table_name = 'procedures'
-    not_in_fields = ['id']
+
+    table_name = "procedures"
+    not_in_fields = ["id"]
     id: int
     name: str
     price: int
@@ -229,14 +240,15 @@ class Procedure(BASE):
 @dataclass
 class LineProcedure(BASE):
     """Thủ thuật của lượt khám"""
-    table_name = 'lineprocedure'
-    not_in_fields = ['id']
+
+    table_name = "lineprocedure"
+    not_in_fields = ["id"]
     id: int
     procedure_id: int
     visit_id: int
 
 
-T = TypeVar('T', bound='BASE')
+T = TypeVar("T", bound="BASE")
 
 
 create_table_sql = f"""

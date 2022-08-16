@@ -10,6 +10,7 @@ class App(wx.App):
     def __init__(self, con: dbf.Connection):
         super().__init__()
         from core.mainview import MainView
+
         mv = MainView(con)
         self.SetTopWindow(mv)
         mv.Show()
@@ -17,12 +18,13 @@ class App(wx.App):
 
 
 def platform_settings():
-    if sys.platform == 'win32':
+    if sys.platform == "win32":
         import ctypes
+
         ctypes.windll.shcore.SetProcessDpiAwareness(True)
-    elif sys.platform == 'linux':
+    elif sys.platform == "linux":
         # light theme
-        os.environ['GTK_THEME'] = "Default " + os.path.join(SRC_DIR, "main.py")
+        os.environ["GTK_THEME"] = "Default " + os.path.join(SRC_DIR, "main.py")
         pass
 
 

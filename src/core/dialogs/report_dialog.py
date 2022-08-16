@@ -9,22 +9,25 @@ import sqlite3
 
 
 class DayReportDialog(wx.Dialog):
-    def __init__(self, parent: 'mv.MainView', date: dt.date):
+    def __init__(self, parent: "mv.MainView", date: dt.date):
         super().__init__(parent, title="Báo cáo ngày")
         self.mv = parent
         res = self.get_report(date)
 
         def w(s: str):
             return (wx.StaticText(self, label=s), 0, wx.EXPAND | wx.ALL, 5)
+
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.AddMany([
-            w(f"Số ca khám: {res['visit_count']}"),
-            w(f"Doanh thu: {otf.num_to_str(res['revenue'])}"),
-            w(f"Tổng tiền thuốc (giá mua): {otf.num_to_str(res['drug_purchase'])}"),
-            w(f"Tổng tiền thuốc (giá bán): {otf.num_to_str(res['drug_sale'])}"),
-            w(f"Lợi nhuận từ thuốc: {otf.num_to_str(res['profit_from_drug'])}"),
-            w(f"Lợi nhuận từ thủ thuật: {otf.num_to_str(res['procedure'])}"),
-        ])
+        sizer.AddMany(
+            [
+                w(f"Số ca khám: {res['visit_count']}"),
+                w(f"Doanh thu: {otf.num_to_str(res['revenue'])}"),
+                w(f"Tổng tiền thuốc (giá mua): {otf.num_to_str(res['drug_purchase'])}"),
+                w(f"Tổng tiền thuốc (giá bán): {otf.num_to_str(res['drug_sale'])}"),
+                w(f"Lợi nhuận từ thuốc: {otf.num_to_str(res['profit_from_drug'])}"),
+                w(f"Lợi nhuận từ thủ thuật: {otf.num_to_str(res['procedure'])}"),
+            ]
+        )
         self.SetSizerAndFit(sizer)
 
     def get_report(self, date: dt.date) -> sqlite3.Row:
@@ -84,15 +87,18 @@ class MonthReportDialog(wx.Dialog):
 
         def w(s: str):
             return (wx.StaticText(self, label=s), 0, wx.EXPAND | wx.ALL, 5)
+
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.AddMany([
-            w(f"Số ca khám: {res['visit_count']}"),
-            w(f"Doanh thu: {otf.num_to_str(res['revenue'])}"),
-            w(f"Tổng tiền thuốc (giá mua): {otf.num_to_str(res['drug_purchase'])}"),
-            w(f"Tổng tiền thuốc (giá bán): {otf.num_to_str(res['drug_sale'])}"),
-            w(f"Lợi nhuận từ thuốc: {otf.num_to_str(res['profit_from_drug'])}"),
-            w(f"Lợi nhuận từ thủ thuật: {otf.num_to_str(res['procedure'])}"),
-        ])
+        sizer.AddMany(
+            [
+                w(f"Số ca khám: {res['visit_count']}"),
+                w(f"Doanh thu: {otf.num_to_str(res['revenue'])}"),
+                w(f"Tổng tiền thuốc (giá mua): {otf.num_to_str(res['drug_purchase'])}"),
+                w(f"Tổng tiền thuốc (giá bán): {otf.num_to_str(res['drug_sale'])}"),
+                w(f"Lợi nhuận từ thuốc: {otf.num_to_str(res['profit_from_drug'])}"),
+                w(f"Lợi nhuận từ thủ thuật: {otf.num_to_str(res['procedure'])}"),
+            ]
+        )
         self.SetSizerAndFit(sizer)
 
     def get_report(self, month: int, year: int) -> sqlite3.Row:

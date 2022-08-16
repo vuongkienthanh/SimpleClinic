@@ -5,19 +5,19 @@ import wx
 
 
 class DaysCtrl(wx.SpinCtrl):
-    """ Changing DaysCtrl Value also changes RecheckCtrl Value """
+    """Changing DaysCtrl Value also changes RecheckCtrl Value"""
 
     def __init__(self, parent: "mv.MainView", **kwargs):
         super().__init__(
             parent,
             style=wx.SP_ARROW_KEYS,
             initial=config["default_days_for_prescription"],
-            **kwargs
+            **kwargs,
         )
         self.mv = parent
         self.SetRange(0, 100)
         self.Disable()
-        self.SetBackgroundColour(otf.get_background_color('days'))
+        self.SetBackgroundColour(otf.get_background_color("days"))
         self.Bind(wx.EVT_SPINCTRL, self.onSpin)
 
     def onSpin(self, e: wx.SpinEvent):
@@ -31,11 +31,15 @@ class RecheckCtrl(wx.SpinCtrl):
     """Independant of DaysCtrl"""
 
     def __init__(self, parent: "mv.MainView", **kwargs):
-        super().__init__(parent, style=wx.SP_ARROW_KEYS,
-                         initial=config["default_days_for_prescription"], **kwargs)
+        super().__init__(
+            parent,
+            style=wx.SP_ARROW_KEYS,
+            initial=config["default_days_for_prescription"],
+            **kwargs,
+        )
         self.SetRange(0, 100)
         self.Disable()
-        self.SetBackgroundColour(otf.get_background_color('recheck'))
+        self.SetBackgroundColour(otf.get_background_color("recheck"))
 
 
 class PriceCtrl(wx.TextCtrl):
@@ -45,23 +49,22 @@ class PriceCtrl(wx.TextCtrl):
         super().__init__(parent, **kwargs)
         self.mv = parent
         self.Clear()
-        self.SetBackgroundColour(otf.get_background_color('price'))
+        self.SetBackgroundColour(otf.get_background_color("price"))
 
     def FetchPrice(self):
         """Display new price"""
-        price: int = config['initial_price']
+        price: int = config["initial_price"]
         price += sum(
             item.sale_price * item.quantity
             for item in self.mv.order_book.page0.drug_list.d_list
         )
         price += sum(
-            pr.price
-            for pr in self.mv.order_book.page1.procedurelistctrl.pr_list
+            pr.price for pr in self.mv.order_book.page1.procedurelistctrl.pr_list
         )
         self.ChangeValue(otf.num_to_str(price))
 
     def Clear(self):
-        self.ChangeValue(otf.num_to_str(config['initial_price']))
+        self.ChangeValue(otf.num_to_str(config["initial_price"]))
 
 
 class Follow(wx.ComboBox):
@@ -71,19 +74,19 @@ class Follow(wx.ComboBox):
     - when print use full_value
     """
 
-    def __init__(self, parent: 'mv.MainView', **kwargs):
+    def __init__(self, parent: "mv.MainView", **kwargs):
         super().__init__(
             parent,
             style=wx.CB_DROPDOWN,
-            choices=list(config['follow_choices'].keys()),
-            **kwargs
+            choices=list(config["follow_choices"].keys()),
+            **kwargs,
         )
         self.mv = parent
-        self.SetBackgroundColour(otf.get_background_color('follow'))
+        self.SetBackgroundColour(otf.get_background_color("follow"))
         self.SetDefault()
 
     def full_value(self) -> str:
-        'return `key: value` from `key`'
+        "return `key: value` from `key`"
         k = self.GetValue().strip()
         if k in config["follow_choices"].keys():
             return f"{k}: {config['follow_choices'][k]}"
@@ -93,14 +96,14 @@ class Follow(wx.ComboBox):
     def SetFollow(self, val: str | None):
         "use when select visit"
         if val is None:
-            self.SetValue('')
+            self.SetValue("")
         else:
             self.SetValue(val)
 
     def GetFollow(self) -> str | None:
         "use when save/update visit"
         val: str = self.GetValue().strip()
-        if val == '':
+        if val == "":
             return None
         else:
             return val

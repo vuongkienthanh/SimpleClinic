@@ -9,7 +9,7 @@ def get_config() -> dict[str, Any]:
     try:
         with (
             open(CONFIG_PATH, "r", encoding="utf-8") as f1,
-            open(DEFAULT_CONFIG_PATH, "r", encoding="utf-8") as f2
+            open(DEFAULT_CONFIG_PATH, "r", encoding="utf-8") as f2,
         ):
             config = json.load(f1)
             default = json.load(f2)
@@ -31,7 +31,7 @@ w: tuple[int, int] = wx.DisplaySize()[0]
 
 
 def size(p):
-    return round(w*p*config['listctrl_header_scale'])
+    return round(w * p * config["listctrl_header_scale"])
 
 
 def tsize(p):

@@ -1,8 +1,8 @@
 from db.db_class import *
 from core import mainview
 import other_func as otf
-from core import menubar
 from core.init import config
+from core import menubar
 
 
 import sqlite3
@@ -159,9 +159,9 @@ class State():
         self.mv.diagnosis.Clear()
         self.mv.vnote.Clear()
         self.mv.weight.SetValue(0)
-        self.mv.days.SetValue(config['so_ngay_toa_ve_mac_dinh'])
+        self.mv.days.SetValue(config['default_days_for_prescription'])
         self.mv.updatequantitybtn.Disable()
-        self.mv.recheck.SetValue(config['so_ngay_toa_ve_mac_dinh'])
+        self.mv.recheck.SetValue(config['default_days_for_prescription'])
         self.mv.follow.SetDefault()
         self.linedruglist = []
         self.lineprocedurelist = []
@@ -291,14 +291,17 @@ class State():
             ON v.patient_id = p.id
         """).fetchall()
 
-    def get_visits_by_patient_id(self, pid, limit=5) -> list[sqlite3.Row]:
+    def get_visits_by_patient_id(self, pid) -> list[sqlite3.Row]:
         query = f"""
             SELECT id AS vid, exam_datetime,diagnosis
             FROM {Visit.table_name}
             WHERE {Visit.table_name}.patient_id = {pid}
             ORDER BY exam_datetime DESC
-            LIMIT {limit}
         """
+        if config['display_recent_visit_count'] >= 0:
+            query += f"""
+                LIMIT {config['display_recent_visit_count']}
+            """
         return self.mv.con.execute(query).fetchall()
 
     def get_linedrugs_by_visit_id(self, vid: int) -> list[sqlite3.Row]:

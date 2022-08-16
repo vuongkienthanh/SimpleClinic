@@ -1,17 +1,7 @@
 from core import mainview as mv
 from core.mainview_widgets import order_book
 from core.init import (
-    config,
-    k_tab,
-    k_number,
-    k_special,
-    size,
-    tsize,
-    drug_list_background_color,
-    drug_times_background_color,
-    drug_dose_background_color,
-    drug_quantity_background_color,
-    drug_note_background_color
+    k_tab, k_number, k_special, size, tsize
 )
 import other_func as otf
 from core.generic import NumberTextCtrl, DoseTextCtrl
@@ -105,7 +95,7 @@ class DrugList(wx.ListCtrl):
         self.SetBackgroundColour(wx.Colour(220, 220, 220))
         self.parent = parent
         self.mv = parent.parent.mv
-        self.SetBackgroundColour(drug_list_background_color)
+        self.SetBackgroundColour(otf.get_background_color('drug_list'))
         self.d_list: list[DrugListItem] = []
         self.AppendColumn('STT', width=size(0.02))
         self.AppendColumn('Thuốc', width=size(0.1))
@@ -208,7 +198,7 @@ class Times(NumberTextCtrl):
         super().__init__(parent, size=tsize(0.03))
         self.parent = parent
         self.SetHint('lần')
-        self.SetBackgroundColour(drug_times_background_color)
+        self.SetBackgroundColour(otf.get_background_color('drug_times'))
         self.Bind(wx.EVT_TEXT, self.onText)
 
     def onText(self, e):
@@ -222,7 +212,7 @@ class Dose(DoseTextCtrl):
         super().__init__(parent, size=tsize(0.03))
         self.parent = parent
         self.SetHint('liều')
-        self.SetBackgroundColour(drug_dose_background_color)
+        self.SetBackgroundColour(otf.get_background_color('drug_dose'))
         self.Bind(wx.EVT_TEXT, self.onText)
 
     def onText(self, e):
@@ -237,7 +227,7 @@ class Quantity(NumberTextCtrl):
         super().__init__(parent, size=tsize(0.03), style=wx.TE_PROCESS_TAB)
         self.parent = parent
         self.SetHint('Enter')
-        self.SetBackgroundColour(drug_quantity_background_color)
+        self.SetBackgroundColour(otf.get_background_color('drug_quantity'))
         self.Bind(wx.EVT_CHAR, self.onChar)
 
     def FetchQuantity(self):
@@ -247,8 +237,7 @@ class Quantity(NumberTextCtrl):
         days = mv.days.GetValue()
         wh = mv.state.warehouse
         assert wh is not None
-        res = otf.calc_quantity(times, dose, days, wh.sale_unit,
-                                config['thuoc_ban_mot_don_vi'])
+        res = otf.calc_quantity(times, dose, days, wh.sale_unit)
         if res is not None:
             self.SetValue(str(res))
         else:
@@ -271,7 +260,7 @@ class Note(wx.TextCtrl):
         super().__init__(parent, style=wx.TE_PROCESS_ENTER)
         self.parent = parent
         self.Bind(wx.EVT_CHAR, self.onChar)
-        self.SetBackgroundColour(drug_note_background_color)
+        self.SetBackgroundColour(otf.get_background_color('drug_note'))
 
     def onChar(self, e: wx.KeyEvent):
         if e.KeyCode in (wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER):

@@ -11,26 +11,26 @@ class SetupDialog(wx.Dialog):
         super().__init__(parent, title="Cài đặt hệ thống")
         self.mv = parent
         self.clinic = wx.TextCtrl(
-            self, value=config['ten_phong_kham'], name="Tên phòng khám")
+            self, value=config['clinic_name'], name="Tên phòng khám")
         self.address = wx.TextCtrl(
-            self, value=config['dia_chi'], name="Địa chỉ")
+            self, value=config['clinic_address'], name="Địa chỉ")
         self.phone = wx.TextCtrl(
-            self, value=config['so_dien_thoai'], name="Số điện thoại")
+            self, value=config['clinic_phone_number'], name="Số điện thoại")
         self.doctor = wx.TextCtrl(
-            self, value=config['ky_ten_bac_si'], name="Ký tên bác sĩ")
+            self, value=config['doctor_name'], name="Ký tên bác sĩ")
         self.price = wx.TextCtrl(
-            self, value=str(config["cong_kham_benh"]), name="Công khám bệnh")
+            self, value=str(config["initial_price"]), name="Công khám bệnh")
         self.display_price = wx.CheckBox(self, name="In giá tiền")
-        self.display_price.SetValue(config['in_gia_tien'])
+        self.display_price.SetValue(config['print_price'])
         self.days = wx.SpinCtrl(
-            self, initial=config["so_ngay_toa_ve_mac_dinh"], name="Số ngày toa về mặc định")
+            self, initial=config["default_days_for_prescription"], name="Số ngày toa về mặc định")
         self.alert = wx.SpinCtrl(
-            self, initial=config["so_luong_thuoc_toi_thieu_de_bao_dong"], max=10000, name="Lượng thuốc tối thiểu để báo động")
+            self, initial=config["minumum_drug_quantity_alert"], max=10000, name="Lượng thuốc tối thiểu để báo động")
         self.unit = adv.EditableListBox(
             self, label="Đơn vị bán", style=adv.EL_DEFAULT_STYLE | adv.EL_NO_REORDER, name="Thuốc bán một đơn vị")
         lc: wx.ListCtrl = self.unit.GetListCtrl()
         lc.DeleteAllItems()
-        for item in config["thuoc_ban_mot_don_vi"]:
+        for item in config["single_sale_units"]:
             lc.Append((item,))
         lc.Append(("",))
 
@@ -74,16 +74,16 @@ class SetupDialog(wx.Dialog):
         try:
             lc: wx.ListCtrl = self.unit.GetListCtrl()
 
-            config['ten_phong_kham'] = self.clinic.Value
-            config['ky_ten_bac_si'] = self.doctor.Value
-            config['dia_chi'] = self.address.Value
-            config['so_dien_thoai'] = self.phone.Value
-            config['in_gia_tien'] = self.display_price.Value
-            config['cong_kham_benh'] = int(self.price.Value)
-            config['so_ngay_toa_ve_mac_dinh'] = self.days.GetValue()
-            config["so_luong_thuoc_toi_thieu_de_bao_dong"] = self.alert.GetValue(
+            config['clinic_name'] = self.clinic.Value
+            config['doctor_name'] = self.doctor.Value
+            config['clinic_address'] = self.address.Value
+            config['clinic_phone_number'] = self.phone.Value
+            config['print_price'] = self.display_price.Value
+            config['initial_price'] = int(self.price.Value)
+            config['default_days_for_prescription'] = self.days.GetValue()
+            config["minumum_drug_quantity_alert"] = self.alert.GetValue(
             )
-            config["thuoc_ban_mot_don_vi"] = [
+            config["single_sale_units"] = [
                 lc.GetItemText(idx).strip()
                 for idx in range(lc.ItemCount)
                 if lc.GetItemText(idx).strip() != ''
@@ -95,4 +95,3 @@ class SetupDialog(wx.Dialog):
             e.Skip()
         except Exception as error:
             wx.MessageBox(f"Lỗi không lưu được\n{error}", "Lỗi")
-

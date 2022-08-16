@@ -29,7 +29,7 @@ class PrintOut(wx.Printout):
         "Relative to `num_of_ld`"
         x, y = divmod(
             self.mv.order_book.page0.drug_list.ItemCount,
-            config['so_muc_thuoc_1_toa']
+            config['number_of_drugs_in_one_page']
         )
         if page <= (x + bool(y)):
             return True
@@ -45,13 +45,13 @@ class PrintOut(wx.Printout):
         else:
             x, y = divmod(
                 self.mv.order_book.page0.drug_list.ItemCount,
-                config['so_muc_thuoc_1_toa']
+                config['number_of_drugs_in_one_page']
             )
         return (1, x + bool(y), 1, x + bool(y))
 
     def OnPrintPage(self, page):
 
-        num_of_ld = config['so_muc_thuoc_1_toa']
+        num_of_ld = config['number_of_drugs_in_one_page']
         d_list = self.mv.order_book.page0.drug_list.d_list
         state = self.mv.state
         p = state.patient
@@ -101,10 +101,10 @@ class PrintOut(wx.Printout):
 
             with wx.DCFontChanger(dc, heading):
                 x = atx(0.085)
-                dc.DrawText(config['ten_phong_kham'], x, row(0))
-                dc.DrawText("Địa chỉ: " + config['dia_chi'], x, row(1))
+                dc.DrawText(config['clinic_name'], x, row(0))
+                dc.DrawText("Địa chỉ: " + config['clinic_address'], x, row(1))
                 dc.DrawText(
-                    "SĐT: " + config['so_dien_thoai'], x, row(2))
+                    "SĐT: " + config['clinic_phone_number'], x, row(2))
             with wx.DCFontChanger(dc, title):
                 draw_centered_text('ĐƠN THUỐC', round(
                     dcx / 2), row(3))
@@ -155,13 +155,13 @@ class PrintOut(wx.Printout):
             with wx.DCFontChanger(dc, info):
                 dc.DrawText("Bác sĩ khám bệnh", atx(0.63), aty(0.735))
                 draw_centered_text(
-                    config['ky_ten_bac_si'], atx(0.75), aty(0.865))
+                    config['doctor_name'], atx(0.75), aty(0.865))
 
             row_y = round(dcy * 0.02)
             y = aty(0.72)
             def row(i): return y + row_y * i
             with wx.DCFontChanger(dc, heading):
-                if config['in_gia_tien']:
+                if config['print_price']:
                     t = f"Tổng cộng: {self.mv.price.GetValue()}"
                     if self.mv.order_book.page1.procedurelistctrl.ItemCount > 0:
                         t += " (đã gồm tiền thủ thuật)"

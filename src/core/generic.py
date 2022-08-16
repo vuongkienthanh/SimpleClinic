@@ -1,11 +1,5 @@
 from core.init import (
-    k_number,
-    k_special,
-    k_tab,
-    k_decimal,
-    k_hash,
-    k_slash,
-    weight_background_color
+    k_number, k_special, k_tab, k_decimal, k_hash, k_slash
 )
 import other_func as otf
 from db.db_class import Gender
@@ -35,7 +29,7 @@ class WeightCtrl(wx.SpinCtrlDouble):
         super().__init__(parent, **kwargs)
         self.SetDigits(1)
         self.Disable()
-        self.SetBackgroundColour(weight_background_color)
+        self.SetBackgroundColour(otf.get_background_color('weight'))
 
     def GetWeight(self) -> Decimal:
         return Decimal(self.GetValue())

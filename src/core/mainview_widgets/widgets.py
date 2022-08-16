@@ -1,12 +1,6 @@
 from core import mainview as mv
 import other_func as otf
-from core.init import (
-    config,
-    recheck_background_color,
-    days_background_color,
-    price_background_color,
-    follow_background_color
-)
+from core.init import config
 import wx
 
 
@@ -17,13 +11,13 @@ class DaysCtrl(wx.SpinCtrl):
         super().__init__(
             parent,
             style=wx.SP_ARROW_KEYS,
-            initial=config["so_ngay_toa_ve_mac_dinh"],
+            initial=config["default_days_for_prescription"],
             **kwargs
         )
         self.mv = parent
         self.SetRange(0, 100)
         self.Disable()
-        self.SetBackgroundColour(days_background_color)
+        self.SetBackgroundColour(otf.get_background_color('days'))
         self.Bind(wx.EVT_SPINCTRL, self.onSpin)
 
     def onSpin(self, e: wx.SpinEvent):
@@ -38,10 +32,10 @@ class RecheckCtrl(wx.SpinCtrl):
 
     def __init__(self, parent: "mv.MainView", **kwargs):
         super().__init__(parent, style=wx.SP_ARROW_KEYS,
-                         initial=config["so_ngay_toa_ve_mac_dinh"], **kwargs)
+                         initial=config["default_days_for_prescription"], **kwargs)
         self.SetRange(0, 100)
         self.Disable()
-        self.SetBackgroundColour(recheck_background_color)
+        self.SetBackgroundColour(otf.get_background_color('recheck'))
 
 
 class PriceCtrl(wx.TextCtrl):
@@ -51,11 +45,11 @@ class PriceCtrl(wx.TextCtrl):
         super().__init__(parent, **kwargs)
         self.mv = parent
         self.Clear()
-        self.SetBackgroundColour(price_background_color)
+        self.SetBackgroundColour(otf.get_background_color('price'))
 
     def FetchPrice(self):
         """Display new price"""
-        price: int = config['cong_kham_benh']
+        price: int = config['initial_price']
         price += sum(
             item.sale_price * item.quantity
             for item in self.mv.order_book.page0.drug_list.d_list
@@ -67,35 +61,32 @@ class PriceCtrl(wx.TextCtrl):
         self.ChangeValue(otf.num_to_str(price))
 
     def Clear(self):
-        self.ChangeValue(otf.num_to_str(config['cong_kham_benh']))
+        self.ChangeValue(otf.num_to_str(config['initial_price']))
 
 
 class Follow(wx.ComboBox):
     """A Combobox which is able to:
-    - display only the `key` in `key: value` pair in combo popup
-    - display `key: value` when selected
-    - return only the `key` when save
+    - use only the `key` in `follow_choices`
     - return `None` if text in empty
-    - the displayed text is used in printing
+    - when print use full_value
     """
 
     def __init__(self, parent: 'mv.MainView', **kwargs):
-        "`choice_dict`: `key: value` pair, the `key` is for popup and doing save/update, the`value` is for UI displaying and printing"
         super().__init__(
             parent,
             style=wx.CB_DROPDOWN,
-            choices=list(config['loi_dan_do'].keys()),
+            choices=list(config['follow_choices'].keys()),
             **kwargs
         )
         self.mv = parent
-        self.SetBackgroundColour(follow_background_color)
+        self.SetBackgroundColour(otf.get_background_color('follow'))
         self.SetDefault()
 
     def full_value(self) -> str:
         'return `key: value` from `key`'
         k = self.GetValue().strip()
-        if k in config['loi_dan_do'].keys():
-            return f"{k}: {config['loi_dan_do'][k]}"
+        if k in config["follow_choices"].keys():
+            return f"{k}: {config['follow_choices'][k]}"
         else:
             return k
 

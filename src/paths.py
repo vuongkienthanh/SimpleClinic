@@ -21,8 +21,6 @@ CONFIG_PATH = os.path.join(APP_DIR, "config.json")
 
 # sample dir
 SAMPLE_DIR = os.path.join(SRC_DIR, 'sample')
-# sql dir
-CREATE_TABLE_SQL = os.path.join(SRC_DIR, 'db', 'create_table.sql')
 
 
 # bitmaps

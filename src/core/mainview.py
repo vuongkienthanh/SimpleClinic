@@ -1,18 +1,6 @@
 from db import db_func
-from core.init import (
-    config,
-    mainview_background_color,
-    tsize,
-    diagnosis_background_color,
-    name_background_color,
-    gender_background_color,
-    age_background_color,
-    address_background_color,
-    phone_background_color,
-    birthdate_background_color,
-    past_history_background_color,
-    visit_note_background_color,
-)
+from core.init import config, tsize
+import other_func as otf
 from core.state import State
 from core.generic import AgeCtrl, PhoneTextCtrl, DateTextCtrl, WeightCtrl
 from core.mainview_widgets import (
@@ -32,8 +20,7 @@ class MainView(wx.Frame):
             parent=None,
             pos=(20, 20),
             title='PHẦN MỀM PHÒNG KHÁM TẠI NHÀ')
-        self.SetBackgroundColour(mainview_background_color)
-        self.locale = wx.Locale(wx.LANGUAGE_VIETNAMESE)
+        self.SetBackgroundColour(otf.get_background_color('mainview'))
 
         self.con = con
         self.state = State(self)
@@ -73,15 +60,18 @@ class MainView(wx.Frame):
         self.age.Disable()
         self.address.Disable()
         self.phone.Disable()
-        self.name.SetBackgroundColour(name_background_color)
-        self.gender.SetBackgroundColour(gender_background_color)
-        self.birthdate.SetBackgroundColour(birthdate_background_color)
-        self.age.SetBackgroundColour(age_background_color)
-        self.address.SetBackgroundColour(address_background_color)
-        self.phone.SetBackgroundColour(phone_background_color)
-        self.diagnosis.SetBackgroundColour(diagnosis_background_color)
-        self.past_history.SetBackgroundColour(past_history_background_color)
-        self.vnote.SetBackgroundColour(visit_note_background_color)
+        self.name.SetBackgroundColour(otf.get_background_color('name'))
+        self.gender.SetBackgroundColour(otf.get_background_color('gender'))
+        self.birthdate.SetBackgroundColour(
+            otf.get_background_color('birthdate'))
+        self.age.SetBackgroundColour(otf.get_background_color('age'))
+        self.address.SetBackgroundColour(otf.get_background_color('address'))
+        self.phone.SetBackgroundColour(otf.get_background_color('phone'))
+        self.diagnosis.SetBackgroundColour(
+            otf.get_background_color('diagnosis'))
+        self.past_history.SetBackgroundColour(
+            otf.get_background_color('past_history'))
+        self.vnote.SetBackgroundColour(otf.get_background_color('visit_note'))
 
         def widget(w, p, r):
             return (w, p, wx.EXPAND | wx.RIGHT, r)

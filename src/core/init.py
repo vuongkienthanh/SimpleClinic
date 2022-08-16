@@ -1,58 +1,27 @@
-from other_func import get_config
+from paths import DEFAULT_CONFIG_PATH, CONFIG_PATH
+import json
+import shutil
 import wx
+from typing import Any
+
+
+def get_config() -> dict[str, Any]:
+    try:
+        with (
+            open(CONFIG_PATH, "r", encoding="utf-8") as f1,
+            open(DEFAULT_CONFIG_PATH, "r", encoding="utf-8") as f2
+        ):
+            return json.load(f2) | json.load(f1)
+    except FileNotFoundError:
+        with open(DEFAULT_CONFIG_PATH, "r", encoding="utf-8") as f:
+            shutil.copyfile(DEFAULT_CONFIG_PATH, CONFIG_PATH)
+            return json.load(f)
+    except json.JSONDecodeError:
+        with open(DEFAULT_CONFIG_PATH, "r", encoding="utf-8") as f:
+            return json.load(f)
+
 
 config = get_config()
-
-mainview_background_color = wx.Colour(
-    *config['background_color']['mainview'])
-patient_list_background_color = wx.Colour(
-    *config['background_color']['patient_list'])
-visit_list_background_color = wx.Colour(
-    *config['background_color']['visit_list'])
-name_background_color = wx.Colour(
-    *config['background_color']['name'])
-gender_background_color = wx.Colour(
-    *config['background_color']['gender'])
-birthdate_background_color = wx.Colour(
-    *config['background_color']['birthdate'])
-age_background_color = wx.Colour(
-    *config['background_color']['age'])
-diagnosis_background_color = wx.Colour(
-    *config['background_color']['diagnosis'])
-phone_background_color = wx.Colour(
-    *config['background_color']['phone'])
-address_background_color = wx.Colour(
-    *config['background_color']['address'])
-price_background_color = wx.Colour(
-    *config['background_color']['price'])
-drug_list_background_color = wx.Colour(
-    *config['background_color']['drug_list'])
-procedure_list_background_color = wx.Colour(
-    *config['background_color']['procedure_list'])
-past_history_background_color = wx.Colour(
-    *config['background_color']['past_history'])
-visit_note_background_color = wx.Colour(
-    *config['background_color']['visit_note'])
-weight_background_color = wx.Colour(
-    *config['background_color']['weight'])
-days_background_color = wx.Colour(
-    *config['background_color']['days'])
-drug_picker_background_color = wx.Colour(
-    *config['background_color']['drug_picker'])
-drug_times_background_color = wx.Colour(
-    *config['background_color']['drug_times'])
-drug_dose_background_color = wx.Colour(
-    *config['background_color']['drug_dose'])
-drug_quantity_background_color = wx.Colour(
-    *config['background_color']['drug_quantity'])
-drug_note_background_color = wx.Colour(
-    *config['background_color']['drug_note'])
-recheck_background_color = wx.Colour(
-    *config['background_color']['recheck'])
-follow_background_color = wx.Colour(
-    *config['background_color']['follow'])
-procedure_picker_background_color = wx.Colour(
-    *config['background_color']['procedure_picker'])
 
 # some size
 w: tuple[int, int] = wx.DisplaySize()[0]

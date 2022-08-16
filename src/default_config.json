@@ -1,23 +1,24 @@
 {
-  "ten_phong_kham": "Phòng khám chuyên khoa nhi - Bs xxxx yyyyy zzzz",
-  "ky_ten_bac_si": "Bs xxxx yyyyy zzzz aaa",
-  "dia_chi": "Qui laboriosam corporis non quasi maiores velit culpa",
-  "so_dien_thoai": "0909.222.111",
-  "cong_kham_benh": 50000,
-  "so_ngay_toa_ve_mac_dinh": 2,
-  "so_luong_thuoc_toi_thieu_de_bao_dong": 20,
-  "thuoc_ban_mot_don_vi": [
+  "clinic_name": "Phòng khám chuyên khoa nhi - Bs xxxx yyyyy zzzz",
+  "doctor_name": "Bs xxxx yyyyy zzzz aaa",
+  "clinic_address": "Qui laboriosam corporis non quasi maiores velit culpa",
+  "clinic_phone_number": "0909.222.111",
+  "initial_price": 50000,
+  "default_days_for_prescription": 2,
+  "minimum_drug_quantity_alert": 20,
+  "single_sale_units": [
     "chai",
     "lọ",
     "týp"
   ],
-  "loi_dan_do": {
+  "follow_choices": {
     "Dấu hiệu chung": "Khám lại khi trẻ có những dấu hiệu sau: co giật, ngủ li bì hay vật vã, bứt rứt, thở mệt, nôn ói nhiều, sốt cao liên tục, tiêu máu",
     "Dấu hiệu nặng TCM": "Sốt cao ≥39 độ C hay sốt liên tục trên 2 ngày - Giật mình, chới với, hốt hoảng bất thường - Ngủ gà, li bì hay bứt rứt - Run giật tay chân bất thường - Yếu tay chân, ngồi không vững, đi đứng loạng choạng - Thở bất thường: không đều, thở nhanh - Nuốt sặc, thay đổi giọng nói",
     "Dấu hiệu nặng SXH": "Lừ đừ, bứt rứt - Lạnh tay chân khi trẻ đã hết sốt (thường vào ngày thứ 4, thứ 5 của bệnh) - Đau bụng - Ói nhiều - Chảy máu bất thường: Chảy máu răng, máu mũi, đi cầu phân đen, ói ra máu"
   },
-  "in_gia_tien": true,
-  "so_muc_thuoc_1_toa": 8,
+  "print_price": true,
+  "number_of_drugs_in_one_page": 8,
+  "display_recent_visit_count": -1,
   "print_scale": 1,
   "preview_scale": 1,
   "maximize_at_start": false,

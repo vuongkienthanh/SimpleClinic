@@ -1,28 +1,14 @@
-from paths import DEFAULT_CONFIG_PATH, CONFIG_PATH
 import wx
 import datetime as dt
 from fractions import Fraction
 from typing import Any, TypeVar
 from itertools import cycle
-import json
 from math import ceil
-import shutil
 
 
-def get_config() -> dict[str, Any]:
-    try:
-        with (
-            open(CONFIG_PATH, "r", encoding="utf-8") as f1,
-            open(DEFAULT_CONFIG_PATH, "r", encoding="utf-8") as f2
-        ):
-            return json.load(f2) | json.load(f1)
-    except FileNotFoundError:
-        with open(DEFAULT_CONFIG_PATH, "r", encoding="utf-8") as f:
-            shutil.copyfile(DEFAULT_CONFIG_PATH, CONFIG_PATH)
-            return json.load(f)
-    except json.JSONDecodeError:
-        with open(DEFAULT_CONFIG_PATH, "r", encoding="utf-8") as f:
-            return json.load(f)
+def get_background_color(s: str):
+    from core.init import config
+    return wx.Colour(*config['background_color'][s])
 
 
 def bd_to_age(bd: dt.date):
@@ -49,7 +35,7 @@ def check_none(val: Any | None):
     return str(val) if val else ''
 
 
-def calc_quantity(times: int, dose: str, days: int, sale_unit: str | None, list_of_unit: list[str]) -> int | None:
+def calc_quantity(times: int, dose: str, days: int, sale_unit: str | None) -> int | None:
     def calc(times: int, dose: str, days: int) -> int:
         if '/' in dose:
             numer, denom = [int(i) for i in dose.split('/')]
@@ -58,7 +44,8 @@ def calc_quantity(times: int, dose: str, days: int, sale_unit: str | None, list_
             return ceil(times * float(dose) * days)
     try:
         if sale_unit is not None:
-            if sale_unit.casefold() in (item.casefold() for item in list_of_unit):
+            from core.init import config
+            if sale_unit.casefold() in (item.casefold() for item in config['single_sale_units']):
                 return 1
             else:
                 return calc(times, dose, days)

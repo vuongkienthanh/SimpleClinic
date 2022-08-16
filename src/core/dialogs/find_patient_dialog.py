@@ -250,7 +250,7 @@ class FindPatientDialog(wx.Dialog):
         self.rebuild()
 
     def onAtDate(self, e: wx.CommandEvent):
-        dlg =DatePickerDialog(self.mv)
+        dlg = DatePickerDialog(self.mv)
         if dlg.ShowModal() == wx.ID_OK:
             d = dlg.GetDate()
             self.cur = self.mv.con.execute(f"""

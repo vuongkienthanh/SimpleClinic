@@ -1,6 +1,5 @@
 from core.mainview_widgets import order_book
 from core.mainview_widgets import prescription_widgets
-from core.init import config
 from db.db_class import Warehouse, LineSamplePrescription
 from paths import plus_bm, minus_bm
 from core.dialogs.sample_prescription_dialog import SampleDialog
@@ -85,7 +84,7 @@ class UseSamplePrescriptionBtn(wx.Button):
                 """).fetchall()
                 for lsp in llsp:
                     q = calc_quantity(lsp['times'], lsp['dose'], self.mv.days.Value,
-                                      lsp['sale_unit'], config['thuoc_ban_mot_don_vi'])
+                                      lsp['sale_unit'])
                     assert q is not None
                     self.parent.drug_list.append(prescription_widgets.DrugListItem(
                         drug_id=lsp['drug_id'],

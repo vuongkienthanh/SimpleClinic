@@ -2,7 +2,6 @@ from paths import weight_bm, update_druglist_bm
 from db.db_class import LineProcedure, Visit, Patient, LineDrug
 import other_func as otf
 from core import mainview as mv
-from core.init import config
 from core.printer import PrintOut, printdata
 
 import sqlite3
@@ -65,8 +64,7 @@ class UpdateQuantityBtn(wx.BitmapButton):
                 times=item.times,
                 dose=item.dose,
                 days=self.mv.days.GetValue(),
-                sale_unit=item.sale_unit,
-                list_of_unit=config['thuoc_ban_mot_don_vi']
+                sale_unit=item.sale_unit
             )
             assert q is not None
             item.quantity = q

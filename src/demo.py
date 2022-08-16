@@ -100,5 +100,3 @@ def sample_con():
 if __name__ == '__main__':
     con = sample_con()
     App(con)
-
-

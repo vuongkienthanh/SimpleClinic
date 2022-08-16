@@ -21,18 +21,18 @@ class WarehouseDialog(wx.Dialog):
         self.search.SetHint("Tên thuốc hoặc thành phần thuốc")
         self.lc = wx.ListCtrl(self, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
 
-        self.lc.AppendColumn("Mã",width=size(0.03))
+        self.lc.AppendColumn("Mã", width=size(0.03))
         self.lc.AppendColumn("Tên", width=size(0.1))
         self.lc.AppendColumn("Thành phần", width=size(0.1))
-        self.lc.AppendColumn("Số lượng",width=size(0.04))
+        self.lc.AppendColumn("Số lượng", width=size(0.04))
         self.lc.AppendColumn("Đơn vị sử dụng", width=size(0.06))
         self.lc.AppendColumn("Cách sử dụng", width=size(0.06))
-        self.lc.AppendColumn("Giá mua",width=size(0.03))
-        self.lc.AppendColumn("Giá bán",width=size(0.03))
+        self.lc.AppendColumn("Giá mua", width=size(0.03))
+        self.lc.AppendColumn("Giá bán", width=size(0.03))
         self.lc.AppendColumn("Đơn vị bán", width=size(0.04))
         self.lc.AppendColumn("Ngày hết hạn", width=size(0.05))
-        self.lc.AppendColumn("Xuất xứ",width=size(0.06))
-        self.lc.AppendColumn("Ghi chú",width=size(0.06))
+        self.lc.AppendColumn("Xuất xứ", width=size(0.06))
+        self.lc.AppendColumn("Ghi chú", width=size(0.06))
         self.newbtn = wx.Button(self, label="Thêm mới")
         self.editbtn = wx.Button(self, label="Cập nhật")
         self.delbtn = wx.Button(self, label="Xóa")
@@ -131,7 +131,7 @@ class WarehouseDialog(wx.Dialog):
 
     def check_min_quantity(self, wh: Warehouse, idx: int):
         "conditional recolor"
-        if wh.quantity <= config["so_luong_thuoc_toi_thieu_de_bao_dong"]:
+        if wh.quantity <= config["minimum_drug_quantity_alert"]:
             self.lc.SetItemTextColour(idx, wx.Colour(252, 3, 57))
 
     def onSearch(self, e: wx.CommandEvent):

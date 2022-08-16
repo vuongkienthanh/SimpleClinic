@@ -139,35 +139,37 @@ Config and database are located at:
 ```sh
 {
   // Tên phòng khám, được in trong toa
-  "ten_phong_kham": "Phòng khám chuyên khoa nhi - Bs xxxx yyyyy zzzz",
+  "clinic_name": "Phòng khám chuyên khoa nhi - Bs xxxx yyyyy zzzz",
   // Tên bác sĩ, được in trong toa
-  "ky_ten_bac_si": "Bs xxxx yyyyy zzzz aaa",
+  "doctor_name": "Bs xxxx yyyyy zzzz aaa",
   // Địa chỉ, được in trong toa
-  "dia_chi": "Qui laboriosam corporis non quasi maiores velit culpa",
+  "clinic_address": "Qui laboriosam corporis non quasi maiores velit culpa",
   // Số điện thoại, được in trong toa
-  "so_dien_thoai": "0909.222.111",
+  "clinic_phone_number": "0909.222.111",
   // Tiền công khám bệnh
-  "cong_kham_benh": 50000,
+  "initial_price": 50000,
   // Số ngày toa về mặc định cho toa thuốc
-  "so_ngay_toa_ve_mac_dinh": 2,
+  "default_days_for_prescription": 2,
   // Lượng thuốc tối thiểu để báo động trong danh sách thuốc
-  "so_luong_thuoc_toi_thieu_de_bao_dong": 20,
+  "minimum_drug_quantity_alert": 20,
   // Đơn vị thuốc bán một đơn vị
-  "thuoc_ban_mot_don_vi": [
+  "single_sale_units": [
     "chai",
     "lọ",
     "týp"
   ],
   // Lời dặn dò mở rộng khi in toa
-  "loi_dan_do": {
+  "follow_choices": {
     "Dấu hiệu chung": "Khám lại khi trẻ có những dấu hiệu sau: co giật, ngủ li bì hay vật vã, bứt rứt, thở mệt, nôn ói nhiều, sốt cao liên tục, tiêu máu",
     "Dấu hiệu nặng TCM": "Sốt cao ≥39 độ C hay sốt liên tục trên 2 ngày - Giật mình, chới với, hốt hoảng bất thường - Ngủ gà, li bì hay bứt rứt - Run giật tay chân bất thường - Yếu tay chân, ngồi không vững, đi đứng loạng choạng - Thở bất thường: không đều, thở nhanh - Nuốt sặc, thay đổi giọng nói",
     "Dấu hiệu nặng SXH": "Lừ đừ, bứt rứt - Lạnh tay chân khi trẻ đã hết sốt (thường vào ngày thứ 4, thứ 5 của bệnh) - Đau bụng - Ói nhiều - Chảy máu bất thường: Chảy máu răng, máu mũi, đi cầu phân đen, ói ra máu"
   },
   // Hiển thị giá tiền trên toa thuốc
-  "in_gia_tien": true,
+  "print_price": true,
   // Số lượng thuốc tối đa trong một tờ giấy toa thuốc
-  "so_muc_thuoc_1_toa": 8,
+  "number_of_drugs_ine_one_page": 8,
+  // Số lượt khám gần nhất được hiển thị; -1 là hiển thị hết
+  "display_recent_visit_count": -1,
   // Tùy vào hệ điều hành, máy in, toa thuốc bị thu nhỏ hay phóng toa
   // Phải chỉnh lại qua print_scale, preview_scale
   "print_scale": 1,

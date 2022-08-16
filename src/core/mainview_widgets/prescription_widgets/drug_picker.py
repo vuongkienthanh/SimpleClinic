@@ -1,6 +1,7 @@
 from db.db_class import Warehouse
 from core.mainview_widgets import order_book
-from core.init import size, drug_picker_background_color, config
+from core.init import size, config
+import other_func as otf
 import wx
 
 
@@ -75,7 +76,7 @@ class DrugPopup(wx.ComboPopup):
         ])
 
     def check_min_quantity(self, item, index):
-        if item.quantity <= config["so_luong_thuoc_toi_thieu_de_bao_dong"]:
+        if item.quantity <= config["minimum_drug_quantity_alert"]:
             self.lc.SetItemTextColour(index, wx.Colour(252, 3, 57))
 
     def OnPopup(self):
@@ -137,7 +138,7 @@ class DrugPicker(wx.ComboCtrl):
     def __init__(self, parent: 'order_book.PrescriptionPage'):
         super().__init__(parent, style=wx.TE_PROCESS_ENTER)
         self.parent = parent
-        self.SetBackgroundColour(drug_picker_background_color)
+        self.SetBackgroundColour(otf.get_background_color('drug_picker'))
         self.SetPopupControl(DrugPopup())
         self.Bind(wx.EVT_CHAR, self.onChar)
         self.Bind(wx.EVT_TEXT, self.onText)

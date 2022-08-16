@@ -8,7 +8,6 @@ import datetime as dt
 import sqlite3
 
 
-
 class DayReportDialog(wx.Dialog):
     def __init__(self, parent: 'mv.MainView', date: dt.date):
         super().__init__(parent, title="Báo cáo ngày")
@@ -40,7 +39,7 @@ class DayReportDialog(wx.Dialog):
         query = f"""
             SELECT
                 visit_count,
-                ({config['cong_kham_benh']} * visit_count) + drug_sale + procedure AS revenue,
+                ({config['initial_price']} * visit_count) + drug_sale + procedure AS revenue,
                 drug_purchase,
                 drug_sale,
                 (drug_sale - drug_purchase) AS profit_from_drug,
@@ -108,7 +107,7 @@ class MonthReportDialog(wx.Dialog):
         query = f"""
             SELECT
                 visit_count,
-                ({self.mv.config['cong_kham_benh']} * visit_count) + drug_sale + procedure AS revenue,
+                ({config['initial_price']} * visit_count) + drug_sale + procedure AS revenue,
                 drug_purchase,
                 drug_sale,
                 (drug_sale - drug_purchase) AS profit_from_drug,

@@ -1,7 +1,7 @@
 from db.db_func import Connection
 from db.db_class import *
 from paths import SAMPLE_DIR
-from main import App
+from main import App, platform_settings
 
 import os
 import csv
@@ -102,4 +102,5 @@ def sample_con():
 
 if __name__ == "__main__":
     con = sample_con()
+    platform_settings()
     App(con)

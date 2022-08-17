@@ -72,10 +72,15 @@ class SetupDialog(wx.Dialog):
         self.mainview_color = wx.ColourPickerCtrl(
             self.scroll, colour=get_background_color("mainview"), name="Màu nền chính"
         )
-        self.patient_list_color = wx.ColourPickerCtrl(
+        self.patient_queuelist_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color("patient_list"),
-            name="Màu nền danh sách bệnh nhân",
+            colour=get_background_color("patient_queuelist"),
+            name="Màu nền danh sách bệnh nhân\n(Đang chờ)",
+        )
+        self.patient_seenlist_color = wx.ColourPickerCtrl(
+            self.scroll,
+            colour=get_background_color("patient_seenlist"),
+            name="Màu nền danh sách bệnh nhân\n(Đã khám hôm nay)",
         )
         self.visit_list_color = wx.ColourPickerCtrl(
             self.scroll,
@@ -205,7 +210,8 @@ class SetupDialog(wx.Dialog):
                 *widget(self.visit_count),
                 *widget(self.maximize_at_start),
                 *widget(self.mainview_color),
-                *widget(self.patient_list_color),
+                *widget(self.patient_queuelist_color),
+                *widget(self.patient_seenlist_color),
                 *widget(self.visit_list_color),
                 *widget(self.name_color),
                 *widget(self.gender_color),
@@ -281,7 +287,8 @@ class SetupDialog(wx.Dialog):
                 config["background_color"][name] = widget.Colour.GetIM()[:3]
 
             set_color("mainview", self.mainview_color)
-            set_color("patient_list", self.patient_list_color)
+            set_color("patient_queuelist", self.patient_queuelist_color)
+            set_color("patient_seenlist", self.patient_seenlist_color)
             set_color("visit_list", self.visit_list_color)
             set_color("name", self.name_color)
             set_color("gender", self.gender_color)

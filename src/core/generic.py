@@ -24,7 +24,6 @@ class WeightCtrl(wx.SpinCtrlDouble):
         super().__init__(parent, **kwargs)
         self.SetDigits(1)
         self.Disable()
-        self.SetBackgroundColour(otf.get_background_color("weight"))
 
     def GetWeight(self) -> Decimal:
         return Decimal(self.GetValue())

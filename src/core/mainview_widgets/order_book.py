@@ -35,7 +35,7 @@ class PrescriptionPage(wx.Panel):
         self.note = Note(self)
         self.add_drug_btn = AddDrugButton(self)
         self.del_drug_btn = DelDrugButton(self)
-        self.drug_list = DrugList(self)
+        self.drug_list = DrugListCtrl(self)
         self.reuse_druglist_btn = ReuseDrugListButton(self)
         self.use_sample_prescription_btn = UseSamplePrescriptionBtn(self)
 
@@ -113,7 +113,7 @@ class ProcedurePage(wx.Panel):
         self.parent = parent
         self.mv = parent.mv
 
-        self.choice = wx.Choice(
+        self.procedure_picker = wx.Choice(
             self,
             choices=[
                 f"{pr.name} ({otf.num_to_str(pr.price)})"
@@ -122,14 +122,12 @@ class ProcedurePage(wx.Panel):
         )
         self.addbtn = AddProcedureButton(self)
         self.delbtn = DelProcedureButton(self)
-        self.procedurelistctrl = ProcedureListCtrl(self)
-
-        self.choice.SetBackgroundColour(otf.get_background_color("procedure_picker"))
+        self.procedure_list = ProcedureListCtrl(self)
 
         choice_row = wx.BoxSizer(wx.HORIZONTAL)
         choice_row.AddMany(
             [
-                (self.choice, 1, wx.RIGHT, 5),
+                (self.procedure_picker, 1, wx.RIGHT, 5),
                 (self.addbtn, 0, wx.RIGHT, 5),
                 (self.delbtn, 0),
             ]
@@ -138,7 +136,7 @@ class ProcedurePage(wx.Panel):
         sizer.AddMany(
             [
                 (choice_row, 0, wx.EXPAND | wx.ALL, 5),
-                (self.procedurelistctrl, 1, wx.EXPAND | wx.ALL, 5),
+                (self.procedure_list, 1, wx.EXPAND | wx.ALL, 5),
             ]
         )
         self.SetSizerAndFit(sizer)

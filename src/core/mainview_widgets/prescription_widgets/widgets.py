@@ -99,13 +99,11 @@ class DrugListItem:
         )
 
 
-class DrugList(wx.ListCtrl):
+class DrugListCtrl(wx.ListCtrl):
     def __init__(self, parent: "order_book.PrescriptionPage"):
         super().__init__(parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
-        self.SetBackgroundColour(wx.Colour(220, 220, 220))
         self.parent = parent
         self.mv = parent.parent.mv
-        self.SetBackgroundColour(otf.get_background_color("drug_list"))
         self.d_list: list[DrugListItem] = []
         self.AppendColumn("STT", width=size(0.02))
         self.AppendColumn("Thuốc", width=size(0.1))
@@ -211,7 +209,6 @@ class Times(NumberTextCtrl):
         super().__init__(parent, size=tsize(0.03))
         self.parent = parent
         self.SetHint("lần")
-        self.SetBackgroundColour(otf.get_background_color("drug_times"))
         self.Bind(wx.EVT_TEXT, self.onText)
 
     def onText(self, e):
@@ -225,7 +222,6 @@ class Dose(DoseTextCtrl):
         super().__init__(parent, size=tsize(0.03))
         self.parent = parent
         self.SetHint("liều")
-        self.SetBackgroundColour(otf.get_background_color("drug_dose"))
         self.Bind(wx.EVT_TEXT, self.onText)
 
     def onText(self, e):
@@ -239,7 +235,6 @@ class Quantity(NumberTextCtrl):
         super().__init__(parent, size=tsize(0.03), style=wx.TE_PROCESS_TAB)
         self.parent = parent
         self.SetHint("Enter")
-        self.SetBackgroundColour(otf.get_background_color("drug_quantity"))
         self.Bind(wx.EVT_CHAR, self.onChar)
 
     def FetchQuantity(self):
@@ -272,7 +267,6 @@ class Note(wx.TextCtrl):
         super().__init__(parent, style=wx.TE_PROCESS_ENTER)
         self.parent = parent
         self.Bind(wx.EVT_CHAR, self.onChar)
-        self.SetBackgroundColour(otf.get_background_color("drug_note"))
 
     def onChar(self, e: wx.KeyEvent):
         if e.KeyCode in (wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER):

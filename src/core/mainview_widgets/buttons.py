@@ -158,7 +158,7 @@ class SaveBtn(wx.Button):
                         insert_ld,
                     )
                     insert_lp = []
-                    for item in self.mv.order_book.page1.procedurelistctrl.pr_list:
+                    for item in self.mv.order_book.page1.procedure_list.pr_list:
                         insert_lp.append(
                             {
                                 "procedure_id": item.pr_id,
@@ -247,7 +247,7 @@ class SaveBtn(wx.Button):
 
             insert_lp = [
                 {"procedure_id": pr.pr_id, "visit_id": v.id}
-                for pr in self.mv.order_book.page1.procedurelistctrl.pr_list
+                for pr in self.mv.order_book.page1.procedure_list.pr_list
             ]
 
             try:

@@ -12,12 +12,12 @@ class AddProcedureButton(wx.BitmapButton):
         self.Bind(wx.EVT_BUTTON, self.onClick)
 
     def onClick(self, e: wx.CommandEvent):
-        idx: int = self.parent.choice.GetSelection()
+        idx: int = self.parent.procedure_picker.GetSelection()
         if idx != wx.NOT_FOUND:
             pr = self.mv.state.procedurelist[idx]
-            self.parent.procedurelistctrl.append(pr)
+            self.parent.procedure_list.append(pr)
             self.mv.price.FetchPrice()
-            self.parent.choice.SetSelection(-1)
+            self.parent.procedure_picker.SetSelection(-1)
 
 
 class DelProcedureButton(wx.BitmapButton):
@@ -28,7 +28,7 @@ class DelProcedureButton(wx.BitmapButton):
         self.Bind(wx.EVT_BUTTON, self.onClick)
 
     def onClick(self, e: wx.CommandEvent):
-        idx: int = self.parent.procedurelistctrl.GetFirstSelected()
+        idx: int = self.parent.procedure_list.GetFirstSelected()
         if idx != -1:
-            self.parent.procedurelistctrl.pop(idx)
+            self.parent.procedure_list.pop(idx)
             self.mv.price.FetchPrice()

@@ -106,14 +106,14 @@ class DeleteBtn(wx.Button):
             assert idx >= 0
             pr = self.mv.state.procedurelist.pop(idx)
             self.parent.procedurelist.pop(idx)
-            self.mv.order_book.page1.choice.Delete(idx)
-            if self.mv.order_book.page1.procedurelistctrl.ItemCount > 0:
-                for i in range(self.mv.order_book.page1.procedurelistctrl.ItemCount):
+            self.mv.order_book.page1.procedure_picker.Delete(idx)
+            if self.mv.order_book.page1.procedure_list.ItemCount > 0:
+                for i in range(self.mv.order_book.page1.procedure_list.ItemCount):
                     if (
-                        self.mv.order_book.page1.procedurelistctrl.GetItemText(i, 0)
+                        self.mv.order_book.page1.procedure_list.GetItemText(i, 0)
                         == pr.name
                     ):
-                        self.mv.order_book.page1.procedurelistctrl.DeleteItem(i)
+                        self.mv.order_book.page1.procedure_list.DeleteItem(i)
                 self.mv.price.FetchPrice()
         except Exception as error:
             wx.MessageBox(f"{error}", "Lỗi")
@@ -171,7 +171,7 @@ class AddDialog(BaseDialog):
             new_pr = Procedure(lastrowid, name, price)
             self.parent.procedurelist.append(new_pr)
             self.mv.state.procedurelist.append(new_pr)
-            self.mv.order_book.page1.choice.Append(name)
+            self.mv.order_book.page1.procedure_picker.Append(name)
             e.Skip()
         except Exception as error:
             wx.MessageBox(f"{error}", "Lỗi")
@@ -192,8 +192,8 @@ class UpdateDialog(BaseDialog):
             self.pr.price = int(self.price.Value.strip())
             self.mv.con.update(self.pr)
             self.parent.procedurelist.update(self.idx, self.pr)
-            self.mv.order_book.page1.choice.SetString(self.idx, self.pr.name)
-            procedurelist = self.mv.order_book.page1.procedurelistctrl
+            self.mv.order_book.page1.procedure_picker.SetString(self.idx, self.pr.name)
+            procedurelist = self.mv.order_book.page1.procedure_list
             if len(procedurelist.pr_list) > 0:
                 procedurelist.update(self.pr)
                 self.mv.price.FetchPrice()

@@ -157,7 +157,7 @@ class PrintOut(wx.Printout):
             with wx.DCFontChanger(dc, heading):
                 if config["print_price"]:
                     t = f"Tổng cộng: {self.mv.price.GetValue()}"
-                    if self.mv.order_book.page1.procedurelistctrl.ItemCount > 0:
+                    if self.mv.order_book.page1.procedure_list.ItemCount > 0:
                         t += " (đã gồm tiền thủ thuật)"
                     dc.DrawText(t, atx(0.06), row(0))
                 if self.mv.recheck.GetValue() != 0:

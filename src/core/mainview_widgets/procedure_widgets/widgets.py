@@ -1,5 +1,4 @@
 from core.init import size
-import other_func as otf
 from db.db_class import Procedure
 import wx
 import sqlite3
@@ -17,7 +16,6 @@ class ProcedureListItem:
 class ProcedureListCtrl(wx.ListCtrl):
     def __init__(self, parent):
         super().__init__(parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
-        self.SetBackgroundColour(otf.get_background_color("procedure_list"))
         self.AppendColumn("Tên thủ thuật", width=size(0.2))
         self.pr_list: list[ProcedureListItem] = []
 

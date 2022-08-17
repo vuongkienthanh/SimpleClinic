@@ -268,7 +268,7 @@ class MyMenuBar(wx.MenuBar):
             )
             prl = "\n".join(
                 "{}/ {} x {}".format(i + 1, p[1], p[2])
-                for i, p in enumerate(mv.order_book.page1.procedurelistctrl.summary())
+                for i, p in enumerate(mv.order_book.page1.procedure_list.summary())
             )
             if prl != "":
                 prl = "\n".join(["Thủ thuật", prl])

@@ -12,7 +12,6 @@ class VisitList(wx.ListCtrl):
     def __init__(self, parent: "mv.MainView"):
         super().__init__(parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
         self.mv = parent
-        self.SetBackgroundColour(otf.get_background_color("visit_list"))
         self.AppendColumn("Mã lượt khám", width=size(0.07))
         self.AppendColumn("Ngày giờ khám", width=size(0.075))
         self.AppendColumn("Chẩn đoán", width=size(0.15))

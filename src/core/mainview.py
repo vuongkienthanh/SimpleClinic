@@ -24,7 +24,6 @@ import wx
 class MainView(wx.Frame):
     def __init__(self, con: "db_func.Connection", sample: bool = False):
         super().__init__(parent=None, pos=(20, 20), title="PHẦN MỀM PHÒNG KHÁM TẠI NHÀ")
-        self.SetBackgroundColour(otf.get_background_color("mainview"))
 
         self.con = con
         self.state = State(self)
@@ -66,18 +65,40 @@ class MainView(wx.Frame):
         self.newvisitbtn = NewVisitBtn(self)
         self.savebtn = SaveBtn(self)
 
-        def set_color(widget: wx.Window, name: str):
-            widget.SetBackgroundColour(otf.get_background_color(name))
+        def set_color(p: list[tuple[wx.Window, str]]):
+            for widget, name in p:
+                widget.SetBackgroundColour(otf.get_background_color(name))
 
-        set_color(self.name, "name")
-        set_color(self.gender, "gender")
-        set_color(self.birthdate, "birthdate")
-        set_color(self.age, "age")
-        set_color(self.address, "address")
-        set_color(self.phone, "phone")
-        set_color(self.diagnosis, "diagnosis")
-        set_color(self.past_history, "past_history")
-        set_color(self.vnote, "visit_note")
+        set_color(
+            [
+                (self, "mainview"),
+                (self.name, "name"),
+                (self.gender, "gender"),
+                (self.birthdate, "birthdate"),
+                (self.age, "age"),
+                (self.address, "address"),
+                (self.phone, "phone"),
+                (self.diagnosis, "diagnosis"),
+                (self.past_history, "past_history"),
+                (self.vnote, "visit_note"),
+                (self.days, "days"),
+                (self.recheck, "recheck"),
+                (self.price, "price"),
+                (self.weight, "weight"),
+                (self.follow, "follow"),
+                (self.visit_list, "visit_list"),
+                (self.patient_book.page0, "patient_list"),
+                (self.patient_book.page1, "patient_list"),
+                (self.order_book.page0.drug_list, "drug_list"),
+                (self.order_book.page0.drug_picker, "drug_picker"),
+                (self.order_book.page0.times, "drug_times"),
+                (self.order_book.page0.dose, "drug_dose"),
+                (self.order_book.page0.quantity, "drug_quantity"),
+                (self.order_book.page0.note, "drug_note"),
+                (self.order_book.page1.procedure_picker, "procedure_picker"),
+                (self.order_book.page1.procedure_list, "procedure_list"),
+            ]
+        )
 
         def widget(w, p, r):
             return (w, p, wx.EXPAND | wx.RIGHT, r)

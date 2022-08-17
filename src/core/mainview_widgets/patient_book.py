@@ -1,5 +1,4 @@
 from core.init import size
-import other_func as otf
 from core import mainview
 from db.db_class import Patient, Visit
 import wx
@@ -34,7 +33,6 @@ class PatientListCtrl(wx.ListCtrl):
         super().__init__(parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
         self.parent = parent
         self.mv = parent.mv
-        self.SetBackgroundColour(otf.get_background_color("patient_list"))
         self.AppendColumn("Mã BN", width=size(0.03))
         self.AppendColumn("Họ tên", width=size(0.1))
         self.AppendColumn("Giới", width=size(0.03))

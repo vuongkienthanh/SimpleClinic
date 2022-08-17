@@ -17,7 +17,6 @@ class DaysCtrl(wx.SpinCtrl):
         self.mv = parent
         self.SetRange(0, 100)
         self.Disable()
-        self.SetBackgroundColour(otf.get_background_color("days"))
         self.Bind(wx.EVT_SPINCTRL, self.onSpin)
 
     def onSpin(self, e: wx.SpinEvent):
@@ -39,7 +38,6 @@ class RecheckCtrl(wx.SpinCtrl):
         )
         self.SetRange(0, 100)
         self.Disable()
-        self.SetBackgroundColour(otf.get_background_color("recheck"))
 
 
 class PriceCtrl(wx.TextCtrl):
@@ -49,7 +47,6 @@ class PriceCtrl(wx.TextCtrl):
         super().__init__(parent, **kwargs)
         self.mv = parent
         self.Clear()
-        self.SetBackgroundColour(otf.get_background_color("price"))
 
     def FetchPrice(self):
         """Display new price"""
@@ -58,9 +55,7 @@ class PriceCtrl(wx.TextCtrl):
             item.sale_price * item.quantity
             for item in self.mv.order_book.page0.drug_list.d_list
         )
-        price += sum(
-            pr.price for pr in self.mv.order_book.page1.procedurelistctrl.pr_list
-        )
+        price += sum(pr.price for pr in self.mv.order_book.page1.procedure_list.pr_list)
         self.ChangeValue(otf.num_to_str(price))
 
     def Clear(self):
@@ -82,7 +77,6 @@ class Follow(wx.ComboBox):
             **kwargs,
         )
         self.mv = parent
-        self.SetBackgroundColour(otf.get_background_color("follow"))
         self.SetDefault()
 
     def full_value(self) -> str:

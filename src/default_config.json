@@ -31,7 +31,12 @@
       219,
       186
     ],
-    "patient_list": [
+    "patient_queuelist": [
+      255,
+      255,
+      255
+    ],
+    "patient_seenlist": [
       255,
       255,
       255

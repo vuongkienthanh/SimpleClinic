@@ -138,6 +138,7 @@ Config and database are located at:
 
 ```sh
 {
+  // Xoá comment trước khi dùng
   // Tên phòng khám, được in trong toa
   "clinic_name": "Phòng khám chuyên khoa nhi - Bs xxxx yyyyy zzzz",
   // Tên bác sĩ, được in trong toa
@@ -182,7 +183,8 @@ Config and database are located at:
   // Tùy chỉnh màu sắc
   "background_color":{
     "mainview": [ 206, 219, 186 ], // Nền chính của app
-    "patient_list": [ 255, 255, 255 ], // Danh sách bệnh nhân
+    "patient_queuelist": [ 255, 255, 255 ], // Danh sách bệnh nhân đang chờ
+    "patient_seenlist": [ 255, 255, 255 ], // Danh sách bệnh nhân đã khám hôm nay
     "visit_list": [ 255, 255, 255 ], // Danh sách các lượt khám
     "name": [ 200, 200, 200 ], // Tên
     "gender": [ 200, 200, 200 ], // Giới tính

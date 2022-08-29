@@ -11,6 +11,7 @@ from core.dialogs import (
     ProcedureDialog,
     DayReportDialog,
     MonthReportDialog,
+    MonthWarehouseReportDialog,
 )
 from core.generic import MonthPickerDialog, DatePickerDialog
 from core.printer import printdata, PrintOut
@@ -92,8 +93,11 @@ class MyMenuBar(wx.MenuBar):
         menuSample: wx.MenuItem = manageMenu.Append(wx.ID_ANY, "Toa mẫu")
         menuProcedure: wx.MenuItem = manageMenu.Append(wx.ID_ANY, "Thủ thuật")
         menuReport = wx.Menu()
-        menuDayReport = menuReport.Append(wx.ID_ANY, "Theo ngày")
-        menuMonthReport = menuReport.Append(wx.ID_ANY, "Theo tháng")
+        menuDayReport = menuReport.Append(wx.ID_ANY, "Số lượng bệnh theo ngày")
+        menuMonthReport = menuReport.Append(wx.ID_ANY, "Số lượng bệnh theo tháng")
+        menuMonthWarehouseReport = menuReport.Append(
+            wx.ID_ANY, "Tình hình dùng thuốc theo tháng"
+        )
         manageMenu.AppendSubMenu(menuReport, "Báo cáo")
 
         settingMenu = wx.Menu()
@@ -133,6 +137,7 @@ class MyMenuBar(wx.MenuBar):
         self.Bind(wx.EVT_MENU, self.onProcedure, menuProcedure)
         self.Bind(wx.EVT_MENU, self.onDayReport, menuDayReport)
         self.Bind(wx.EVT_MENU, self.onMonthReport, menuMonthReport)
+        self.Bind(wx.EVT_MENU, self.onMonthWarehouseReport, menuMonthWarehouseReport)
         self.Bind(wx.EVT_MENU, self.onSetup, menuSetupConfig)
         self.Bind(wx.EVT_MENU, self.onOpenConfig, menuOpenConfig)
         self.Bind(wx.EVT_MENU, self.onVacuum, menuVacuum)
@@ -316,6 +321,14 @@ class MyMenuBar(wx.MenuBar):
         monthpickerdialog = MonthPickerDialog(mv)
         if monthpickerdialog.ShowModal() == wx.ID_OK:
             MonthReportDialog(
+                mv, monthpickerdialog.GetMonth(), monthpickerdialog.GetYear()
+            ).ShowModal()
+
+    def onMonthWarehouseReport(self, e):
+        mv: "mainview.MainView" = self.GetFrame()
+        monthpickerdialog = MonthPickerDialog(mv)
+        if monthpickerdialog.ShowModal() == wx.ID_OK:
+            MonthWarehouseReportDialog(
                 mv, monthpickerdialog.GetMonth(), monthpickerdialog.GetYear()
             ).ShowModal()
 

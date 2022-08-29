@@ -61,7 +61,7 @@ class SetupDialog(wx.Dialog):
             initial=config["number_of_drugs_in_one_page"],
             name="Số lượng thuốc trong một toa\n)Tối đa: 8)",
             min=4,
-            max=8
+            max=8,
         )
         self.visit_count = wx.SpinCtrl(
             self.scroll,

@@ -8,10 +8,11 @@ from math import ceil
 
 def get_background_color(s: str):
     from core.init import config
+
     try:
         return wx.Colour(*config["background_color"][s])
     except KeyError:
-        return wx.Colour(255,255,255)
+        return wx.Colour(255, 255, 255)
 
 
 def bd_to_age(bd: dt.date):

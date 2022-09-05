@@ -39,14 +39,14 @@ Open power shell
 ```
 Check installed version
 ```sh
-poetry --version # poetry 1.1.13
+poetry --version # poetry 1.2.0
 ```
 
 ### Download this repo
 Initialize the poetry env
 ```sh
 poetry env use python3.10
-poetry install --no-dev
+poetry install
 ```
 </details>
 
@@ -61,22 +61,22 @@ curl -sSL https://install.python-poetry.org | python3 -
 ```
 Check installed version
 ```sh
-poetry --version # poetry 1.1.13
+poetry --version # poetry 1.2.0
 ```
 
 ### Download this repo
 Initialize the poetry env
 ```sh
 poetry env use python3.10
-poetry install --no-dev
+poetry install
 ```
 </details>
 
 <details> <summary>Linux (Ubuntu, Debian based)</summary>
 
 ### Download source code and build `python`
-As of writing, there is no available python3.10 executable.  
-You have to compile it yourself.  
+If your distro already has python3.10, skip to installing poetry.  
+If your distro doesn't have python3.10 executable, you have to compile it yourself.  
 Download **python3.10** source code at https://www.python.org/downloads/
 
 Install dependencies
@@ -108,14 +108,19 @@ curl -sSL https://install.python-poetry.org | python3 -
 ```
 Check installed version
 ```sh
-poetry --version # poetry 1.1.13
+poetry --version # poetry 1.2.0
 ```
 
 ### Download this repo
 Initialize the poetry env
 ```sh
 poetry env use python3.10
-poetry install --no-dev
+poetry install
+```
+
+There is currently a bug in poetry 1.2.0, which doesn't install wxpython as expected, you may need to install with pip
+```
+poetry run pip install wxpython==4.2.0
 ```
 </details>
 

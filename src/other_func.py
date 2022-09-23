@@ -79,4 +79,20 @@ def num_to_str(price: int) -> str:
     return res[::-1]
 
 
+def weekdays(d: int):
+    today = dt.date.today()
+    target = today + dt.timedelta(days=d)
+    wd = target.weekday()
+    vn = {
+        0: "Thứ hai",
+        1: "Thứ ba",
+        2: "Thứ tư",
+        3: "Thứ năm",
+        4: "Thứ sáu",
+        5: "Thứ bảy",
+        6: "Chủ nhật",
+    }
+    return f"=>{vn[wd]}"
+
+
 TC = TypeVar("TC", bound=wx.TextCtrl)

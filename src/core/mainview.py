@@ -57,6 +57,9 @@ class MainView(wx.Frame):
         self.get_weight_btn = GetWeightBtn(self)
         self.days = DaysCtrl(self, name="Số ngày cho toa:")
         self.updatequantitybtn = UpdateQuantityBtn(self)
+        self.recheck_weekday = wx.StaticText(
+            self, label=otf.weekdays(config["default_days_for_prescription"])
+        )
         self.order_book = OrderBook(self)
         self.recheck = RecheckCtrl(self, name="Số ngày tái khám:")
         self.norecheck = NoRecheckBtn(self)
@@ -137,7 +140,8 @@ class MainView(wx.Frame):
                 *comb(self.weight),
                 widget(self.get_weight_btn, 0, 5),
                 *comb(self.days),
-                widget(self.updatequantitybtn, 0, 0),
+                widget(self.updatequantitybtn, 0, 5),
+                (self.recheck_weekday, 0, wx.ALIGN_CENTER, 0),
             ]
         )
         recheck_row = wx.BoxSizer(wx.HORIZONTAL)

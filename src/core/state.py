@@ -133,6 +133,7 @@ class State:
         self.mv.vnote.ChangeValue(v.vnote or "")
         self.mv.weight.SetValue(v.weight)
         self.mv.days.SetValue(v.days)
+        self.mv.recheck_weekday.SetLabel(otf.weekdays(v.days))
         self.mv.recheck.SetValue(v.recheck)
         self.mv.follow.SetFollow(v.follow)
         self.linedruglist = self.get_linedrugs_by_visit_id(v.id)
@@ -159,6 +160,9 @@ class State:
         self.mv.vnote.Clear()
         self.mv.weight.SetValue(0)
         self.mv.days.SetValue(config["default_days_for_prescription"])
+        self.mv.recheck_weekday.SetLabel(
+            otf.weekdays(config["default_days_for_prescription"])
+        )
         self.mv.updatequantitybtn.Disable()
         self.mv.recheck.SetValue(config["default_days_for_prescription"])
         self.mv.follow.SetDefault()

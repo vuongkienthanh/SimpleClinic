@@ -165,7 +165,7 @@ class MonthWarehouseReportDialog(wx.Dialog):
         self.scroll = wx.ScrolledWindow(
             self,
             style=wx.VSCROLL | wx.ALWAYS_SHOW_SB,
-            size=(round(wx.DisplaySize()[0] * 0.4), round(wx.DisplaySize()[1] * 0.4)),
+            size=(round(wx.DisplaySize()[0] * 0.4), round(wx.DisplaySize()[1] * 0.4))
         )
         self.scroll.SetScrollRate(0, 20)
 
@@ -199,7 +199,7 @@ class MonthWarehouseReportDialog(wx.Dialog):
         sizer.Add(self.export_btn, 0, wx.EXPAND | wx.ALL, 5)
         self.SetSizerAndFit(sizer)
 
-    def get_report(self, month: int, year: int) -> sqlite3.Row:
+    def get_report(self, month: int, year: int) -> list[sqlite3.Row]:
         query = f"""
             SELECT
                 wh.name AS name,
@@ -218,6 +218,7 @@ class MonthWarehouseReportDialog(wx.Dialog):
             LEFT JOIN {Warehouse.table_name} AS wh
             ON ld.drug_id = wh.id
             GROUP BY wh.name
+            HAVING wh.name IS NOT NULL
         """
         ret = self.mv.con.execute(query).fetchall()
         return ret

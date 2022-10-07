@@ -165,7 +165,7 @@ class MonthWarehouseReportDialog(wx.Dialog):
         self.scroll = wx.ScrolledWindow(
             self,
             style=wx.VSCROLL | wx.ALWAYS_SHOW_SB,
-            size=(round(wx.DisplaySize()[0] * 0.4), round(wx.DisplaySize()[1] * 0.4))
+            size=(round(wx.DisplaySize()[0] * 0.4), round(wx.DisplaySize()[1] * 0.4)),
         )
         self.scroll.SetScrollRate(0, 20)
 
@@ -206,19 +206,18 @@ class MonthWarehouseReportDialog(wx.Dialog):
                 SUM(ld.quantity) AS quantity,
                 wh.sale_unit AS sale_unit,
                 wh.usage_unit AS usage_unit
-            FROM (
+            FROM {LineDrug.table_name} AS ld
+            LEFT JOIN (
                 SELECT id FROM {Visit.table_name}
                 WHERE (
                     STRFTIME('%m', exam_datetime) = '{month:>02}' AND
                     STRFTIME('%Y', exam_datetime) = '{year}'
                 )
             ) AS v
-            LEFT JOIN {LineDrug.table_name} AS ld
             ON ld.visit_id = v.id
             LEFT JOIN {Warehouse.table_name} AS wh
             ON ld.drug_id = wh.id
             GROUP BY wh.name
-            HAVING wh.name IS NOT NULL
         """
         ret = self.mv.con.execute(query).fetchall()
         return ret

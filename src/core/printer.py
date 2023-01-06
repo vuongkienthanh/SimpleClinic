@@ -2,6 +2,7 @@ import other_func as otf
 from core import mainview as mv
 from core.init import config
 import textwrap as tw
+import datetime as dt
 import wx
 
 
@@ -145,7 +146,13 @@ class PrintOut(wx.Printout):
 
         def draw_bottom():
             with wx.DCFontChanger(dc, info):
-                dc.DrawText("Bác sĩ khám bệnh", atx(0.63), aty(0.735))
+                d = dt.date.today()
+                dc.DrawText(
+                    f"Ngày {d.day:02} tháng {d.month:02} năm {d.year}",
+                    atx(0.56),
+                    aty(0.735),
+                )
+                dc.DrawText("Bác sĩ khám bệnh", atx(0.63), aty(0.765))
                 draw_centered_text(config["doctor_name"], atx(0.75), aty(0.865))
 
             row_y = round(dcy * 0.02)

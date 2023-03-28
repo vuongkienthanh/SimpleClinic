@@ -236,7 +236,7 @@ class MyMenuBar(wx.MenuBar):
     def onPrint(self, e):
         mv: "mainview.MainView" = self.GetFrame()
         printout = PrintOut(mv)
-        wx.Printer(wx.PrintDialogData(printdata)).Print(self, printout, True)
+        wx.Printer(wx.PrintDialogData(printdata)).Print(self, printout, False)
 
     def onPreview(self, e):
         mv: "mainview.MainView" = self.GetFrame()

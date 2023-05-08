@@ -3,6 +3,7 @@ from db.db_class import LineProcedure, Visit, Patient, LineDrug
 import other_func as otf
 from core import mainview as mv
 from core.printer import PrintOut, printdata
+from core.init import config
 
 import sqlite3
 import wx
@@ -173,7 +174,7 @@ class SaveBtn(wx.Button):
                         insert_lp,
                     )
                     wx.MessageBox("Lưu lượt khám mới thành công", "Lưu lượt khám mới")
-                    if (
+                    if config["ask_print"] == True & (
                         wx.MessageBox("In toa về?", "In toa", style=wx.YES | wx.NO)
                         == wx.YES
                     ):
@@ -297,7 +298,7 @@ class SaveBtn(wx.Button):
                         insert_lp,
                     )
                 wx.MessageBox("Cập nhật lượt khám thành công", "Cập nhật lượt khám")
-                if (
+                if config["ask_print"] == True & (
                     wx.MessageBox("In toa về?", "In toa", style=wx.YES | wx.NO)
                     == wx.YES
                 ):

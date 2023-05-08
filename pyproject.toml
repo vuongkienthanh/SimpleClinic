@@ -1,11 +1,11 @@
 [tool.poetry]
-name = "pmpktn"
-version = "2.2.1"
-description = "Phần mềm phòng khám tại nhà"
+name = "SimpleClinic"
+version = "2.3"
+description = "Phần mềm phòng khám Simple Clinic"
 license = "MIT"
 authors = ["vuongkienthanh <thanhstardust@outlook.com>"]
 readme = "README.md"
-repository = "https://github.com/vuongkienthanh/pmpktn2"
+repository = "https://github.com/vuongkienthanh/SimpleClinic"
 
 
 [tool.poetry.dependencies]
@@ -13,12 +13,16 @@ python = "~3.10"
 attrdict3 = { version = "^2.0.2", platform = "linux" }
 wxPython = "^4.1"
 
-[tool.poetry.group.build]
+[tool.poetry.group.dev]
 optional = true
 
-[tool.poetry.group.build.dependencies]
+[tool.poetry.group.dev.dependencies]
 pyinstaller = "^5.3"
+pynvim = "^0.4.3"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.sqlfluff.core]
+dialect = "sqlite"

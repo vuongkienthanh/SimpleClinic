@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 
-APP_DIR = os.path.join(Path.home(), ".pmpktn")
+APP_DIR = os.path.join(Path.home(), ".simpleclinic")
 if not Path(APP_DIR).exists():
     os.mkdir(APP_DIR)
 

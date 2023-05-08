@@ -96,7 +96,7 @@ def sample_con():
             "vnote": "dynamic created",
         },
     )
-    print("Sample populized")
+    print("Fake data generated")
     return con
 
 

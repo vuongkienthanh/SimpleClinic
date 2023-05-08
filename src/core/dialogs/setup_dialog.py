@@ -32,6 +32,8 @@ class SetupDialog(wx.Dialog):
         self.initial_price = wx.TextCtrl(
             self.scroll, value=str(config["initial_price"]), name="Công khám bệnh"
         )
+        self.ask_print = wx.CheckBox(self.scroll, name="Hỏi in toa thuốc")
+        self.ask_print.SetValue(config["ask_print"])
         self.print_price = wx.CheckBox(self.scroll, name="In giá tiền")
         self.print_price.SetValue(config["print_price"])
         self.days = wx.SpinCtrl(
@@ -204,6 +206,7 @@ class SetupDialog(wx.Dialog):
                 *widget(self.clinic_address),
                 *widget(self.clinic_phone_number),
                 *widget(self.initial_price),
+                *widget(self.ask_print),
                 *widget(self.print_price),
                 *widget(self.days),
                 *widget(self.alert),
@@ -272,6 +275,7 @@ class SetupDialog(wx.Dialog):
             config["doctor_name"] = self.doctor_name.Value
             config["clinic_address"] = self.clinic_address.Value
             config["clinic_phone_number"] = self.clinic_phone_number.Value
+            config["ask_print"] = self.ask_print.Value
             config["print_price"] = self.print_price.Value
             config["initial_price"] = int(self.initial_price.Value)
             config["default_days_for_prescription"] = self.days.GetValue()

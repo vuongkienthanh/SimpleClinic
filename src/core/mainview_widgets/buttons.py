@@ -174,14 +174,15 @@ class SaveBtn(wx.Button):
                         insert_lp,
                     )
                     wx.MessageBox("Lưu lượt khám mới thành công", "Lưu lượt khám mới")
-                    if config["ask_print"] == True & (
-                        wx.MessageBox("In toa về?", "In toa", style=wx.YES | wx.NO)
-                        == wx.YES
-                    ):
-                        printout = PrintOut(self.mv)
-                        wx.Printer(wx.PrintDialogData(printdata)).Print(
-                            self, printout, False
-                        )
+                    if config["ask_print"]:
+                        if (
+                            wx.MessageBox("In toa về?", "In toa", style=wx.YES | wx.NO)
+                            == wx.YES
+                        ):
+                            printout = PrintOut(self.mv)
+                            wx.Printer(wx.PrintDialogData(printdata)).Print(
+                                self, printout, False
+                            )
                     self.mv.state.refresh()
             except sqlite3.IntegrityError as error:
                 for a in error.args:
@@ -298,14 +299,15 @@ class SaveBtn(wx.Button):
                         insert_lp,
                     )
                 wx.MessageBox("Cập nhật lượt khám thành công", "Cập nhật lượt khám")
-                if config["ask_print"] == True & (
-                    wx.MessageBox("In toa về?", "In toa", style=wx.YES | wx.NO)
-                    == wx.YES
-                ):
-                    printout = PrintOut(self.mv)
-                    wx.Printer(wx.PrintDialogData(printdata)).Print(
-                        self, printout, False
-                    )
+                if config["ask_print"]:
+                    if (
+                        wx.MessageBox("In toa về?", "In toa", style=wx.YES | wx.NO)
+                        == wx.YES
+                    ):
+                        printout = PrintOut(self.mv)
+                        wx.Printer(wx.PrintDialogData(printdata)).Print(
+                            self, printout, False
+                        )
                 self.mv.state.refresh()
             except sqlite3.IntegrityError as error:
                 for a in error.args:

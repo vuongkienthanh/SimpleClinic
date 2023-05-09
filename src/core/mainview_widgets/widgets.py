@@ -51,7 +51,7 @@ class PriceCtrl(wx.TextCtrl):
 
     def FetchPrice(self):
         """Display new price"""
-        price: int = config["initial_price"]
+        price: int = config["checkup_price"]
         price += sum(
             item.sale_price * item.quantity
             for item in self.mv.order_book.page0.drug_list.d_list
@@ -60,7 +60,7 @@ class PriceCtrl(wx.TextCtrl):
         self.ChangeValue(otf.num_to_str(price))
 
     def Clear(self):
-        self.ChangeValue(otf.num_to_str(config["initial_price"]))
+        self.ChangeValue(otf.num_to_str(config["checkup_price"]))
 
 
 class Follow(wx.ComboBox):

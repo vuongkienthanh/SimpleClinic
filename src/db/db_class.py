@@ -16,7 +16,7 @@ class Gender(enum.Enum):
         return ["Nam", "Nữ"][self.value]
 
 
-@dataclass(slots=True)
+@dataclass
 class BASE:
     """
     Base Abstract Class for derived sql table
@@ -26,6 +26,7 @@ class BASE:
 
     table_name: ClassVar[str]
     not_in_fields: ClassVar[list[str]]
+    id: int
 
     @classmethod
     def parse(cls, row: Mapping[str, Any]):
@@ -62,14 +63,7 @@ class BASE:
 
 @dataclass(slots=True)
 class Patient(BASE):
-    """Bệnh nhân
-    - `name`: Tên
-    - `gender`: Giới tính
-    - `birthdate`: Ngày tháng năm sinh
-    - `address`: Địa chỉ nhà
-    - `phone`: Số điện thoại
-    - `past_history`: Tiền căn, dị ứng
-    """
+    """Bệnh nhân"""
 
     table_name = "patients"
     not_in_fields = ["id"]
@@ -104,12 +98,13 @@ class SeenList(BASE):
 
 
 @dataclass(slots=True)
-class AppointedList(BASE):
-    """Danh sách hẹn tái khám hôm nay"""
+class AppointmentList(BASE):
+    """Danh sách hẹn tái khám"""
 
-    table_name = "appointedlist"
+    table_name = "appointmentlist"
     not_in_fields = ["id"]
     id: int
+    appointed_date: dt.date
     patient_id: int
 
 
@@ -146,7 +141,6 @@ class LineDrug(BASE):
     - `dose`: Liều một cữ
     - `times`: Số cữ
     - `quantity`: Số lượng
-    - `visit_id`: Mã lượt khám
     """
 
     table_name = "linedrugs"
@@ -194,9 +188,7 @@ class Warehouse(BASE):
 
 @dataclass(slots=True)
 class SamplePrescription(BASE):
-    """Toa mẫu
-    - `name`: Tên toa mẫu
-    """
+    """Toa mẫu"""
 
     table_name = "sampleprescription"
     not_in_fields = ["id"]
@@ -207,8 +199,6 @@ class SamplePrescription(BASE):
 @dataclass(slots=True)
 class LineSamplePrescription(BASE):
     """Thuốc trong toa mẫu
-    - `drug_id`: Mã thuốc
-    - `sample_id`: Mã toa thuốc
     - `times`: Liều một cữ
     - `dose`: Số cữ
     """
@@ -224,9 +214,7 @@ class LineSamplePrescription(BASE):
 
 @dataclass(slots=True)
 class Procedure(BASE):
-    """Thủ thuật
-    - `name`: tên
-    - `price`: giá"""
+    """Thủ thuật"""
 
     table_name = "procedures"
     not_in_fields = ["id"]
@@ -260,10 +248,14 @@ CREATE TABLE IF NOT EXISTS {Patient.table_name} (
   past_history TEXT
 );
 
+CREATE TABLE IF NOT EXISTS last_open_date (
+    last_open_date DATE
+);
+
 CREATE TABLE IF NOT EXISTS {QueueList.table_name} (
     id INTEGER PRIMARY KEY,
     patient_id INTEGER UNIQUE NOT NULL,
-    added_datetime TIMESTAMP DEFAULT (datetime('now', 'localtime')),
+    return added_datetime TIMESTAMP DEFAULT (datetime('now', 'localtime')),
     FOREIGN KEY (patient_id)
       REFERENCES {Patient.table_name} (id)
         ON DELETE CASCADE
@@ -279,8 +271,9 @@ CREATE TABLE IF NOT EXISTS {SeenList.table_name} (
         ON UPDATE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS {AppointedList.table_name} (
+CREATE TABLE IF NOT EXISTS {AppointmentList.table_name} (
     id INTEGER PRIMARY KEY,
+    appointed_date DATE NOT NULL,
     patient_id INTEGER UNIQUE NOT NULL,
     FOREIGN KEY (patient_id)
       REFERENCES {Patient.table_name} (id)
@@ -291,9 +284,6 @@ CREATE TABLE IF NOT EXISTS {AppointedList.table_name} (
 CREATE INDEX IF NOT EXISTS patient_name
   ON {Patient.table_name} (name);
 
-CREATE TABLE IF NOT EXISTS last_open_date (
-    last_open_date DATE
-);
 
 CREATE TABLE IF NOT EXISTS {Visit.table_name} (
   id INTEGER PRIMARY KEY,

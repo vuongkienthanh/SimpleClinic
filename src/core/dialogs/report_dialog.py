@@ -45,7 +45,7 @@ class DayReportDialog(wx.Dialog):
         query = f"""
             SELECT
                 visit_count,
-                ({config['initial_price']} * visit_count) + drug_sale + procedure AS revenue,
+                ({config['checkup_price']} * visit_count) + drug_sale + procedure AS revenue,
                 drug_purchase,
                 drug_sale,
                 (drug_sale - drug_purchase) AS profit_from_drug,
@@ -116,7 +116,7 @@ class MonthReportDialog(wx.Dialog):
         query = f"""
             SELECT
                 visit_count,
-                ({config['initial_price']} * visit_count) + drug_sale + procedure AS revenue,
+                ({config['checkup_price']} * visit_count) + drug_sale + procedure AS revenue,
                 drug_purchase,
                 drug_sale,
                 (drug_sale - drug_purchase) AS profit_from_drug,

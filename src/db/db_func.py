@@ -60,8 +60,8 @@ class Connection:
         with self.sqlcon as con:
             cur = con.execute(
                 f"""
-                INSERT INTO {t.table_name} ({t.commna_joined_fields()})
-                VALUES ({t.named_style_fields()})
+                INSERT INTO {t.table_name} ({t.commna_joined_field_names()})
+                VALUES ({t.named_style_placeholders()})
             """,
                 base,
             )
@@ -90,11 +90,11 @@ class Connection:
         with self.sqlcon as con:
             return con.execute(
                 f"""
-                UPDATE {t.table_name} SET ({t.commna_joined_fields()})
-                = ({t.qmark_style_fields()})
+                UPDATE {t.table_name} SET ({t.commna_joined_field_names()})
+                = ({t.qmark_style_placeholders()})
                 WHERE id = {base.id}
             """,
-                base.into_qmark_style_params(),
+                base.qmark_style_sql_params(),
             ).rowcount
 
     def vacuum(self):

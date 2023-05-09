@@ -133,8 +133,8 @@ class SaveBtn(wx.Button):
                     )
                     vid = con.execute(
                         f"""
-                        INSERT INTO {Visit.table_name} ({Visit.commna_joined_fields()})
-                        VALUES ({Visit.named_style_fields()})
+                        INSERT INTO {Visit.table_name} ({Visit.commna_joined_field_names()})
+                        VALUES ({Visit.named_style_placeholders()})
                     """,
                         v,
                     ).lastrowid
@@ -153,8 +153,8 @@ class SaveBtn(wx.Button):
                         )
                     con.executemany(
                         f"""
-                        INSERT INTO {LineDrug.table_name} ({LineDrug.commna_joined_fields()})
-                        VALUES ({LineDrug.named_style_fields()})
+                        INSERT INTO {LineDrug.table_name} ({LineDrug.commna_joined_field_names()})
+                        VALUES ({LineDrug.named_style_placeholders()})
                     """,
                         insert_ld,
                     )
@@ -168,8 +168,8 @@ class SaveBtn(wx.Button):
                         )
                     con.executemany(
                         f"""
-                        INSERT INTO {LineProcedure.table_name} ({LineProcedure.commna_joined_fields()})
-                        VALUES ({LineProcedure.named_style_fields()})
+                        INSERT INTO {LineProcedure.table_name} ({LineProcedure.commna_joined_field_names()})
+                        VALUES ({LineProcedure.named_style_placeholders()})
                     """,
                         insert_lp,
                     )
@@ -263,11 +263,11 @@ class SaveBtn(wx.Button):
                     )
                     con.execute(
                         f"""
-                        UPDATE {Visit.table_name} SET ({Visit.commna_joined_fields()})
-                        = ({Visit.qmark_style_fields()})
+                        UPDATE {Visit.table_name} SET ({Visit.commna_joined_field_names()})
+                        = ({Visit.qmark_style_placeholders()})
                         WHERE id = {v.id}
                     """,
-                        v.into_qmark_style_params(),
+                        v.qmark_style_sql_params(),
                     )
                     con.executemany(
                         f"""
@@ -282,8 +282,8 @@ class SaveBtn(wx.Button):
                     )
                     con.executemany(
                         f"""
-                        INSERT INTO {LineDrug.table_name} ({LineDrug.commna_joined_fields()})
-                        VALUES ({LineDrug.named_style_fields()})
+                        INSERT INTO {LineDrug.table_name} ({LineDrug.commna_joined_field_names()})
+                        VALUES ({LineDrug.named_style_placeholders()})
                     """,
                         insert_ld,
                     )
@@ -293,8 +293,8 @@ class SaveBtn(wx.Button):
                     )
                     con.executemany(
                         f"""
-                        INSERT INTO {LineProcedure.table_name} ({LineProcedure.commna_joined_fields()})
-                        VALUES ({LineProcedure.named_style_fields()})
+                        INSERT INTO {LineProcedure.table_name} ({LineProcedure.commna_joined_field_names()})
+                        VALUES ({LineProcedure.named_style_placeholders()})
                     """,
                         insert_lp,
                     )

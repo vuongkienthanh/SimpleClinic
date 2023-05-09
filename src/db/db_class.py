@@ -16,7 +16,7 @@ class Gender(enum.Enum):
         return ["Nam", "Nữ"][self.value]
 
 
-@dataclass
+@dataclass(slots=True)
 class BASE:
     """
     Base Abstract Class for derived sql table
@@ -26,7 +26,6 @@ class BASE:
 
     table_name: ClassVar[str]
     not_in_fields: ClassVar[list[str]]
-    id: int
 
     @classmethod
     def parse(cls, row: Mapping[str, Any]):
@@ -37,49 +36,31 @@ class BASE:
 
     @classmethod
     def fields(cls) -> tuple[str]:
-        """
-        Return fields used in sql insert & update string
-        """
         return tuple(
             (f.name for f in dataclasses.fields(cls) if f.name not in cls.not_in_fields)
         )
 
     @classmethod
-    def commna_joined_fields(cls) -> str:
-        """
-        Return comma-joined fields
-        """
+    def commna_joined_field_names(cls) -> str:
         return ",".join(cls.fields())
 
     @classmethod
-    def qmark_style_fields(cls) -> str:
-        """
-        Return qmark-style placeholders
-        """
+    def qmark_style_placeholders(cls) -> str:
         num_of_qmark = len(cls.fields())
         return ",".join(["?"] * num_of_qmark)
 
     @classmethod
-    def named_style_fields(cls) -> str:
-        """
-        Return named-style placeholders
-        """
+    def named_style_placeholders(cls) -> str:
         return ",".join([f":{f}" for f in cls.fields()])
 
-    def into_qmark_style_params(self) -> tuple:
-        """
-        qmark-style parameters
-        """
-        return tuple((getattr(self, attr) for attr in self.fields()))
+    def qmark_style_sql_params(self) -> tuple:
+        return tuple((getattr(self, field) for field in self.fields()))
 
-    def into_named_style_params(self) -> dict[str, Any]:
-        """
-        named-style parameters
-        """
-        return {attr: getattr(self, attr) for attr in self.fields()}
+    def named_style_sql_params(self) -> dict[str, Any]:
+        return {field: getattr(self, field) for field in self.fields()}
 
 
-@dataclass
+@dataclass(slots=True)
 class Patient(BASE):
     """Bệnh nhân
     - `name`: Tên
@@ -101,12 +82,9 @@ class Patient(BASE):
     past_history: str | None = None
 
 
-@dataclass
+@dataclass(slots=True)
 class QueueList(BASE):
-    """Lượt chờ khám
-    - `added_datetime`: Giờ đăng ký
-    - `patient_id`: Mã bệnh nhân
-    """
+    """Lượt chờ khám"""
 
     table_name = "queuelist"
     not_in_fields = ["id", "added_datetime"]
@@ -115,7 +93,27 @@ class QueueList(BASE):
     patient_id: int
 
 
-@dataclass
+@dataclass(slots=True)
+class SeenList(BASE):
+    """Danh sách đã khám hôm nay"""
+
+    table_name = "seenlist"
+    not_in_fields = ["id"]
+    id: int
+    patient_id: int
+
+
+@dataclass(slots=True)
+class AppointedList(BASE):
+    """Danh sách hẹn tái khám hôm nay"""
+
+    table_name = "appointedlist"
+    not_in_fields = ["id"]
+    id: int
+    patient_id: int
+
+
+@dataclass(slots=True)
 class Visit(BASE):
     """Lượt khám
     - `exam_datetime`: Thời điểm khám bệnh
@@ -141,7 +139,7 @@ class Visit(BASE):
     vnote: str | None = None
 
 
-@dataclass
+@dataclass(slots=True)
 class LineDrug(BASE):
     """Thuốc trong toa
     - `drug_id`: Mã thuốc
@@ -162,7 +160,7 @@ class LineDrug(BASE):
     note: str | None = None
 
 
-@dataclass
+@dataclass(slots=True)
 class Warehouse(BASE):
     """Thuốc trong kho
     - `name`: Tên thuốc
@@ -194,7 +192,7 @@ class Warehouse(BASE):
     note: str | None = None
 
 
-@dataclass
+@dataclass(slots=True)
 class SamplePrescription(BASE):
     """Toa mẫu
     - `name`: Tên toa mẫu
@@ -206,7 +204,7 @@ class SamplePrescription(BASE):
     name: str
 
 
-@dataclass
+@dataclass(slots=True)
 class LineSamplePrescription(BASE):
     """Thuốc trong toa mẫu
     - `drug_id`: Mã thuốc
@@ -224,7 +222,7 @@ class LineSamplePrescription(BASE):
     dose: str
 
 
-@dataclass
+@dataclass(slots=True)
 class Procedure(BASE):
     """Thủ thuật
     - `name`: tên
@@ -237,7 +235,7 @@ class Procedure(BASE):
     price: int
 
 
-@dataclass
+@dataclass(slots=True)
 class LineProcedure(BASE):
     """Thủ thuật của lượt khám"""
 
@@ -272,8 +270,30 @@ CREATE TABLE IF NOT EXISTS {QueueList.table_name} (
         ON UPDATE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS {SeenList.table_name} (
+    id INTEGER PRIMARY KEY,
+    patient_id INTEGER UNIQUE NOT NULL,
+    FOREIGN KEY (patient_id)
+      REFERENCES {Patient.table_name} (id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS {AppointedList.table_name} (
+    id INTEGER PRIMARY KEY,
+    patient_id INTEGER UNIQUE NOT NULL,
+    FOREIGN KEY (patient_id)
+      REFERENCES {Patient.table_name} (id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
 CREATE INDEX IF NOT EXISTS patient_name
   ON {Patient.table_name} (name);
+
+CREATE TABLE IF NOT EXISTS last_open_date (
+    last_open_date DATE
+);
 
 CREATE TABLE IF NOT EXISTS {Visit.table_name} (
   id INTEGER PRIMARY KEY,

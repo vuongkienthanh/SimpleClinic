@@ -11,7 +11,7 @@ class DaysCtrl(wx.SpinCtrl):
         super().__init__(
             parent,
             style=wx.SP_ARROW_KEYS,
-            initial=config["default_days_for_prescription"],
+            initial=config.default_days_for_prescription,
             **kwargs,
         )
         self.mv = parent
@@ -34,7 +34,7 @@ class RecheckCtrl(wx.SpinCtrl):
         super().__init__(
             parent,
             style=wx.SP_ARROW_KEYS,
-            initial=config["default_days_for_prescription"],
+            initial=config.default_days_for_prescription,
             **kwargs,
         )
         self.SetRange(0, 100)
@@ -51,16 +51,16 @@ class PriceCtrl(wx.TextCtrl):
 
     def FetchPrice(self):
         """Display new price"""
-        price: int = config["checkup_price"]
+        price: int = config.checkup_price
         price += sum(
             item.sale_price * item.quantity
             for item in self.mv.order_book.page0.drug_list.d_list
         )
         price += sum(pr.price for pr in self.mv.order_book.page1.procedure_list.pr_list)
-        self.ChangeValue(otf.num_to_str(price))
+        self.ChangeValue(otf.num_to_str_currency(price))
 
     def Clear(self):
-        self.ChangeValue(otf.num_to_str(config["checkup_price"]))
+        self.ChangeValue(otf.num_to_str_currency(config.checkup_price))
 
 
 class Follow(wx.ComboBox):
@@ -74,7 +74,7 @@ class Follow(wx.ComboBox):
         super().__init__(
             parent,
             style=wx.CB_DROPDOWN,
-            choices=list(config["follow_choices"].keys()),
+            choices=list(config.follow_choices.keys()),
             **kwargs,
         )
         self.mv = parent
@@ -83,8 +83,8 @@ class Follow(wx.ComboBox):
     def full_value(self) -> str:
         "return `key: value` from `key`"
         k = self.GetValue().strip()
-        if k in config["follow_choices"].keys():
-            return f"{k}: {config['follow_choices'][k]}"
+        if k in config.follow_choices.keys():
+            return f"{k}: {config.follow_choices[k]}"
         else:
             return k
 

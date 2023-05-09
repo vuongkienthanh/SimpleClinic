@@ -1,10 +1,8 @@
-from paths import CONFIG_PATH
 from other_func import get_background_color
 from core.init import config
 from core import mainview
 import wx
 import wx.adv as adv
-import json
 
 
 class SetupDialog(wx.Dialog):
@@ -18,32 +16,32 @@ class SetupDialog(wx.Dialog):
         )
         self.scroll.SetScrollRate(0, 20)
         self.clinic_name = wx.TextCtrl(
-            self.scroll, value=config["clinic_name"], name="Tên phòng khám"
+            self.scroll, value=config.clinic_name, name="Tên phòng khám"
         )
         self.doctor_name = wx.TextCtrl(
-            self.scroll, value=config["doctor_name"], name="Tên bác sĩ"
+            self.scroll, value=config.doctor_name, name="Tên bác sĩ"
         )
         self.clinic_address = wx.TextCtrl(
-            self.scroll, value=config["clinic_address"], name="Địa chỉ"
+            self.scroll, value=config.clinic_address, name="Địa chỉ"
         )
         self.clinic_phone_number = wx.TextCtrl(
-            self.scroll, value=config["clinic_phone_number"], name="Số điện thoại"
+            self.scroll, value=config.clinic_phone_number, name="Số điện thoại"
         )
         self.checkup_price = wx.TextCtrl(
-            self.scroll, value=str(config["checkup_price"]), name="Công khám bệnh"
+            self.scroll, value=str(config.checkup_price), name="Công khám bệnh"
         )
         self.ask_print = wx.CheckBox(self.scroll, name="Hỏi in toa thuốc")
-        self.ask_print.SetValue(config["ask_print"])
+        self.ask_print.SetValue(config.ask_print)
         self.print_price = wx.CheckBox(self.scroll, name="In giá tiền")
-        self.print_price.SetValue(config["print_price"])
+        self.print_price.SetValue(config.print_price)
         self.days = wx.SpinCtrl(
             self.scroll,
-            initial=config["default_days_for_prescription"],
+            initial=config.default_days_for_prescription,
             name="Số ngày toa về mặc định",
         )
         self.alert = wx.SpinCtrl(
             self.scroll,
-            initial=config["minimum_drug_quantity_alert"],
+            initial=config.minimum_drug_quantity_alert,
             max=10000,
             name="Lượng thuốc tối thiểu để báo động",
         )
@@ -55,24 +53,24 @@ class SetupDialog(wx.Dialog):
         )
         lc: wx.ListCtrl = self.unit.GetListCtrl()
         lc.DeleteAllItems()
-        for item in config["single_sale_units"]:
+        for item in config.single_sale_units:
             lc.Append((item,))
         lc.Append(("",))
         self.num_of_ld = wx.SpinCtrl(
             self.scroll,
-            initial=config["number_of_drugs_in_one_page"],
+            initial=config.number_of_drugs_in_one_page,
             name="Số lượng thuốc trong một toa\n)Tối đa: 8)",
             min=4,
             max=8,
         )
         self.visit_count = wx.SpinCtrl(
             self.scroll,
-            initial=config["display_recent_visit_count"],
+            initial=config.display_recent_visit_count,
             min=-1,
             name="Số lượt khám gần nhất được hiển thị\n(-1 là tất cả)",
         )
         self.maximize_at_start = wx.CheckBox(self.scroll, name="Phóng to khi khởi động")
-        self.maximize_at_start.SetValue(config["maximize_at_start"])
+        self.maximize_at_start.SetValue(config.maximize_at_start)
         self.mainview_color = wx.ColourPickerCtrl(
             self.scroll, colour=get_background_color("mainview"), name="Màu nền chính"
         )
@@ -271,26 +269,26 @@ class SetupDialog(wx.Dialog):
         try:
             lc: wx.ListCtrl = self.unit.GetListCtrl()
 
-            config["clinic_name"] = self.clinic_name.Value
-            config["doctor_name"] = self.doctor_name.Value
-            config["clinic_address"] = self.clinic_address.Value
-            config["clinic_phone_number"] = self.clinic_phone_number.Value
-            config["ask_print"] = self.ask_print.Value
-            config["print_price"] = self.print_price.Value
-            config["checkup_price"] = int(self.checkup_price.Value)
-            config["default_days_for_prescription"] = self.days.GetValue()
-            config["minimum_drug_quantity_alert"] = self.alert.GetValue()
-            config["single_sale_units"] = [
+            config.clinic_name = self.clinic_name.Value
+            config.doctor_name = self.doctor_name.Value
+            config.clinic_address = self.clinic_address.Value
+            config.clinic_phone_number = self.clinic_phone_number.Value
+            config.ask_print = self.ask_print.Value
+            config.print_price = self.print_price.Value
+            config.checkup_price = int(self.checkup_price.Value)
+            config.default_days_for_prescription = self.days.GetValue()
+            config.minimum_drug_quantity_alert = self.alert.GetValue()
+            config.single_sale_units = [
                 lc.GetItemText(idx).strip()
                 for idx in range(lc.ItemCount)
                 if lc.GetItemText(idx).strip() != ""
             ]
-            config["number_of_drugs_in_one_page"] = self.num_of_ld.GetValue()
-            config["display_recent_visit_count"] = self.visit_count.GetValue()
-            config["maximize_at_start"] = self.maximize_at_start.Value
+            config.number_of_drugs_in_one_page = self.num_of_ld.GetValue()
+            config.display_recent_visit_count = self.visit_count.GetValue()
+            config.maximize_at_start = self.maximize_at_start.Value
 
             def set_color(name: str, widget: wx.ColourPickerCtrl):
-                config["background_color"][name] = widget.Colour.GetIM()[:3]
+                config.background_color[name] = widget.Colour.GetIM()[:3]
 
             set_color("mainview", self.mainview_color)
             set_color("patient_queuelist", self.patient_queuelist_color)
@@ -319,9 +317,8 @@ class SetupDialog(wx.Dialog):
             set_color("follow", self.follow_color)
             set_color("procedure_picker", self.procedure_picker_color)
 
-            with open(CONFIG_PATH, mode="w", encoding="utf-8") as f:
-                json.dump(config, f, ensure_ascii=False, indent=4)
-            wx.MessageBox("Đã lưu cài đặt", "Cài đặt")
+            config.dump()
+            wx.MessageBox("Đã lưu cài đặt\nKhởi động lại để thay đổi màu", "Cài đặt")
             self.mv.price.FetchPrice()
             e.Skip()
         except Exception as error:

@@ -116,7 +116,7 @@ class ProcedurePage(wx.Panel):
         self.procedure_picker = wx.Choice(
             self,
             choices=[
-                f"{pr.name} ({otf.num_to_str(pr.price)})"
+                f"{pr.name} ({otf.num_to_str_currency(pr.price)})"
                 for pr in self.mv.state.procedurelist
             ],
         )

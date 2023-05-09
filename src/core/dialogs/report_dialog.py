@@ -1,6 +1,6 @@
 from paths import APP_DIR
 from core import mainview as mv
-from db.db_class import LineDrug, LineProcedure, Visit, Warehouse, Procedure
+from db import LineDrug, LineProcedure, Visit, Warehouse, Procedure
 import other_func as otf
 from core.init import config
 import wx
@@ -24,11 +24,11 @@ class DayReportDialog(wx.Dialog):
         sizer.AddMany(
             [
                 w(f"Số ca khám: {res['visit_count']}"),
-                w(f"Doanh thu: {otf.num_to_str(res['revenue'])}"),
-                w(f"Tổng tiền thuốc (giá mua): {otf.num_to_str(res['drug_purchase'])}"),
-                w(f"Tổng tiền thuốc (giá bán): {otf.num_to_str(res['drug_sale'])}"),
-                w(f"Lợi nhuận từ thuốc: {otf.num_to_str(res['profit_from_drug'])}"),
-                w(f"Lợi nhuận từ thủ thuật: {otf.num_to_str(res['procedure'])}"),
+                w(f"Doanh thu: {otf.num_to_str_currency(res['revenue'])}"),
+                w(f"Tổng tiền thuốc (giá mua): {otf.num_to_str_currency(res['drug_purchase'])}"),
+                w(f"Tổng tiền thuốc (giá bán): {otf.num_to_str_currency(res['drug_sale'])}"),
+                w(f"Lợi nhuận từ thuốc: {otf.num_to_str_currency(res['profit_from_drug'])}"),
+                w(f"Lợi nhuận từ thủ thuật: {otf.num_to_str_currency(res['procedure'])}"),
             ]
         )
         self.SetSizerAndFit(sizer)
@@ -45,7 +45,7 @@ class DayReportDialog(wx.Dialog):
         query = f"""
             SELECT
                 visit_count,
-                ({config['checkup_price']} * visit_count) + drug_sale + procedure AS revenue,
+                ({config.checkup_price} * visit_count) + drug_sale + procedure AS revenue,
                 drug_purchase,
                 drug_sale,
                 (drug_sale - drug_purchase) AS profit_from_drug,
@@ -95,11 +95,11 @@ class MonthReportDialog(wx.Dialog):
         sizer.AddMany(
             [
                 w(f"Số ca khám: {res['visit_count']}"),
-                w(f"Doanh thu: {otf.num_to_str(res['revenue'])}"),
-                w(f"Tổng tiền thuốc (giá mua): {otf.num_to_str(res['drug_purchase'])}"),
-                w(f"Tổng tiền thuốc (giá bán): {otf.num_to_str(res['drug_sale'])}"),
-                w(f"Lợi nhuận từ thuốc: {otf.num_to_str(res['profit_from_drug'])}"),
-                w(f"Lợi nhuận từ thủ thuật: {otf.num_to_str(res['procedure'])}"),
+                w(f"Doanh thu: {otf.num_to_str_currency(res['revenue'])}"),
+                w(f"Tổng tiền thuốc (giá mua): {otf.num_to_str_currency(res['drug_purchase'])}"),
+                w(f"Tổng tiền thuốc (giá bán): {otf.num_to_str_currency(res['drug_sale'])}"),
+                w(f"Lợi nhuận từ thuốc: {otf.num_to_str_currency(res['profit_from_drug'])}"),
+                w(f"Lợi nhuận từ thủ thuật: {otf.num_to_str_currency(res['procedure'])}"),
             ]
         )
         self.SetSizerAndFit(sizer)
@@ -116,7 +116,7 @@ class MonthReportDialog(wx.Dialog):
         query = f"""
             SELECT
                 visit_count,
-                ({config['checkup_price']} * visit_count) + drug_sale + procedure AS revenue,
+                ({config.checkup_price} * visit_count) + drug_sale + procedure AS revenue,
                 drug_purchase,
                 drug_sale,
                 (drug_sale - drug_purchase) AS profit_from_drug,

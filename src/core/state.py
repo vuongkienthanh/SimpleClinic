@@ -1,20 +1,41 @@
-from db.db_class import *
+from db import *
 from core import mainview
 import other_func as otf
 from core.init import config
 from core import menubar
-
-
+import datetime as dt
 import sqlite3
 import wx
 
 
 class State:
-    """Manager data, appearance and button state"""
+    """Manage data, appearance and button state"""
 
     def __init__(self, mv: "mainview.MainView") -> None:
         self.mv = mv
+        self.check_last_open_date()
         self.Init()
+
+    def check_last_open_date(self):
+        with self.mv.con as con:
+            last_date: dt.date | None = con.execute(
+                "SELECT * FROM last_open_date"
+            ).fetchone()
+            if last_date is not None:
+                if last_date < dt.date.today():
+                    print("sadf")
+                    con.execute(f"DELETE * FROM {TodayList.table_name}")
+                    con.execute(
+                        "UPDATE last_open_date SET last_open_date =?",
+                        (dt.date.today(),),
+                    )
+                else:
+                    print("gasdgasdg")
+            else:
+                con.execute(
+                    "INSERT INTO last_open_date (last_open_date) VALUES (?)",
+                    (dt.date.today(),),
+                )
 
     def Init(self) -> None:
         self._patient: Patient | None = None
@@ -159,12 +180,12 @@ class State:
         self.mv.diagnosis.Clear()
         self.mv.vnote.Clear()
         self.mv.weight.SetValue(0)
-        self.mv.days.SetValue(config["default_days_for_prescription"])
+        self.mv.days.SetValue(config.default_days_for_prescription)
         self.mv.recheck_weekday.SetLabel(
-            otf.weekdays(config["default_days_for_prescription"])
+            otf.weekdays(config.default_days_for_prescription)
         )
         self.mv.updatequantitybtn.Disable()
-        self.mv.recheck.SetValue(config["default_days_for_prescription"])
+        self.mv.recheck.SetValue(config.default_days_for_prescription)
         self.mv.follow.SetDefault()
         self.linedruglist = []
         self.lineprocedurelist = []
@@ -265,37 +286,12 @@ class State:
 
     def get_queuelist(self) -> list[sqlite3.Row]:
         return self.mv.con.execute(
-            f"""
-            SELECT
-                p.id AS pid,
-                p.name,
-                p.gender,
-                p.birthdate,
-                ql.added_datetime
-            FROM {QueueList.table_name} AS ql
-            JOIN {Patient.table_name} AS p
-            ON ql.patient_id = p.id
-            ORDER BY ql.added_datetime ASC
-        """
+            f"SELECT * FROM {QueueList.table_name}_view"
         ).fetchall()
 
     def get_todaylist(self) -> list[sqlite3.Row]:
         return self.mv.con.execute(
-            f"""
-            SELECT
-                p.id AS pid,
-                p.name,
-                p.gender,
-                p.birthdate,
-                v.id AS vid,
-                v.exam_datetime
-            FROM {Patient.table_name} AS p
-            JOIN (
-                SELECT id,patient_id,exam_datetime FROM {Visit.table_name}
-                WHERE date(exam_datetime) = date('now', 'localtime')
-            ) AS v
-            ON v.patient_id = p.id
-        """
+            f"SELECT * FROM {TodayList.table_name}_view"
         ).fetchall()
 
     def get_visits_by_patient_id(self, pid) -> list[sqlite3.Row]:
@@ -305,9 +301,9 @@ class State:
             WHERE {Visit.table_name}.patient_id = {pid}
             ORDER BY exam_datetime DESC
         """
-        if config["display_recent_visit_count"] >= 0:
+        if config.display_recent_visit_count >= 0:
             query += f"""
-                LIMIT {config['display_recent_visit_count']}
+                LIMIT {config.display_recent_visit_count}
             """
         return self.mv.con.execute(query).fetchall()
 

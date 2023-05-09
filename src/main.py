@@ -1,4 +1,4 @@
-import db.db_func as dbf
+import db
 from paths import *
 import os.path
 import wx
@@ -7,7 +7,7 @@ import sys
 
 
 class App(wx.App):
-    def __init__(self, con: dbf.Connection):
+    def __init__(self, con: db.Connection):
         super().__init__()
         from core.mainview import MainView
 
@@ -29,7 +29,7 @@ def platform_settings():
 
 
 if __name__ == "__main__":
-    con = dbf.Connection(MY_DATABASE_PATH)
+    con = db.Connection(MY_DATABASE_PATH)
     con.make_db()
     platform_settings()
     App(con)

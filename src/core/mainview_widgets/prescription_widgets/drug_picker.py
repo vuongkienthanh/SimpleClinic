@@ -1,4 +1,4 @@
-from db.db_class import Warehouse
+from db import Warehouse
 from core.mainview_widgets import order_book
 from core.init import size, config
 import wx
@@ -77,7 +77,7 @@ class DrugPopup(wx.ComboPopup):
         )
 
     def check_min_quantity(self, item, index):
-        if item.quantity <= config["minimum_drug_quantity_alert"]:
+        if item.quantity <= config.minimum_drug_quantity_alert:
             self.lc.SetItemTextColour(index, wx.Colour(252, 3, 57))
 
     def OnPopup(self):

@@ -1,5 +1,5 @@
 from core.init import size, config
-from db.db_class import Warehouse
+from db import Warehouse
 import other_func as otf
 from core import mainview
 from core.generic import DatePicker, NumberTextCtrl
@@ -142,7 +142,7 @@ class WarehouseDialog(wx.Dialog):
 
     def check_min_quantity(self, wh: Warehouse, idx: int):
         "conditional recolor"
-        if wh.quantity <= config["minimum_drug_quantity_alert"]:
+        if wh.quantity <= config.minimum_drug_quantity_alert:
             self.lc.SetItemTextColour(idx, wx.Colour(252, 3, 57))
 
     def onSearch(self, e: wx.CommandEvent):

@@ -1,5 +1,4 @@
-from db.db_func import Connection
-from db.db_class import *
+from db import *
 from paths import SAMPLE_DIR
 from main import App, platform_settings
 

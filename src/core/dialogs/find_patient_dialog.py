@@ -2,7 +2,7 @@ from core.init import size
 from core import mainview
 import other_func as otf
 from core.dialogs.patient_dialog import EditPatientDialog
-from db.db_class import Patient, QueueList, QueueList, Visit
+from db import Patient, QueueList, QueueList, Visit
 from core.generic import DatePickerDialog
 import wx
 import sqlite3

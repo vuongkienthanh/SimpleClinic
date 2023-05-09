@@ -1,5 +1,5 @@
 from paths import APP_DIR, MY_DATABASE_PATH, DEFAULT_CONFIG_PATH, CONFIG_PATH
-from db.db_class import *
+from db import *
 from core import mainview
 from core.dialogs import (
     FindPatientDialog,
@@ -98,10 +98,11 @@ class MyMenuBar(wx.MenuBar):
         menuMonthWarehouseReport = menuReport.Append(
             wx.ID_ANY, "Tình hình dùng thuốc theo tháng"
         )
+        manageMenu.AppendSubMenu(menuReport, "Báo cáo")
 
         settingMenu = wx.Menu()
         menuSetupConfig: wx.MenuItem = settingMenu.Append(wx.ID_ANY, "Cài đặt hệ thống")
-        menuOpenConfig: wx.MenuItem = settingMenu.Append(
+        menuOpenConfigFolder: wx.MenuItem = settingMenu.Append(
             wx.ID_ANY, "Mở folder cài đặt + dữ liệu"
         )
         menuVacuum: wx.MenuItem = settingMenu.Append(
@@ -138,34 +139,34 @@ class MyMenuBar(wx.MenuBar):
         self.Bind(wx.EVT_MENU, self.onMonthReport, menuMonthReport)
         self.Bind(wx.EVT_MENU, self.onMonthWarehouseReport, menuMonthWarehouseReport)
         self.Bind(wx.EVT_MENU, self.onSetup, menuSetupConfig)
-        self.Bind(wx.EVT_MENU, self.onOpenConfig, menuOpenConfig)
+        self.Bind(wx.EVT_MENU, self.onOpenConfigFolder, menuOpenConfigFolder)
         self.Bind(wx.EVT_MENU, self.onVacuum, menuVacuum)
         self.Bind(wx.EVT_MENU, self.onBackup, menuBackup)
         self.Bind(wx.EVT_MENU, self.onResetConfig, menuResetConfig)
 
-    def onRefresh(self, e):
+    def onRefresh(self, _):
         mv: "mainview.MainView" = self.GetFrame()
         mv.state.refresh()
 
-    def onAbout(self, e):
+    def onAbout(self, _):
         wx.MessageBox(
-            "Phần mềm phòng khám tại nhà\nTác giả: Vương Kiến Thanh\nEmail: thanhstardust@outlook.com",
+            "Phần mềm phòng khám Simple Clinic\nTác giả: Vương Kiến Thanh\nEmail: thanhstardust@outlook.com",
             style=wx.OK | wx.CENTRE | wx.ICON_NONE,
         )
 
-    def onExit(self, e):
+    def onExit(self, _):
         mv: "mainview.MainView" = self.GetFrame()
         mv.Close()
 
-    def onNewPatient(self, e):
+    def onNewPatient(self, _):
         mv: "mainview.MainView" = self.GetFrame()
         NewPatientDialog(mv).ShowModal()
 
-    def onFindPatient(self, e):
+    def onFindPatient(self, _):
         mv: "mainview.MainView" = self.GetFrame()
         FindPatientDialog(mv).ShowModal()
 
-    def onEditPatient(self, e):
+    def onEditPatient(self, _):
         mv: "mainview.MainView" = self.GetFrame()
         page: wx.ListCtrl = mv.patient_book.GetPage(mv.patient_book.Selection)
         idx: int = page.GetFirstSelected()
@@ -174,20 +175,20 @@ class MyMenuBar(wx.MenuBar):
         if EditPatientDialog(mv).ShowModal() == wx.ID_OK:
             page.EnsureVisible(idx)
 
-    def onNewVisit(self, e):
+    def onNewVisit(self, _):
         mv: "mainview.MainView" = self.GetFrame()
         idx = mv.visit_list.GetFirstSelected()
         mv.visit_list.Select(idx, 0)
 
-    def onInsertVisit(self, e):
+    def onInsertVisit(self, _):
         mv: "mainview.MainView" = self.GetFrame()
         mv.savebtn.insert_visit()
 
-    def onUpdateVisit(self, e):
+    def onUpdateVisit(self, _):
         mv: "mainview.MainView" = self.GetFrame()
         mv.savebtn.update_visit()
 
-    def onDeleteVisit(self, e):
+    def onDeleteVisit(self, _):
         if (
             wx.MessageBox(
                 "Xác nhận?",
@@ -209,7 +210,7 @@ class MyMenuBar(wx.MenuBar):
             except sqlite3.Error as error:
                 wx.MessageBox("Lỗi không xóa được\n" + str(error), "Lỗi")
 
-    def onDeleteQueueList(self, e):
+    def onDeleteQueueList(self, _):
         if (
             wx.MessageBox(
                 "Xác nhận?",
@@ -232,12 +233,12 @@ class MyMenuBar(wx.MenuBar):
             except Exception as error:
                 wx.MessageBox("Lỗi không xóa được\n" + str(error), "Lỗi")
 
-    def onPrint(self, e):
+    def onPrint(self, _):
         mv: "mainview.MainView" = self.GetFrame()
         printout = PrintOut(mv)
         wx.Printer(wx.PrintDialogData(printdata)).Print(self, printout, False)
 
-    def onPreview(self, e):
+    def onPreview(self, _):
         mv: "mainview.MainView" = self.GetFrame()
         printout = PrintOut(mv, preview=True)
         printdialogdata = wx.PrintDialogData(printdata)
@@ -248,7 +249,7 @@ class MyMenuBar(wx.MenuBar):
         frame.Initialize()
         frame.Show()
 
-    def onCopyVisitInfo(self, e):
+    def onCopyVisitInfo(self, _):
         cb: wx.Clipboard = wx.TheClipboard  # type:ignore
         mv: "mainview.MainView" = self.GetFrame()
         if cb.Open():
@@ -297,25 +298,25 @@ class MyMenuBar(wx.MenuBar):
             cb.SetData(wx.TextDataObject(t))
             cb.Close()
 
-    def onWarehouse(self, e):
+    def onWarehouse(self, _):
         mv: "mainview.MainView" = self.GetFrame()
         WarehouseDialog(mv).ShowModal()
 
-    def onSample(self, e):
+    def onSample(self, _):
         mv: "mainview.MainView" = self.GetFrame()
         SampleDialog(mv).ShowModal()
 
-    def onProcedure(self, e):
+    def onProcedure(self, _):
         mv: "mainview.MainView" = self.GetFrame()
         ProcedureDialog(mv).ShowModal()
 
-    def onDayReport(self, e):
+    def onDayReport(self, _):
         mv: "mainview.MainView" = self.GetFrame()
         datepickerdialog = DatePickerDialog(mv)
         if datepickerdialog.ShowModal() == wx.ID_OK:
             DayReportDialog(mv, datepickerdialog.GetDate()).ShowModal()
 
-    def onMonthReport(self, e):
+    def onMonthReport(self, _):
         mv: "mainview.MainView" = self.GetFrame()
         monthpickerdialog = MonthPickerDialog(mv)
         if monthpickerdialog.ShowModal() == wx.ID_OK:
@@ -323,7 +324,7 @@ class MyMenuBar(wx.MenuBar):
                 mv, monthpickerdialog.GetMonth(), monthpickerdialog.GetYear()
             ).ShowModal()
 
-    def onMonthWarehouseReport(self, e):
+    def onMonthWarehouseReport(self, _):
         mv: "mainview.MainView" = self.GetFrame()
         monthpickerdialog = MonthPickerDialog(mv)
         if monthpickerdialog.ShowModal() == wx.ID_OK:
@@ -331,11 +332,11 @@ class MyMenuBar(wx.MenuBar):
                 mv, monthpickerdialog.GetMonth(), monthpickerdialog.GetYear()
             ).ShowModal()
 
-    def onSetup(self, e):
+    def onSetup(self, _):
         mv: "mainview.MainView" = self.GetFrame()
         SetupDialog(mv).ShowModal()
 
-    def onOpenConfig(self, e):
+    def onOpenConfigFolder(self, _):
         if sys.platform == "win32":
             os.startfile(APP_DIR)
         elif sys.platform == "linux":
@@ -343,7 +344,7 @@ class MyMenuBar(wx.MenuBar):
         elif sys.platform == "darwin":
             subprocess.run(["start", APP_DIR])
 
-    def onVacuum(self, e):
+    def onVacuum(self, _):
         mv: "mainview.MainView" = self.GetFrame()
         pre, post = mv.con.vacuum()
         wx.MessageBox(
@@ -351,7 +352,7 @@ class MyMenuBar(wx.MenuBar):
             "Thu gọn dữ liệu",
         )
 
-    def onBackup(self, e):
+    def onBackup(self, _):
         bak = (
             os.path.realpath(MY_DATABASE_PATH)
             + dt.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
@@ -363,7 +364,7 @@ class MyMenuBar(wx.MenuBar):
         else:
             wx.MessageBox("Sao lưu không thành công", "Sao lưu dữ liệu")
 
-    def onResetConfig(self, e):
+    def onResetConfig(self, _):
         try:
             bak = CONFIG_PATH + dt.datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + ".bak"
             shutil.copyfile(CONFIG_PATH, bak)

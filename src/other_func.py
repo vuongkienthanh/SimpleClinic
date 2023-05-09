@@ -10,7 +10,7 @@ def get_background_color(s: str):
     from core.init import config
 
     try:
-        return wx.Colour(*config["background_color"][s])
+        return wx.Colour(*config.background_color[s])
     except KeyError:
         return wx.Colour(255, 255, 255)
 
@@ -54,18 +54,18 @@ def calc_quantity(
             from core.init import config
 
             if sale_unit.casefold() in (
-                item.casefold() for item in config["single_sale_units"]
+                item.casefold() for item in config.single_sale_units
             ):
                 return 1
             else:
                 return calc(times, dose, days)
         else:
             return calc(times, dose, days)
-    except Exception as e:
+    except Exception as _:
         return None
 
 
-def num_to_str(price: int) -> str:
+def num_to_str_currency(price: int) -> str:
     """Return proper currency format str from int"""
     s = str(price)
     res = ""

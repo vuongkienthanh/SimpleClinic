@@ -1,4 +1,4 @@
-from db import db_func
+import db
 from core.init import config, tsize
 import other_func as otf
 from core.state import State
@@ -22,14 +22,15 @@ import wx
 
 
 class MainView(wx.Frame):
-    def __init__(self, con: "db_func.Connection", sample: bool = False):
-        super().__init__(parent=None, pos=(20, 20), title="PHẦN MỀM PHÒNG KHÁM SIMPLE CLINIC")
+    def __init__(self, con: "db.Connection"):
+        super().__init__(
+            parent=None, pos=(20, 20), title="PHẦN MỀM PHÒNG KHÁM SIMPLE CLINIC"
+        )
 
         self.con = con
         self.state = State(self)
-        self.sample = sample
 
-        if config["maximize_at_start"]:
+        if config.maximize_at_start:
             self.Maximize()
 
         self.patient_book = PatientBook(self)
@@ -58,7 +59,7 @@ class MainView(wx.Frame):
         self.days = DaysCtrl(self, name="Số ngày cho toa:")
         self.updatequantitybtn = UpdateQuantityBtn(self)
         self.recheck_weekday = wx.StaticText(
-            self, label=otf.weekdays(config["default_days_for_prescription"])
+            self, label=otf.weekdays(config.default_days_for_prescription)
         )
         self.order_book = OrderBook(self)
         self.recheck = RecheckCtrl(self, name="Số ngày tái khám:")

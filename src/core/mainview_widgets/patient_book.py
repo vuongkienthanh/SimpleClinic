@@ -1,6 +1,6 @@
 from core.init import size
 from core import mainview
-from db.db_class import Patient, Visit
+from db import Patient, Visit
 import wx
 import sqlite3
 

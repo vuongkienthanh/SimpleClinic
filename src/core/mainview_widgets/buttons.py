@@ -1,5 +1,5 @@
 from paths import weight_bm, update_druglist_bm
-from db.db_class import LineProcedure, Visit, Patient, LineDrug
+from db import LineProcedure, Visit, Patient, LineDrug, TodayList
 import other_func as otf
 from core import mainview as mv
 from core.printer import PrintOut, printdata
@@ -173,8 +173,15 @@ class SaveBtn(wx.Button):
                     """,
                         insert_lp,
                     )
+                    con.execute(
+                        f"""
+                        INSERT INTO {TodayList.table_name} ({TodayList.commna_joined_field_names()})
+                        VALUES ({TodayList.qmark_style_placeholders()})
+                    """,
+                        (p.id,),
+                    )
                     wx.MessageBox("Lưu lượt khám mới thành công", "Lưu lượt khám mới")
-                    if config["ask_print"]:
+                    if config.ask_print:
                         if (
                             wx.MessageBox("In toa về?", "In toa", style=wx.YES | wx.NO)
                             == wx.YES
@@ -299,7 +306,7 @@ class SaveBtn(wx.Button):
                         insert_lp,
                     )
                 wx.MessageBox("Cập nhật lượt khám thành công", "Cập nhật lượt khám")
-                if config["ask_print"]:
+                if config.ask_print:
                     if (
                         wx.MessageBox("In toa về?", "In toa", style=wx.YES | wx.NO)
                         == wx.YES

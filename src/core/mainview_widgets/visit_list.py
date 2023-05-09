@@ -1,7 +1,7 @@
 from core import mainview as mv
 from core.init import size
 import other_func as otf
-from db.db_class import Visit
+from db import Visit
 import wx
 import sqlite3
 

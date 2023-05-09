@@ -1,5 +1,5 @@
 from core.init import size
-from db.db_class import Procedure
+from db import Procedure
 import wx
 import sqlite3
 

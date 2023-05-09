@@ -1,4 +1,4 @@
-from db.db_class import Patient, Patient, QueueList, QueueList
+from db import Patient, Patient, QueueList, QueueList
 from core.generic import DateTextCtrl, DatePicker, AgeCtrl, PhoneTextCtrl, GenderChoice
 import other_func as otf
 from core import mainview

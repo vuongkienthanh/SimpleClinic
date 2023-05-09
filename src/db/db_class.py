@@ -21,24 +21,21 @@ class BASE:
     """
     Base Abstract Class for derived sql table
     - `table_name`: name of table in sqlite database
-    - `not_in_fields`: names of fields that are not returned by classmethod fields()
+    - `excluded_fields`: names of fields that are excluded by classmethod fields()
     """
 
     table_name: ClassVar[str]
-    not_in_fields: ClassVar[list[str]]
+    excluded_fields: ClassVar[list[str]]
     id: int
 
     @classmethod
     def parse(cls, row: Mapping[str, Any]):
-        """
-        Return the BASE object from a mapping with no conversion
-        """
         return cls(**row)
 
     @classmethod
     def fields(cls) -> tuple[str]:
         return tuple(
-            (f.name for f in dataclasses.fields(cls) if f.name not in cls.not_in_fields)
+            (f.name for f in dataclasses.fields(cls) if f.name not in cls.excluded_fields)
         )
 
     @classmethod
@@ -66,7 +63,7 @@ class Patient(BASE):
     """Bệnh nhân"""
 
     table_name = "patients"
-    not_in_fields = ["id"]
+    excluded_fields = ["id"]
     id: int
     name: str
     gender: Gender
@@ -81,20 +78,21 @@ class QueueList(BASE):
     """Lượt chờ khám"""
 
     table_name = "queuelist"
-    not_in_fields = ["id", "added_datetime"]
+    excluded_fields = ["id", "added_datetime"]
     id: int
-    added_datetime: dt.datetime
     patient_id: int
+    added_datetime: dt.datetime
 
 
 @dataclass(slots=True)
-class SeenList(BASE):
+class TodayList(BASE):
     """Danh sách đã khám hôm nay"""
 
     table_name = "seenlist"
-    not_in_fields = ["id"]
+    excluded_fields = ["id", "exam_datetime"]
     id: int
     patient_id: int
+    exam_datetime: dt.datetime
 
 
 @dataclass(slots=True)
@@ -102,7 +100,7 @@ class AppointmentList(BASE):
     """Danh sách hẹn tái khám"""
 
     table_name = "appointmentlist"
-    not_in_fields = ["id"]
+    excluded_fields = ["id"]
     id: int
     appointed_date: dt.date
     patient_id: int
@@ -122,7 +120,7 @@ class Visit(BASE):
     """
 
     table_name = "visits"
-    not_in_fields = ["id", "exam_datetime"]
+    excluded_fields = ["id", "exam_datetime"]
     id: int
     exam_datetime: dt.datetime
     diagnosis: str
@@ -144,7 +142,7 @@ class LineDrug(BASE):
     """
 
     table_name = "linedrugs"
-    not_in_fields = ["id"]
+    excluded_fields = ["id"]
     id: int
     drug_id: int
     dose: str
@@ -171,7 +169,7 @@ class Warehouse(BASE):
     """
 
     table_name = "warehouse"
-    not_in_fields = ["id"]
+    excluded_fields = ["id"]
     id: int
     name: str
     element: str
@@ -191,7 +189,7 @@ class SamplePrescription(BASE):
     """Toa mẫu"""
 
     table_name = "sampleprescription"
-    not_in_fields = ["id"]
+    excluded_fields = ["id"]
     id: int
     name: str
 
@@ -204,7 +202,7 @@ class LineSamplePrescription(BASE):
     """
 
     table_name = "linesampleprescription"
-    not_in_fields = ["id"]
+    excluded_fields = ["id"]
     id: int
     drug_id: int
     sample_id: int
@@ -214,10 +212,10 @@ class LineSamplePrescription(BASE):
 
 @dataclass(slots=True)
 class Procedure(BASE):
-    """Thủ thuật"""
+    """Danh sách thủ thuật"""
 
     table_name = "procedures"
-    not_in_fields = ["id"]
+    excluded_fields = ["id"]
     id: int
     name: str
     price: int
@@ -228,7 +226,7 @@ class LineProcedure(BASE):
     """Thủ thuật của lượt khám"""
 
     table_name = "lineprocedure"
-    not_in_fields = ["id"]
+    excluded_fields = ["id"]
     id: int
     procedure_id: int
     visit_id: int
@@ -255,21 +253,48 @@ CREATE TABLE IF NOT EXISTS last_open_date (
 CREATE TABLE IF NOT EXISTS {QueueList.table_name} (
     id INTEGER PRIMARY KEY,
     patient_id INTEGER UNIQUE NOT NULL,
-    return added_datetime TIMESTAMP DEFAULT (datetime('now', 'localtime')),
+    added_datetime TIMESTAMP DEFAULT (datetime('now', 'localtime')),
     FOREIGN KEY (patient_id)
       REFERENCES {Patient.table_name} (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS {SeenList.table_name} (
+CREATE VIEW IF NOT EXISTS {QueueList.table_name}_view AS
+    SELECT
+        p.id AS pid,
+        p.name,
+        p.gender,
+        p.birthdate,
+        ql.added_datetime
+    FROM {QueueList.table_name} AS ql
+    JOIN {Patient.table_name} AS p
+    ON ql.patient_id = p.id
+    ORDER BY ql.added_datetime ASC
+;
+
+CREATE TABLE IF NOT EXISTS {TodayList.table_name} (
     id INTEGER PRIMARY KEY,
     patient_id INTEGER UNIQUE NOT NULL,
+    exam_datetime TIMESTAMP DEFAULT (datetime('now', 'localtime')),
     FOREIGN KEY (patient_id)
       REFERENCES {Patient.table_name} (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
+
+CREATE VIEW IF NOT EXISTS {TodayList.table_name}_view AS
+    SELECT
+        p.id AS pid,
+        p.name,
+        p.gender,
+        p.birthdate,
+        tl.exam_datetime
+    FROM {TodayList.table_name} AS tl
+    JOIN {Patient.table_name} AS p
+    ON tl.patient_id = p.id
+    ORDER BY tl.exam_datetime ASC
+;
 
 CREATE TABLE IF NOT EXISTS {AppointmentList.table_name} (
     id INTEGER PRIMARY KEY,

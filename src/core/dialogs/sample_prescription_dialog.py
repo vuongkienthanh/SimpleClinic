@@ -1,7 +1,7 @@
 from core import mainview
 from core.init import size
 from core.generic import DoseTextCtrl, NumberTextCtrl
-from db.db_class import *
+from db import *
 import wx
 import sqlite3
 from typing import Any

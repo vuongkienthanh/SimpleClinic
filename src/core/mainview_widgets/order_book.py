@@ -1,7 +1,7 @@
 from core.mainview_widgets.prescription_widgets import *
 from core.mainview_widgets.procedure_widgets import *
 from core import mainview
-import other_func as otf
+from misc import num_to_str_price
 
 import wx
 
@@ -116,7 +116,7 @@ class ProcedurePage(wx.Panel):
         self.procedure_picker = wx.Choice(
             self,
             choices=[
-                f"{pr.name} ({otf.num_to_str_currency(pr.price)})"
+                f"{pr.name} ({num_to_str_price(pr.price)})"
                 for pr in self.mv.state.procedurelist
             ],
         )

@@ -1,6 +1,6 @@
 import db
 from core.init import config, tsize
-import other_func as otf
+import misc
 from core.state import State
 from core.generic import AgeCtrl, PhoneTextCtrl, DateTextCtrl, WeightCtrl
 from core.mainview_widgets import (
@@ -59,7 +59,7 @@ class MainView(wx.Frame):
         self.days = DaysCtrl(self, name="Số ngày cho toa:")
         self.updatequantitybtn = UpdateQuantityBtn(self)
         self.recheck_weekday = wx.StaticText(
-            self, label=otf.weekdays(config.default_days_for_prescription)
+            self, label=misc.weekdays(config.default_days_for_prescription)
         )
         self.order_book = OrderBook(self)
         self.recheck = RecheckCtrl(self, name="Số ngày tái khám:")
@@ -71,7 +71,7 @@ class MainView(wx.Frame):
 
         def set_color(p: list[tuple[wx.Window, str]]):
             for widget, name in p:
-                widget.SetBackgroundColour(otf.get_background_color(name))
+                widget.SetBackgroundColour(misc.get_background_color_from_config(name))
 
         set_color(
             [

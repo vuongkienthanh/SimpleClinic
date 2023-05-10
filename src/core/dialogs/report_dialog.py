@@ -1,7 +1,7 @@
-from paths import APP_DIR
+from misc import APP_DIR
 from core import mainview as mv
 from db import LineDrug, LineProcedure, Visit, Warehouse, Procedure
-import other_func as otf
+from misc import num_to_str_price
 from core.init import config
 import wx
 import datetime as dt
@@ -24,11 +24,11 @@ class DayReportDialog(wx.Dialog):
         sizer.AddMany(
             [
                 w(f"Số ca khám: {res['visit_count']}"),
-                w(f"Doanh thu: {otf.num_to_str_currency(res['revenue'])}"),
-                w(f"Tổng tiền thuốc (giá mua): {otf.num_to_str_currency(res['drug_purchase'])}"),
-                w(f"Tổng tiền thuốc (giá bán): {otf.num_to_str_currency(res['drug_sale'])}"),
-                w(f"Lợi nhuận từ thuốc: {otf.num_to_str_currency(res['profit_from_drug'])}"),
-                w(f"Lợi nhuận từ thủ thuật: {otf.num_to_str_currency(res['procedure'])}"),
+                w(f"Doanh thu: {num_to_str_price(res['revenue'])}"),
+                w(f"Tổng tiền thuốc (giá mua): {num_to_str_price(res['drug_purchase'])}"),
+                w(f"Tổng tiền thuốc (giá bán): {num_to_str_price(res['drug_sale'])}"),
+                w(f"Lợi nhuận từ thuốc: {num_to_str_price(res['profit_from_drug'])}"),
+                w(f"Lợi nhuận từ thủ thuật: {num_to_str_price(res['procedure'])}"),
             ]
         )
         self.SetSizerAndFit(sizer)
@@ -95,11 +95,11 @@ class MonthReportDialog(wx.Dialog):
         sizer.AddMany(
             [
                 w(f"Số ca khám: {res['visit_count']}"),
-                w(f"Doanh thu: {otf.num_to_str_currency(res['revenue'])}"),
-                w(f"Tổng tiền thuốc (giá mua): {otf.num_to_str_currency(res['drug_purchase'])}"),
-                w(f"Tổng tiền thuốc (giá bán): {otf.num_to_str_currency(res['drug_sale'])}"),
-                w(f"Lợi nhuận từ thuốc: {otf.num_to_str_currency(res['profit_from_drug'])}"),
-                w(f"Lợi nhuận từ thủ thuật: {otf.num_to_str_currency(res['procedure'])}"),
+                w(f"Doanh thu: {num_to_str_price(res['revenue'])}"),
+                w(f"Tổng tiền thuốc (giá mua): {num_to_str_price(res['drug_purchase'])}"),
+                w(f"Tổng tiền thuốc (giá bán): {num_to_str_price(res['drug_sale'])}"),
+                w(f"Lợi nhuận từ thuốc: {num_to_str_price(res['profit_from_drug'])}"),
+                w(f"Lợi nhuận từ thủ thuật: {num_to_str_price(res['procedure'])}"),
             ]
         )
         self.SetSizerAndFit(sizer)

@@ -1,5 +1,5 @@
 from db import *
-from paths import SAMPLE_DIR
+from misc import SAMPLE_DIR
 from main import App, platform_settings
 
 import os
@@ -70,7 +70,7 @@ def sample_con():
         CSVReader(Visit, f("visits.csv")),
         CSVReader(LineDrug, f("linedrugs.csv")),
         CSVReader(LineProcedure, f("lineprocedure.csv")),
-        CSVReader(QueueList, f("queuelist.csv")),
+        CSVReader(Queue, f("queuelist.csv")),
         CSVReader(SamplePrescription, f("sampleprescription.csv")),
         CSVReader(LineSamplePrescription, f("linesampleprescription.csv")),
     ]:

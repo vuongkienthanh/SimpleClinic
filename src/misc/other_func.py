@@ -6,7 +6,7 @@ from itertools import cycle
 from math import ceil
 
 
-def get_background_color(s: str):
+def get_background_color_from_config(s: str):
     from core.init import config
 
     try:
@@ -15,7 +15,7 @@ def get_background_color(s: str):
         return wx.Colour(255, 255, 255)
 
 
-def bd_to_age(bd: dt.date):
+def bd_to_vn_age(bd: dt.date) -> str:
     today = dt.date.today()
     delta = (today - bd).days
     if delta <= 60:
@@ -27,16 +27,17 @@ def bd_to_age(bd: dt.date):
     return age
 
 
-def get_usage_note_str(usage, times, dose, usage_unit):
+def get_usage_note_str(usage: str, times: int, dose: str, usage_unit: str) -> str:
     return f"{usage} ngày {times} lần, lần {dose} {usage_unit}"
 
 
-def check_blank(val: str):
-    return None if val.strip() == "" else val.strip()
+def check_blank_to_none(val: str) -> str | None:
+    val = val.strip()
+    return None if val == "" else val
 
 
-def check_none(val: Any | None):
-    return str(val) if val else ""
+def check_none_to_blank(val: Any | None) -> str:
+    return str(val).strip() if val else ""
 
 
 def calc_quantity(
@@ -65,8 +66,7 @@ def calc_quantity(
         return None
 
 
-def num_to_str_currency(price: int) -> str:
-    """Return proper currency format str from int"""
+def num_to_str_price(price: int) -> str:
     s = str(price)
     res = ""
     for char, cyc in zip(s[::-1], cycle(range(3))):
@@ -80,6 +80,15 @@ def num_to_str_currency(price: int) -> str:
 
 
 def weekdays(d: int):
+    """
+    0 -> Thứ hai
+    1 -> Thứ ba
+    2 -> Thứ tư
+    3 -> Thứ năm
+    4 -> Thứ sáu
+    5 -> Thứ bảy
+    6 -> Chủ nhật
+    """
     today = dt.date.today()
     target = today + dt.timedelta(days=d)
     wd = target.weekday()

@@ -1,6 +1,6 @@
 from core.init import size, config
 from db import Warehouse
-import other_func as otf
+from misc import check_none_to_blank, check_blank_to_none
 from core import mainview
 from core.generic import DatePicker, NumberTextCtrl
 
@@ -129,8 +129,8 @@ class WarehouseDialog(wx.Dialog):
                 wh.expire_date.strftime("%d/%m/%Y")
                 if wh.expire_date is not None
                 else "",
-                otf.check_none(wh.made_by),
-                otf.check_none(wh.note),
+                check_none_to_blank(wh.made_by),
+                check_none_to_blank(wh.note),
             ]
         )
         self.check_min_quantity(wh, len(self._list) - 1)
@@ -321,8 +321,8 @@ class NewDialog(BaseDialog):
                 "sale_price": int(self.sale_price.Value.strip()),
                 "sale_unit": self.get_sale_unit(),
                 "expire_date": self.expire_date.checked_GetDate(),
-                "made_by": otf.check_blank(self.made_by.Value),
-                "note": otf.check_blank(self.note.Value),
+                "made_by": check_blank_to_none(self.made_by.Value),
+                "note": check_blank_to_none(self.note.Value),
             }
             try:
                 lastrowid = self.mv.con.insert(Warehouse, wh)
@@ -359,8 +359,8 @@ class EditDialog(BaseDialog):
             self.sale_unit.ChangeValue(wh.sale_unit)
         if wh.expire_date is not None:
             self.expire_date.SetDate(wh.expire_date)
-        self.made_by.ChangeValue(otf.check_none(wh.made_by))
-        self.note.ChangeValue(otf.check_none(wh.note))
+        self.made_by.ChangeValue(check_none_to_blank(wh.made_by))
+        self.note.ChangeValue(check_none_to_blank(wh.note))
 
     def onOkBtn(self, e):
         if self.is_valid():
@@ -373,8 +373,8 @@ class EditDialog(BaseDialog):
             self.wh.sale_price = int(self.sale_price.Value)
             self.wh.sale_unit = self.get_sale_unit()
             self.wh.expire_date = self.expire_date.checked_GetDate()
-            self.wh.made_by = otf.check_blank(self.made_by.Value)
-            self.wh.note = otf.check_blank(self.note.Value)
+            self.wh.made_by = check_blank_to_none(self.made_by.Value)
+            self.wh.note = check_blank_to_none(self.note.Value)
             try:
                 self.mv.con.update(self.wh)
                 wx.MessageBox("Cập nhật thành công", "Cập nhật")

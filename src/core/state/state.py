@@ -1,9 +1,8 @@
 from db import *
 from core import mainview
-import other_func as otf
+from misc import bd_to_vn_age, weekdays
 from core.init import config
 from core import menubar
-import datetime as dt
 import sqlite3
 import wx
 
@@ -13,29 +12,7 @@ class State:
 
     def __init__(self, mv: "mainview.MainView") -> None:
         self.mv = mv
-        self.check_last_open_date()
         self.Init()
-
-    def check_last_open_date(self):
-        with self.mv.con as con:
-            last_date: dt.date | None = con.execute(
-                "SELECT * FROM last_open_date"
-            ).fetchone()
-            if last_date is not None:
-                if last_date < dt.date.today():
-                    print("sadf")
-                    con.execute(f"DELETE * FROM {TodayList.table_name}")
-                    con.execute(
-                        "UPDATE last_open_date SET last_open_date =?",
-                        (dt.date.today(),),
-                    )
-                else:
-                    print("gasdgasdg")
-            else:
-                con.execute(
-                    "INSERT INTO last_open_date (last_open_date) VALUES (?)",
-                    (dt.date.today(),),
-                )
 
     def Init(self) -> None:
         self._patient: Patient | None = None
@@ -82,7 +59,7 @@ class State:
         self.mv.name.ChangeValue(p.name)
         self.mv.gender.ChangeValue(str(p.gender))
         self.mv.birthdate.ChangeValue(p.birthdate.strftime("%d/%m/%Y"))
-        self.mv.age.ChangeValue(otf.bd_to_age(p.birthdate))
+        self.mv.age.ChangeValue(bd_to_vn_age(p.birthdate))
         self.mv.address.ChangeValue(p.address or "")
         self.mv.phone.ChangeValue(p.phone or "")
         self.mv.past_history.ChangeValue(p.past_history or "")
@@ -154,7 +131,7 @@ class State:
         self.mv.vnote.ChangeValue(v.vnote or "")
         self.mv.weight.SetValue(v.weight)
         self.mv.days.SetValue(v.days)
-        self.mv.recheck_weekday.SetLabel(otf.weekdays(v.days))
+        self.mv.recheck_weekday.SetLabel(weekdays(v.days))
         self.mv.recheck.SetValue(v.recheck)
         self.mv.follow.SetFollow(v.follow)
         self.linedruglist = self.get_linedrugs_by_visit_id(v.id)
@@ -182,7 +159,7 @@ class State:
         self.mv.weight.SetValue(0)
         self.mv.days.SetValue(config.default_days_for_prescription)
         self.mv.recheck_weekday.SetLabel(
-            otf.weekdays(config.default_days_for_prescription)
+            weekdays(config.default_days_for_prescription)
         )
         self.mv.updatequantitybtn.Disable()
         self.mv.recheck.SetValue(config.default_days_for_prescription)
@@ -286,12 +263,12 @@ class State:
 
     def get_queuelist(self) -> list[sqlite3.Row]:
         return self.mv.con.execute(
-            f"SELECT * FROM {QueueList.table_name}_view"
+            f"SELECT * FROM {Queue.table_name}_view"
         ).fetchall()
 
     def get_todaylist(self) -> list[sqlite3.Row]:
         return self.mv.con.execute(
-            f"SELECT * FROM {TodayList.table_name}_view"
+            f"SELECT * FROM {SeenToday.table_name}_view"
         ).fetchall()
 
     def get_visits_by_patient_id(self, pid) -> list[sqlite3.Row]:

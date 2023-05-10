@@ -1,5 +1,5 @@
 from core.mainview_widgets import order_book
-from paths import plus_bm, minus_bm
+from misc import plus_bm, minus_bm
 
 import wx
 

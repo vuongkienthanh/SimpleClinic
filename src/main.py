@@ -1,5 +1,5 @@
 import db
-from paths import *
+from misc import SRC_DIR, MY_DATABASE_PATH
 import os.path
 import wx
 import os
@@ -31,5 +31,6 @@ def platform_settings():
 if __name__ == "__main__":
     con = db.Connection(MY_DATABASE_PATH)
     con.make_db()
+    con.update_last_open_date()
     platform_settings()
     App(con)

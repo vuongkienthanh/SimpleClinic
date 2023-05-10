@@ -1,6 +1,5 @@
 from core import mainview as mv
 from core.init import size
-import other_func as otf
 from db import Visit
 import wx
 import sqlite3

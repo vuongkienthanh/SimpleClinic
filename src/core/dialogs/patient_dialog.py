@@ -1,6 +1,6 @@
-from db import Patient, Patient, QueueList, QueueList
+from db import Patient, Patient, Queue
 from core.generic import DateTextCtrl, DatePicker, AgeCtrl, PhoneTextCtrl, GenderChoice
-import other_func as otf
+from misc import check_blank_to_none, check_none_to_blank
 from core import mainview
 import sqlite3
 import wx
@@ -133,9 +133,9 @@ class NewPatientDialog(BasePatientDialog):
                         "name": name.strip().upper(),
                         "gender": self.gender.GetGender(),
                         "birthdate": self.birthdate.GetDate(),
-                        "address": otf.check_blank(self.address.Value),
-                        "phone": otf.check_blank(self.phone.Value),
-                        "past_history": otf.check_blank(self.past_history.Value),
+                        "address": check_blank_to_none(self.address.Value),
+                        "phone": check_blank_to_none(self.phone.Value),
+                        "past_history": check_blank_to_none(self.past_history.Value),
                     },
                 )
                 assert lastrowid is not None
@@ -150,7 +150,7 @@ class NewPatientDialog(BasePatientDialog):
                         ).ShowModal()
                         == wx.ID_OK
                     ):
-                        self.mv.con.insert(QueueList, {"patient_id": lastrowid})
+                        self.mv.con.insert(Queue, {"patient_id": lastrowid})
                         wx.MessageBox("Thêm vào danh sách chờ thành công", "OK")
                         self.mv.state.queuelist = self.mv.state.get_queuelist()
                 except sqlite3.IntegrityError as error:
@@ -177,9 +177,9 @@ class EditPatientDialog(BasePatientDialog):
         self.birthdate.SetDate(p.birthdate)
         self.age.SetBirthdate(p.birthdate)
         self.birthdate_text.SetDate(p.birthdate)
-        self.address.ChangeValue(otf.check_none(p.address))
-        self.phone.ChangeValue(otf.check_none(p.phone))
-        self.past_history.ChangeValue(otf.check_none(p.past_history))
+        self.address.ChangeValue(check_none_to_blank(p.address))
+        self.phone.ChangeValue(check_none_to_blank(p.phone))
+        self.past_history.ChangeValue(check_none_to_blank(p.past_history))
 
     def onOkBtn(self, e):
         if self.is_valid():
@@ -189,9 +189,9 @@ class EditPatientDialog(BasePatientDialog):
             p.name = name.strip().upper()
             p.gender = self.gender.GetGender()
             p.birthdate = self.birthdate.GetDate()
-            p.address = otf.check_blank(self.address.Value)
-            p.phone = otf.check_blank(self.phone.Value)
-            p.past_history = otf.check_blank(self.past_history.Value)
+            p.address = check_blank_to_none(self.address.Value)
+            p.phone = check_blank_to_none(self.phone.Value)
+            p.past_history = check_blank_to_none(self.past_history.Value)
             try:
                 self.mv.con.update(p)
                 wx.MessageBox("Cập nhật thành công", "OK")

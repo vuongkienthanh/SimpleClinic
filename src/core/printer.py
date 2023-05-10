@@ -1,4 +1,4 @@
-import other_func as otf
+from misc import bd_to_vn_age, get_usage_note_str
 from core import mainview as mv
 from core.init import config
 import textwrap as tw
@@ -50,7 +50,6 @@ class PrintOut(wx.Printout):
         return (1, x + bool(y), 1, x + bool(y))
 
     def OnPrintPage(self, page):
-
         num_of_ld = config.number_of_drugs_in_one_page
         d_list = self.mv.order_book.page0.drug_list.d_list
         state = self.mv.state
@@ -93,7 +92,6 @@ class PrintOut(wx.Printout):
             dc.DrawText(s, round(x - sx / 2), y)
 
         def draw_top():
-
             row_y = round(dcy * 0.017)
             y = aty(0.05)
 
@@ -134,7 +132,7 @@ class PrintOut(wx.Printout):
                     atx(0.3) + get_text_x(s4) + space,
                     row(1),
                 )
-                dc.DrawText(otf.bd_to_age(p.birthdate), atx(0.7), row(1))
+                dc.DrawText(bd_to_vn_age(p.birthdate), atx(0.7), row(1))
                 diagnosis = tw.wrap(
                     self.mv.diagnosis.Value, 60, initial_indent=" " * 19
                 )
@@ -182,7 +180,6 @@ class PrintOut(wx.Printout):
                 dc.DrawText(f"Trang {i}/2", atx(0.7), aty(0.72))
 
         def draw_content(first=True):
-
             row_y = round(dcy * 0.055)
             y = aty(0.28)
 
@@ -204,8 +201,8 @@ class PrintOut(wx.Printout):
                     t = f"{dl.quantity} {dl.sale_unit or dl.usage_unit}"
                     dc.DrawText(t, atx(0.7), row(i))
                 with wx.DCFontChanger(dc, info_italic):
-                    t = dl.note or otf.get_usage_note_str(
-                        dl.usage, str(dl.times), dl.dose, dl.usage_unit
+                    t = dl.note or get_usage_note_str(
+                        dl.usage, dl.times, dl.dose, dl.usage_unit
                     )
                     dc.DrawText(t, atx(0.12), row(i) + round(row_y / 2))
                 i += 1

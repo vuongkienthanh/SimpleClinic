@@ -2,7 +2,7 @@ from core import mainview as mv
 from core.init import size, tsize
 from core.generic import NumberTextCtrl
 from db import Procedure
-import other_func as otf
+from misc import num_to_str_price
 import wx
 
 
@@ -53,14 +53,14 @@ class ProcedureList(wx.ListCtrl):
         self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onDeselect)
 
     def append(self, pr: Procedure):
-        self.Append((pr.id, pr.name, otf.num_to_str_currency(pr.price)))
+        self.Append((pr.id, pr.name, num_to_str_price(pr.price)))
 
     def pop(self, idx: int):
         self.DeleteItem(idx)
 
     def update(self, idx: int, pr: Procedure):
         self.SetItem(idx, 1, pr.name)
-        self.SetItem(idx, 2, otf.num_to_str_currency(pr.price))
+        self.SetItem(idx, 2, num_to_str_price(pr.price))
 
     def onSelect(self, e):
         self.parent.updatebtn.Enable()

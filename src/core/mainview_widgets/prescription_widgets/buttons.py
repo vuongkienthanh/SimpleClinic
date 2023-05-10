@@ -1,9 +1,8 @@
 from core.mainview_widgets import order_book
 from core.mainview_widgets import prescription_widgets
 from db import Warehouse, LineSamplePrescription
-from paths import plus_bm, minus_bm
+from misc import plus_bm, minus_bm, calc_quantity
 from core.dialogs.sample_prescription_dialog import SampleDialog
-from other_func import calc_quantity
 import wx
 
 
@@ -13,7 +12,7 @@ class AddDrugButton(wx.BitmapButton):
         self.parent = parent
         self.Bind(wx.EVT_BUTTON, self.onClick)
 
-    def onClick(self, e: wx.CommandEvent):
+    def onClick(self, _):
         self.Add()
 
     def Add(self):

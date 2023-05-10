@@ -1,5 +1,5 @@
 from core.init import k_number, k_special, k_tab, k_decimal, k_hash, k_slash
-import other_func as otf
+from misc import bd_to_vn_age
 from db import Gender
 import wx
 import wx.adv
@@ -118,7 +118,7 @@ class AgeCtrl(wx.TextCtrl):
 
     def SetBirthdate(self, bd: dt.date):
         """Change value based on `bd`"""
-        self.ChangeValue(otf.bd_to_age(bd))
+        self.ChangeValue(bd_to_vn_age(bd))
 
 
 class NumberTextCtrl(wx.TextCtrl):

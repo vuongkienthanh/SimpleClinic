@@ -1,7 +1,7 @@
 from core import mainview as mv
 from core.mainview_widgets import order_book
 from core.init import k_tab, k_number, k_special, size, tsize
-import other_func as otf
+from misc import get_usage_note_str, calc_quantity
 from core.generic import NumberTextCtrl, DoseTextCtrl
 import wx
 import sqlite3
@@ -90,7 +90,7 @@ class DrugListItem:
             sale_unit=self.sale_unit or self.usage_unit,
             sale_price=self.sale_price,
             note=self.note
-            or otf.get_usage_note_str(
+            or get_usage_note_str(
                 usage=self.usage,
                 times=self.times,
                 dose=self.dose,
@@ -244,7 +244,7 @@ class Quantity(NumberTextCtrl):
         days = mv.days.GetValue()
         wh = mv.state.warehouse
         assert wh is not None
-        res = otf.calc_quantity(times, dose, days, wh.sale_unit)
+        res = calc_quantity(times, dose, days, wh.sale_unit)
         if res is not None:
             self.SetValue(str(res))
         else:
@@ -280,7 +280,7 @@ class Note(wx.TextCtrl):
         wh = self.parent.parent.mv.state.warehouse
         assert wh is not None
         self.ChangeValue(
-            otf.get_usage_note_str(
+            get_usage_note_str(
                 usage=wh.usage,
                 times=self.parent.times.GetValue(),
                 dose=self.parent.dose.GetValue(),
@@ -292,7 +292,7 @@ class Note(wx.TextCtrl):
         if s is None:
             wh = self.parent.parent.mv.state.warehouse
             assert wh is not None
-            s = otf.get_usage_note_str(
+            s = get_usage_note_str(
                 usage=wh.usage,
                 times=self.parent.times.Value,
                 dose=self.parent.dose.Value,
@@ -305,7 +305,7 @@ class Note(wx.TextCtrl):
         s = _s.strip()
         wh = self.parent.parent.mv.state.warehouse
         assert wh is not None
-        if s == "" or s == otf.get_usage_note_str(
+        if s == "" or s == get_usage_note_str(
             usage=wh.usage,
             times=self.parent.times.Value,
             dose=self.parent.dose.Value,

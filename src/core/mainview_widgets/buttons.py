@@ -1,6 +1,6 @@
-from paths import weight_bm, update_druglist_bm
-from db import LineProcedure, Visit, Patient, LineDrug, TodayList
-import other_func as otf
+from misc import weight_bm, update_druglist_bm
+from db import LineProcedure, Visit, Patient, LineDrug, SeenToday
+from misc import calc_quantity, check_blank_to_none
 from core import mainview as mv
 from core.printer import PrintOut, printdata
 from core.init import config
@@ -44,7 +44,7 @@ class NoRecheckBtn(wx.Button):
         self.Bind(wx.EVT_BUTTON, self.onClick)
         self.Disable()
 
-    def onClick(self, e: wx.CommandEvent):
+    def onClick(self, _):
         self.mv.recheck.SetValue(0)
 
 
@@ -65,7 +65,7 @@ class UpdateQuantityBtn(wx.BitmapButton):
         """Update quantity in DrugList, also update price"""
         drug_list = self.mv.order_book.page0.drug_list
         for idx, item in enumerate(drug_list.d_list):
-            q = otf.calc_quantity(
+            q = calc_quantity(
                 times=item.times,
                 dose=item.dose,
                 days=self.mv.days.GetValue(),
@@ -112,14 +112,14 @@ class SaveBtn(wx.Button):
         if self.mv.check_filled():
             p = self.mv.state.patient
             assert p is not None
-            past_history = otf.check_blank(self.mv.past_history.GetValue())
+            past_history = check_blank_to_none(self.mv.past_history.GetValue())
             v = {
                 "diagnosis": diagnosis.strip(),
                 "weight": self.mv.weight.GetWeight(),
                 "days": self.mv.days.GetValue(),
                 "recheck": self.mv.recheck.GetValue(),
                 "patient_id": p.id,
-                "vnote": otf.check_blank(self.mv.vnote.GetValue()),
+                "vnote": check_blank_to_none(self.mv.vnote.GetValue()),
                 "follow": self.mv.follow.GetFollow(),
             }
             try:
@@ -175,8 +175,8 @@ class SaveBtn(wx.Button):
                     )
                     con.execute(
                         f"""
-                        INSERT INTO {TodayList.table_name} ({TodayList.commna_joined_field_names()})
-                        VALUES ({TodayList.qmark_style_placeholders()})
+                        INSERT INTO {SeenToday.table_name} ({SeenToday.commna_joined_field_names()})
+                        VALUES ({SeenToday.qmark_style_placeholders()})
                     """,
                         (p.id,),
                     )
@@ -205,14 +205,14 @@ class SaveBtn(wx.Button):
         if self.mv.check_filled():
             p = self.mv.state.patient
             assert p is not None
-            past_history = otf.check_blank(self.mv.past_history.GetValue())
+            past_history = check_blank_to_none(self.mv.past_history.GetValue())
             v = self.mv.state.visit
             assert v is not None
             v.diagnosis = diagnosis.strip()
             v.weight = self.mv.weight.GetWeight()
             v.days = self.mv.days.GetValue()
             v.recheck = self.mv.recheck.GetValue()
-            v.vnote = otf.check_blank(self.mv.vnote.GetValue())
+            v.vnote = check_blank_to_none(self.mv.vnote.GetValue())
             v.follow = self.mv.follow.GetFollow()
             update_ld = []
             update_ld_id = []

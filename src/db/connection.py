@@ -1,7 +1,9 @@
-from db.db_class import *
+from db.classes import *
+from db.sql import create_table_sql
 import os.path
 import sqlite3
 from decimal import Decimal
+import datetime as dt
 
 
 class Connection:
@@ -56,8 +58,11 @@ class Connection:
     def execute(self, sql, *parameters):
         return self.sqlcon.execute(sql, *parameters)
 
-    def get_last_open_date(self) -> dt.date | None:
-        return self.sqlcon.execute("SELECT last_open_date FROM last_open_date").fetchone()
+    def update_last_open_date(self) -> dt.date | None:
+        with self.sqlcon as con:
+            con.execute(
+                "UPDATE singleton SET last_open_date = ?", (dt.date.today(),)
+            )
 
     def insert(self, t: type[T], base: dict) -> int | None:
         with self.sqlcon as con:

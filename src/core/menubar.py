@@ -1,4 +1,4 @@
-from paths import APP_DIR, MY_DATABASE_PATH, DEFAULT_CONFIG_PATH, CONFIG_PATH
+from misc import APP_DIR, MY_DATABASE_PATH, DEFAULT_CONFIG_PATH, CONFIG_PATH
 from db import *
 from core import mainview
 from core.dialogs import (
@@ -226,7 +226,7 @@ class MyMenuBar(wx.MenuBar):
             try:
                 with mv.con as con:
                     con.execute(
-                        f"DELETE FROM {QueueList.table_name} WHERE patient_id = {p.id}"
+                        f"DELETE FROM {Queue.table_name} WHERE patient_id = {p.id}"
                     )
                     wx.MessageBox("Xóa thành công", "OK")
                     mv.state.refresh()

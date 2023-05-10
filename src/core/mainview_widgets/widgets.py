@@ -1,5 +1,5 @@
 from core import mainview as mv
-import other_func as otf
+from misc import weekdays, num_to_str_price
 from core.init import config
 import wx
 
@@ -21,7 +21,7 @@ class DaysCtrl(wx.SpinCtrl):
 
     def onSpin(self, e: wx.SpinEvent):
         self.mv.recheck.SetValue(e.GetPosition())
-        self.mv.recheck_weekday.SetLabel(otf.weekdays(e.GetPosition()))
+        self.mv.recheck_weekday.SetLabel(weekdays(e.GetPosition()))
         self.mv.updatequantitybtn.Enable()
         if self.mv.order_book.page0.check_wh_do_ti_filled():
             self.mv.order_book.page0.quantity.FetchQuantity()
@@ -57,10 +57,10 @@ class PriceCtrl(wx.TextCtrl):
             for item in self.mv.order_book.page0.drug_list.d_list
         )
         price += sum(pr.price for pr in self.mv.order_book.page1.procedure_list.pr_list)
-        self.ChangeValue(otf.num_to_str_currency(price))
+        self.ChangeValue(num_to_str_price(price))
 
     def Clear(self):
-        self.ChangeValue(otf.num_to_str_currency(config.checkup_price))
+        self.ChangeValue(num_to_str_price(config.checkup_price))
 
 
 class Follow(wx.ComboBox):

@@ -1,5 +1,5 @@
 import wx
-from config import Config
+from misc import Config
 
 
 config = Config.load()

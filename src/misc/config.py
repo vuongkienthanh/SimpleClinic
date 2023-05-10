@@ -1,4 +1,4 @@
-from paths import DEFAULT_CONFIG_PATH, CONFIG_PATH
+from misc.paths import DEFAULT_CONFIG_PATH, CONFIG_PATH
 import json
 import shutil
 from typing import Any

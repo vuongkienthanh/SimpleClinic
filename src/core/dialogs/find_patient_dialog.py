@@ -1,8 +1,8 @@
 from core.init import size
 from core import mainview
-import other_func as otf
+from misc import check_blank_to_none
 from core.dialogs.patient_dialog import EditPatientDialog
-from db import Patient, QueueList, QueueList, Visit
+from db import Patient, Queue, Visit
 from core.generic import DatePickerDialog
 import wx
 import sqlite3
@@ -293,7 +293,7 @@ class FindPatientDialog(wx.Dialog):
         pid = self.lc.pid
         assert pid is not None
         try:
-            self.mv.con.insert(QueueList, {"patient_id": pid})
+            self.mv.con.insert(Queue, {"patient_id": pid})
             wx.MessageBox("Thêm vào danh sách chờ thành công", "OK")
             self.mv.state.queuelist = self.mv.state.get_queuelist()
         except sqlite3.IntegrityError as error:
@@ -357,9 +357,9 @@ class EditFindPatientDialog(EditPatientDialog):
                 name=name.strip().upper(),
                 gender=self.gender.GetGender(),
                 birthdate=self.birthdate.GetDate(),
-                address=otf.check_blank(self.address.Value),
-                phone=otf.check_blank(self.phone.Value),
-                past_history=otf.check_blank(self.past_history.Value),
+                address=check_blank_to_none(self.address.Value),
+                phone=check_blank_to_none(self.phone.Value),
+                past_history=check_blank_to_none(self.past_history.Value),
             )
             try:
                 self.mv.con.update(p)

@@ -1,4 +1,4 @@
-from other_func import get_background_color
+from misc import get_background_color_from_config
 from core.init import config
 from core import mainview
 import wx
@@ -72,115 +72,115 @@ class SetupDialog(wx.Dialog):
         self.maximize_at_start = wx.CheckBox(self.scroll, name="Phóng to khi khởi động")
         self.maximize_at_start.SetValue(config.maximize_at_start)
         self.mainview_color = wx.ColourPickerCtrl(
-            self.scroll, colour=get_background_color("mainview"), name="Màu nền chính"
+            self.scroll, colour=get_background_color_from_config("mainview"), name="Màu nền chính"
         )
         self.patient_queuelist_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color("patient_queuelist"),
+            colour=get_background_color_from_config("patient_queuelist"),
             name="Màu nền danh sách bệnh nhân\n(Đang chờ)",
         )
         self.patient_seenlist_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color("patient_seenlist"),
+            colour=get_background_color_from_config("patient_seenlist"),
             name="Màu nền danh sách bệnh nhân\n(Đã khám hôm nay)",
         )
         self.visit_list_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color("visit_list"),
+            colour=get_background_color_from_config("visit_list"),
             name="Màu nền danh sách lượt khám cũ",
         )
         self.name_color = wx.ColourPickerCtrl(
-            self.scroll, colour=get_background_color("name"), name="Màu nền họ tên"
+            self.scroll, colour=get_background_color_from_config("name"), name="Màu nền họ tên"
         )
         self.gender_color = wx.ColourPickerCtrl(
-            self.scroll, colour=get_background_color("gender"), name="Màu nền giới tính"
+            self.scroll, colour=get_background_color_from_config("gender"), name="Màu nền giới tính"
         )
         self.birthdate_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color("birthdate"),
+            colour=get_background_color_from_config("birthdate"),
             name="Màu nền ngày sinh",
         )
         self.age_color = wx.ColourPickerCtrl(
-            self.scroll, colour=get_background_color("age"), name="Màu nền tuổi"
+            self.scroll, colour=get_background_color_from_config("age"), name="Màu nền tuổi"
         )
         self.address_color = wx.ColourPickerCtrl(
-            self.scroll, colour=get_background_color("address"), name="Màu nền địa chỉ"
+            self.scroll, colour=get_background_color_from_config("address"), name="Màu nền địa chỉ"
         )
         self.phone_color = wx.ColourPickerCtrl(
-            self.scroll, colour=get_background_color("phone"), name="Màu nền điện thoại"
+            self.scroll, colour=get_background_color_from_config("phone"), name="Màu nền điện thoại"
         )
         self.diagnosis_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color("diagnosis"),
+            colour=get_background_color_from_config("diagnosis"),
             name="Màu nền chẩn đoán",
         )
         self.price_color = wx.ColourPickerCtrl(
-            self.scroll, colour=get_background_color("price"), name="Màu nền giá tiền"
+            self.scroll, colour=get_background_color_from_config("price"), name="Màu nền giá tiền"
         )
         self.drug_list_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color("drug_list"),
+            colour=get_background_color_from_config("drug_list"),
             name="Màu nền danh sách thuốc",
         )
         self.procedure_list_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color("procedure_list"),
+            colour=get_background_color_from_config("procedure_list"),
             name="Màu nền danh sách thủ thuật",
         )
         self.past_history_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color("past_history"),
+            colour=get_background_color_from_config("past_history"),
             name="Màu nền tiền căn",
         )
         self.visit_note_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color("visit_note"),
+            colour=get_background_color_from_config("visit_note"),
             name="Màu nền bệnh sử",
         )
         self.weight_color = wx.ColourPickerCtrl(
-            self.scroll, colour=get_background_color("weight"), name="Màu nền cân nặng"
+            self.scroll, colour=get_background_color_from_config("weight"), name="Màu nền cân nặng"
         )
         self.days_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color("days"),
+            colour=get_background_color_from_config("days"),
             name="Màu nền số ngày toa về",
         )
         self.drug_picker_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color("drug_picker"),
+            colour=get_background_color_from_config("drug_picker"),
             name="Màu nền chọn danh mục thuốc",
         )
         self.drug_times_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color("drug_times"),
+            colour=get_background_color_from_config("drug_times"),
             name="Màu nền số lần dùng thuốc",
         )
         self.drug_dose_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color("drug_dose"),
+            colour=get_background_color_from_config("drug_dose"),
             name="Màu nền liều thuốc",
         )
         self.drug_quantity_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color("drug_quantity"),
+            colour=get_background_color_from_config("drug_quantity"),
             name="Màu nền số lượng thuốc",
         )
         self.drug_note_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color("drug_note"),
+            colour=get_background_color_from_config("drug_note"),
             name="Màu nền cách sử dụng thuốc",
         )
         self.recheck_color = wx.ColourPickerCtrl(
-            self.scroll, colour=get_background_color("recheck"), name="Màu nền tái khám"
+            self.scroll, colour=get_background_color_from_config("recheck"), name="Màu nền tái khám"
         )
         self.follow_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color("follow"),
+            colour=get_background_color_from_config("follow"),
             name="Màu nền lời dặn dò",
         )
         self.procedure_picker_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color("procedure_picker"),
+            colour=get_background_color_from_config("procedure_picker"),
             name="Màu nền chọn danh mục thủ thuật",
         )
 

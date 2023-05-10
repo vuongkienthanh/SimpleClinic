@@ -1,5 +1,4 @@
 from core import mainview as mv
-from core.init import size, tsize
 from core.generic import NumberTextCtrl
 from db import Procedure
 from misc import num_to_str_price
@@ -46,9 +45,10 @@ class ProcedureList(wx.ListCtrl):
     def __init__(self, parent: ProcedureDialog):
         super().__init__(parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
         self.parent = parent
-        self.AppendColumn("Mã", width=size(0.02))
-        self.AppendColumn("Tên thủ thuật", width=size(0.15))
-        self.AppendColumn("Giá tiền", width=size(0.05))
+        self.mv = parent.mv
+        self.AppendColumn("Mã", width=self.mv.config.header_width(0.02))
+        self.AppendColumn("Tên thủ thuật", width=self.mv.config.header_width(0.15))
+        self.AppendColumn("Giá tiền", width=self.mv.config.header_width(0.05))
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onSelect)
         self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onDeselect)
 
@@ -124,7 +124,7 @@ class BaseDialog(wx.Dialog):
         super().__init__(parent, title=title)
         self.parent = parent
         self.mv = parent.mv
-        self.name = wx.TextCtrl(self, size=tsize(0.15), name="Tên thủ thuật:")
+        self.name = wx.TextCtrl(self, size=self.mv.config.header_size(0.15), name="Tên thủ thuật:")
         self.price = NumberTextCtrl(self, name="Giá tiền:")
         self.cancelbtn = wx.Button(self, id=wx.ID_CANCEL)
         self.okbtn = wx.Button(self, id=wx.ID_OK)
@@ -166,7 +166,7 @@ class AddDialog(BaseDialog):
         try:
             name = self.name.Value.strip()
             price = int(self.price.Value.strip())
-            lastrowid = self.mv.con.insert(Procedure, {"name": name, "price": price})
+            lastrowid = self.mv.connection.insert(Procedure, {"name": name, "price": price})
             assert lastrowid is not None
             new_pr = Procedure(lastrowid, name, price)
             self.parent.procedurelist.append(new_pr)
@@ -190,7 +190,7 @@ class UpdateDialog(BaseDialog):
         try:
             self.pr.name = self.name.Value.strip()
             self.pr.price = int(self.price.Value.strip())
-            self.mv.con.update(self.pr)
+            self.mv.connection.update(self.pr)
             self.parent.procedurelist.update(self.idx, self.pr)
             self.mv.order_book.page1.procedure_picker.SetString(self.idx, self.pr.name)
             procedurelist = self.mv.order_book.page1.procedure_list

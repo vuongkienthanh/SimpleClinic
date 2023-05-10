@@ -2,7 +2,6 @@ from misc import APP_DIR
 from core import mainview as mv
 from db import LineDrug, LineProcedure, Visit, Warehouse, Procedure
 from misc import num_to_str_price
-from core.init import config
 import wx
 import datetime as dt
 import sqlite3
@@ -45,7 +44,7 @@ class DayReportDialog(wx.Dialog):
         query = f"""
             SELECT
                 visit_count,
-                ({config.checkup_price} * visit_count) + drug_sale + procedure AS revenue,
+                ({self.mv.config.checkup_price} * visit_count) + drug_sale + procedure AS revenue,
                 drug_purchase,
                 drug_sale,
                 (drug_sale - drug_purchase) AS profit_from_drug,
@@ -77,7 +76,7 @@ class DayReportDialog(wx.Dialog):
                 ON vdp.lpprocedure_id = pr.id
             )
         """
-        ret = self.mv.con.execute(query).fetchone()
+        ret = self.mv.connection.execute(query).fetchone()
         assert ret is not None
         return ret
 
@@ -116,7 +115,7 @@ class MonthReportDialog(wx.Dialog):
         query = f"""
             SELECT
                 visit_count,
-                ({config.checkup_price} * visit_count) + drug_sale + procedure AS revenue,
+                ({self.mv.config.checkup_price} * visit_count) + drug_sale + procedure AS revenue,
                 drug_purchase,
                 drug_sale,
                 (drug_sale - drug_purchase) AS profit_from_drug,

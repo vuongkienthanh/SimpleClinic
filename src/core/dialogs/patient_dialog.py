@@ -127,7 +127,7 @@ class NewPatientDialog(BasePatientDialog):
         if self.is_valid():
             try:
                 name: str = self.name.Value
-                lastrowid = self.mv.con.insert(
+                lastrowid = self.mv.connection.insert(
                     Patient,
                     {
                         "name": name.strip().upper(),
@@ -150,7 +150,7 @@ class NewPatientDialog(BasePatientDialog):
                         ).ShowModal()
                         == wx.ID_OK
                     ):
-                        self.mv.con.insert(Queue, {"patient_id": lastrowid})
+                        self.mv.connection.insert(Queue, {"patient_id": lastrowid})
                         wx.MessageBox("Thêm vào danh sách chờ thành công", "OK")
                         self.mv.state.queuelist = self.mv.state.get_queuelist()
                 except sqlite3.IntegrityError as error:
@@ -193,7 +193,7 @@ class EditPatientDialog(BasePatientDialog):
             p.phone = check_blank_to_none(self.phone.Value)
             p.past_history = check_blank_to_none(self.past_history.Value)
             try:
-                self.mv.con.update(p)
+                self.mv.connection.update(p)
                 wx.MessageBox("Cập nhật thành công", "OK")
                 page: wx.ListCtrl = self.mv.patient_book.GetCurrentPage()
                 idx: int = page.GetFirstSelected()

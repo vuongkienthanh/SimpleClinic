@@ -1,5 +1,3 @@
-from misc import get_background_color_from_config
-from core.init import config
 from core import mainview
 import wx
 import wx.adv as adv
@@ -16,32 +14,32 @@ class SetupDialog(wx.Dialog):
         )
         self.scroll.SetScrollRate(0, 20)
         self.clinic_name = wx.TextCtrl(
-            self.scroll, value=config.clinic_name, name="Tên phòng khám"
+            self.scroll, value=self.mv.config.clinic_name, name="Tên phòng khám"
         )
         self.doctor_name = wx.TextCtrl(
-            self.scroll, value=config.doctor_name, name="Tên bác sĩ"
+            self.scroll, value=self.mv.config.doctor_name, name="Tên bác sĩ"
         )
         self.clinic_address = wx.TextCtrl(
-            self.scroll, value=config.clinic_address, name="Địa chỉ"
+            self.scroll, value=self.mv.config.clinic_address, name="Địa chỉ"
         )
         self.clinic_phone_number = wx.TextCtrl(
-            self.scroll, value=config.clinic_phone_number, name="Số điện thoại"
+            self.scroll, value=self.mv.config.clinic_phone_number, name="Số điện thoại"
         )
         self.checkup_price = wx.TextCtrl(
-            self.scroll, value=str(config.checkup_price), name="Công khám bệnh"
+            self.scroll, value=str(self.mv.config.checkup_price), name="Công khám bệnh"
         )
         self.ask_print = wx.CheckBox(self.scroll, name="Hỏi in toa thuốc")
-        self.ask_print.SetValue(config.ask_print)
+        self.ask_print.SetValue(self.mv.config.ask_print)
         self.print_price = wx.CheckBox(self.scroll, name="In giá tiền")
-        self.print_price.SetValue(config.print_price)
+        self.print_price.SetValue(self.mv.config.print_price)
         self.days = wx.SpinCtrl(
             self.scroll,
-            initial=config.default_days_for_prescription,
+            initial=self.mv.config.default_days_for_prescription,
             name="Số ngày toa về mặc định",
         )
         self.alert = wx.SpinCtrl(
             self.scroll,
-            initial=config.minimum_drug_quantity_alert,
+            initial=self.mv.config.minimum_drug_quantity_alert,
             max=10000,
             name="Lượng thuốc tối thiểu để báo động",
         )
@@ -53,134 +51,134 @@ class SetupDialog(wx.Dialog):
         )
         lc: wx.ListCtrl = self.unit.GetListCtrl()
         lc.DeleteAllItems()
-        for item in config.single_sale_units:
+        for item in self.mv.config.single_sale_units:
             lc.Append((item,))
         lc.Append(("",))
         self.num_of_ld = wx.SpinCtrl(
             self.scroll,
-            initial=config.number_of_drugs_in_one_page,
+            initial=self.mv.config.number_of_drugs_in_one_page,
             name="Số lượng thuốc trong một toa\n)Tối đa: 8)",
             min=4,
             max=8,
         )
         self.visit_count = wx.SpinCtrl(
             self.scroll,
-            initial=config.display_recent_visit_count,
+            initial=self.mv.config.display_recent_visit_count,
             min=-1,
             name="Số lượt khám gần nhất được hiển thị\n(-1 là tất cả)",
         )
         self.maximize_at_start = wx.CheckBox(self.scroll, name="Phóng to khi khởi động")
-        self.maximize_at_start.SetValue(config.maximize_at_start)
+        self.maximize_at_start.SetValue(self.mv.config.maximize_at_start)
         self.mainview_color = wx.ColourPickerCtrl(
-            self.scroll, colour=get_background_color_from_config("mainview"), name="Màu nền chính"
+            self.scroll, colour=self.mv.config.get_background_color("mainview"), name="Màu nền chính"
         )
         self.patient_queuelist_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color_from_config("patient_queuelist"),
+            colour=self.mv.config.get_background_color("patient_queuelist"),
             name="Màu nền danh sách bệnh nhân\n(Đang chờ)",
         )
         self.patient_seenlist_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color_from_config("patient_seenlist"),
+            colour=self.mv.config.get_background_color("patient_seenlist"),
             name="Màu nền danh sách bệnh nhân\n(Đã khám hôm nay)",
         )
         self.visit_list_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color_from_config("visit_list"),
+            colour=self.mv.config.get_background_color("visit_list"),
             name="Màu nền danh sách lượt khám cũ",
         )
         self.name_color = wx.ColourPickerCtrl(
-            self.scroll, colour=get_background_color_from_config("name"), name="Màu nền họ tên"
+            self.scroll, colour=self.mv.config.get_background_color("name"), name="Màu nền họ tên"
         )
         self.gender_color = wx.ColourPickerCtrl(
-            self.scroll, colour=get_background_color_from_config("gender"), name="Màu nền giới tính"
+            self.scroll, colour=self.mv.config.get_background_color("gender"), name="Màu nền giới tính"
         )
         self.birthdate_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color_from_config("birthdate"),
+            colour=self.mv.config.get_background_color("birthdate"),
             name="Màu nền ngày sinh",
         )
         self.age_color = wx.ColourPickerCtrl(
-            self.scroll, colour=get_background_color_from_config("age"), name="Màu nền tuổi"
+            self.scroll, colour=self.mv.config.get_background_color("age"), name="Màu nền tuổi"
         )
         self.address_color = wx.ColourPickerCtrl(
-            self.scroll, colour=get_background_color_from_config("address"), name="Màu nền địa chỉ"
+            self.scroll, colour=self.mv.config.get_background_color("address"), name="Màu nền địa chỉ"
         )
         self.phone_color = wx.ColourPickerCtrl(
-            self.scroll, colour=get_background_color_from_config("phone"), name="Màu nền điện thoại"
+            self.scroll, colour=self.mv.config.get_background_color("phone"), name="Màu nền điện thoại"
         )
         self.diagnosis_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color_from_config("diagnosis"),
+            colour=self.mv.config.get_background_color("diagnosis"),
             name="Màu nền chẩn đoán",
         )
         self.price_color = wx.ColourPickerCtrl(
-            self.scroll, colour=get_background_color_from_config("price"), name="Màu nền giá tiền"
+            self.scroll, colour=self.mv.config.get_background_color("price"), name="Màu nền giá tiền"
         )
         self.drug_list_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color_from_config("drug_list"),
+            colour=self.mv.config.get_background_color("drug_list"),
             name="Màu nền danh sách thuốc",
         )
         self.procedure_list_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color_from_config("procedure_list"),
+            colour=self.mv.config.get_background_color("procedure_list"),
             name="Màu nền danh sách thủ thuật",
         )
         self.past_history_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color_from_config("past_history"),
+            colour=self.mv.config.get_background_color("past_history"),
             name="Màu nền tiền căn",
         )
         self.visit_note_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color_from_config("visit_note"),
+            colour=self.mv.config.get_background_color("visit_note"),
             name="Màu nền bệnh sử",
         )
         self.weight_color = wx.ColourPickerCtrl(
-            self.scroll, colour=get_background_color_from_config("weight"), name="Màu nền cân nặng"
+            self.scroll, colour=self.mv.config.get_background_color("weight"), name="Màu nền cân nặng"
         )
         self.days_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color_from_config("days"),
+            colour=self.mv.config.get_background_color("days"),
             name="Màu nền số ngày toa về",
         )
         self.drug_picker_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color_from_config("drug_picker"),
+            colour=self.mv.config.get_background_color("drug_picker"),
             name="Màu nền chọn danh mục thuốc",
         )
         self.drug_times_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color_from_config("drug_times"),
+            colour=self.mv.config.get_background_color("drug_times"),
             name="Màu nền số lần dùng thuốc",
         )
         self.drug_dose_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color_from_config("drug_dose"),
+            colour=self.mv.config.get_background_color("drug_dose"),
             name="Màu nền liều thuốc",
         )
         self.drug_quantity_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color_from_config("drug_quantity"),
+            colour=self.mv.config.get_background_color("drug_quantity"),
             name="Màu nền số lượng thuốc",
         )
         self.drug_note_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color_from_config("drug_note"),
+            colour=self.mv.config.get_background_color("drug_note"),
             name="Màu nền cách sử dụng thuốc",
         )
         self.recheck_color = wx.ColourPickerCtrl(
-            self.scroll, colour=get_background_color_from_config("recheck"), name="Màu nền tái khám"
+            self.scroll, colour=self.mv.config.get_background_color("recheck"), name="Màu nền tái khám"
         )
         self.follow_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color_from_config("follow"),
+            colour=self.mv.config.get_background_color("follow"),
             name="Màu nền lời dặn dò",
         )
         self.procedure_picker_color = wx.ColourPickerCtrl(
             self.scroll,
-            colour=get_background_color_from_config("procedure_picker"),
+            colour=self.mv.config.get_background_color("procedure_picker"),
             name="Màu nền chọn danh mục thủ thuật",
         )
 
@@ -269,26 +267,26 @@ class SetupDialog(wx.Dialog):
         try:
             lc: wx.ListCtrl = self.unit.GetListCtrl()
 
-            config.clinic_name = self.clinic_name.Value
-            config.doctor_name = self.doctor_name.Value
-            config.clinic_address = self.clinic_address.Value
-            config.clinic_phone_number = self.clinic_phone_number.Value
-            config.ask_print = self.ask_print.Value
-            config.print_price = self.print_price.Value
-            config.checkup_price = int(self.checkup_price.Value)
-            config.default_days_for_prescription = self.days.GetValue()
-            config.minimum_drug_quantity_alert = self.alert.GetValue()
-            config.single_sale_units = [
+            self.mv.config.clinic_name = self.clinic_name.Value
+            self.mv.config.doctor_name = self.doctor_name.Value
+            self.mv.config.clinic_address = self.clinic_address.Value
+            self.mv.config.clinic_phone_number = self.clinic_phone_number.Value
+            self.mv.config.ask_print = self.ask_print.Value
+            self.mv.config.print_price = self.print_price.Value
+            self.mv.config.checkup_price = int(self.checkup_price.Value)
+            self.mv.config.default_days_for_prescription = self.days.GetValue()
+            self.mv.config.minimum_drug_quantity_alert = self.alert.GetValue()
+            self.mv.config.single_sale_units = [
                 lc.GetItemText(idx).strip()
                 for idx in range(lc.ItemCount)
                 if lc.GetItemText(idx).strip() != ""
             ]
-            config.number_of_drugs_in_one_page = self.num_of_ld.GetValue()
-            config.display_recent_visit_count = self.visit_count.GetValue()
-            config.maximize_at_start = self.maximize_at_start.Value
+            self.mv.config.number_of_drugs_in_one_page = self.num_of_ld.GetValue()
+            self.mv.config.display_recent_visit_count = self.visit_count.GetValue()
+            self.mv.config.maximize_at_start = self.maximize_at_start.Value
 
             def set_color(name: str, widget: wx.ColourPickerCtrl):
-                config.background_color[name] = widget.Colour.GetIM()[:3]
+                self.mv.config.background_color[name] = widget.Colour.GetIM()[:3]
 
             set_color("mainview", self.mainview_color)
             set_color("patient_queuelist", self.patient_queuelist_color)
@@ -317,7 +315,7 @@ class SetupDialog(wx.Dialog):
             set_color("follow", self.follow_color)
             set_color("procedure_picker", self.procedure_picker_color)
 
-            config.dump()
+            self.mv.config.dump()
             wx.MessageBox("Đã lưu cài đặt\nKhởi động lại để thay đổi màu", "Cài đặt")
             self.mv.price.FetchPrice()
             e.Skip()

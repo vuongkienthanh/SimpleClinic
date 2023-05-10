@@ -1,6 +1,5 @@
 import db
-from core.init import config, tsize
-import misc
+from misc import Config, vn_weekdays
 from core.state import State
 from core.generic import AgeCtrl, PhoneTextCtrl, DateTextCtrl, WeightCtrl
 from core.mainview_widgets import (
@@ -22,32 +21,50 @@ import wx
 
 
 class MainView(wx.Frame):
-    def __init__(self, con: "db.Connection"):
+    def __init__(self, connection: "db.Connection"):
         super().__init__(
             parent=None, pos=(20, 20), title="PHẦN MỀM PHÒNG KHÁM SIMPLE CLINIC"
         )
 
-        self.con = con
+        self.connection = connection
+        self.config = Config.load()
         self.state = State(self)
 
-        if config.maximize_at_start:
+        if self.config.maximize_at_start:
             self.Maximize()
 
         self.patient_book = PatientBook(self)
         self.visit_list = VisitList(self)
         self.name = wx.TextCtrl(
-            self, size=tsize(0.1), name="Họ tên:", style=wx.TE_READONLY
+            self,
+            size=self.config.header_size(0.1),
+            name="Họ tên:",
+            style=wx.TE_READONLY,
         )
         self.gender = wx.TextCtrl(
-            self, size=tsize(0.025), name="Giới:", style=wx.TE_READONLY
+            self,
+            size=self.config.header_size(0.025),
+            name="Giới:",
+            style=wx.TE_READONLY,
         )
         self.birthdate = DateTextCtrl(
-            self, size=tsize(0.06), name="Ngày sinh:", style=wx.TE_READONLY
+            self,
+            size=self.config.header_size(0.06),
+            name="Ngày sinh:",
+            style=wx.TE_READONLY,
         )
-        self.age = AgeCtrl(self, size=tsize(0.055), name="Tuổi:", style=wx.TE_READONLY)
+        self.age = AgeCtrl(
+            self,
+            size=self.config.header_size(0.055),
+            name="Tuổi:",
+            style=wx.TE_READONLY,
+        )
         self.address = wx.TextCtrl(self, name="Địa chỉ:", style=wx.TE_READONLY)
         self.phone = PhoneTextCtrl(
-            self, size=tsize(0.055), name="Điện thoại:", style=wx.TE_READONLY
+            self,
+            size=self.config.header_size(0.055),
+            name="Điện thoại:",
+            style=wx.TE_READONLY,
         )
         self.past_history = wx.TextCtrl(
             self, style=wx.TE_MULTILINE, name="Bệnh nền, dị ứng:"
@@ -59,7 +76,7 @@ class MainView(wx.Frame):
         self.days = DaysCtrl(self, name="Số ngày cho toa:")
         self.updatequantitybtn = UpdateQuantityBtn(self)
         self.recheck_weekday = wx.StaticText(
-            self, label=misc.weekdays(config.default_days_for_prescription)
+            self, label=vn_weekdays(self.config.default_days_for_prescription)
         )
         self.order_book = OrderBook(self)
         self.recheck = RecheckCtrl(self, name="Số ngày tái khám:")
@@ -71,7 +88,7 @@ class MainView(wx.Frame):
 
         def set_color(p: list[tuple[wx.Window, str]]):
             for widget, name in p:
-                widget.SetBackgroundColour(misc.get_background_color_from_config(name))
+                widget.SetBackgroundColour(self.config.get_background_color(name))
 
         set_color(
             [
@@ -193,7 +210,7 @@ class MainView(wx.Frame):
 
     def onClose(self, e: wx.CloseEvent):
         print("close sqlite3 connection")
-        self.con.close()
+        self.connection.close()
         e.Skip()
 
     def start(self):

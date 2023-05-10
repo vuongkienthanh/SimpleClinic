@@ -69,7 +69,7 @@ class UseSamplePrescriptionBtn(wx.Button):
             if idx != -1:
                 self.parent.drug_list.DeleteAllItems()
                 sp = self.mv.state.sampleprescriptionlist[idx]
-                llsp = self.mv.con.execute(
+                llsp = self.mv.connection.execute(
                     f"""
                     SELECT lsp.drug_id, wh.name, lsp.times, lsp.dose, wh.usage, wh.usage_unit, wh.sale_unit, wh.sale_price
                     FROM (
@@ -82,7 +82,11 @@ class UseSamplePrescriptionBtn(wx.Button):
                 ).fetchall()
                 for lsp in llsp:
                     q = calc_quantity(
-                        lsp["times"], lsp["dose"], self.mv.days.Value, lsp["sale_unit"]
+                        lsp["times"],
+                        lsp["dose"],
+                        self.mv.days.Value,
+                        lsp["sale_unit"],
+                        self.mv.config,
                     )
                     assert q is not None
                     self.parent.drug_list.append(

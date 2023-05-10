@@ -4,15 +4,7 @@ from fractions import Fraction
 from typing import Any, TypeVar
 from itertools import cycle
 from math import ceil
-
-
-def get_background_color_from_config(s: str):
-    from core.init import config
-
-    try:
-        return wx.Colour(*config.background_color[s])
-    except KeyError:
-        return wx.Colour(255, 255, 255)
+from misc import Config
 
 
 def bd_to_vn_age(bd: dt.date) -> str:
@@ -41,7 +33,7 @@ def check_none_to_blank(val: Any | None) -> str:
 
 
 def calc_quantity(
-    times: int, dose: str, days: int, sale_unit: str | None
+        times: int, dose: str, days: int, sale_unit: str | None, config: Config
 ) -> int | None:
     def calc(times: int, dose: str, days: int) -> int:
         if "/" in dose:
@@ -52,8 +44,6 @@ def calc_quantity(
 
     try:
         if sale_unit is not None:
-            from core.init import config
-
             if sale_unit.casefold() in (
                 item.casefold() for item in config.single_sale_units
             ):
@@ -79,7 +69,7 @@ def num_to_str_price(price: int) -> str:
     return res[::-1]
 
 
-def weekdays(d: int):
+def vn_weekdays(d: int):
     """
     0 -> Thứ hai
     1 -> Thứ ba

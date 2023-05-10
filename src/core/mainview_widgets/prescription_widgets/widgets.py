@@ -1,7 +1,6 @@
 from core import mainview as mv
 from core.mainview_widgets import order_book
-from core.init import k_tab, k_number, k_special, size, tsize
-from misc import get_usage_note_str, calc_quantity
+from misc import get_usage_note_str, calc_quantity, k_tab, k_special, k_number
 from core.generic import NumberTextCtrl, DoseTextCtrl
 import wx
 import sqlite3
@@ -103,14 +102,14 @@ class DrugListCtrl(wx.ListCtrl):
     def __init__(self, parent: "order_book.PrescriptionPage"):
         super().__init__(parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
         self.parent = parent
-        self.mv = parent.parent.mv
+        self.mv = parent.mv
         self.d_list: list[DrugListItem] = []
-        self.AppendColumn("STT", width=size(0.02))
-        self.AppendColumn("Thuốc", width=size(0.1))
-        self.AppendColumn("Số cữ", width=size(0.03))
-        self.AppendColumn("Liều", width=size(0.03))
-        self.AppendColumn("Tổng cộng", width=size(0.05))
-        self.AppendColumn("Cách dùng", width=size(0.15))
+        self.AppendColumn("STT", width=self.mv.config.header_width(0.02))
+        self.AppendColumn("Thuốc", width=self.mv.config.header_width(0.1))
+        self.AppendColumn("Số cữ", width=self.mv.config.header_width(0.03))
+        self.AppendColumn("Liều", width=self.mv.config.header_width(0.03))
+        self.AppendColumn("Tổng cộng", width=self.mv.config.header_width(0.05))
+        self.AppendColumn("Cách dùng", width=self.mv.config.header_width(0.15))
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onSelect)
         self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onDeselect)
 
@@ -206,12 +205,13 @@ class DrugListCtrl(wx.ListCtrl):
 
 class Times(NumberTextCtrl):
     def __init__(self, parent: "order_book.PrescriptionPage"):
-        super().__init__(parent, size=tsize(0.03))
+        super().__init__(parent, size=parent.mv.config.header_size(0.03))
         self.parent = parent
+        self.mv = mv
         self.SetHint("lần")
         self.Bind(wx.EVT_TEXT, self.onText)
 
-    def onText(self, e):
+    def onText(self, _):
         if self.parent.check_wh_do_ti_filled():
             self.parent.quantity.FetchQuantity()
             self.parent.note.FetchNote()
@@ -219,12 +219,13 @@ class Times(NumberTextCtrl):
 
 class Dose(DoseTextCtrl):
     def __init__(self, parent: "order_book.PrescriptionPage"):
-        super().__init__(parent, size=tsize(0.03))
+        super().__init__(parent, size=parent.mv.config.header_size(0.03))
         self.parent = parent
+        self.mv = mv
         self.SetHint("liều")
         self.Bind(wx.EVT_TEXT, self.onText)
 
-    def onText(self, e):
+    def onText(self, _):
         if self.parent.check_wh_do_ti_filled():
             self.parent.quantity.FetchQuantity()
             self.parent.note.FetchNote()
@@ -232,19 +233,21 @@ class Dose(DoseTextCtrl):
 
 class Quantity(NumberTextCtrl):
     def __init__(self, parent: "order_book.PrescriptionPage"):
-        super().__init__(parent, size=tsize(0.03), style=wx.TE_PROCESS_TAB)
+        super().__init__(
+            parent, size=parent.mv.config.header_size(0.03), style=wx.TE_PROCESS_TAB
+        )
         self.parent = parent
+        self.mv = parent.mv
         self.SetHint("Enter")
         self.Bind(wx.EVT_CHAR, self.onChar)
 
     def FetchQuantity(self):
-        mv = self.parent.parent.mv
         times = int(self.parent.times.GetValue())
         dose = self.parent.dose.GetValue()
-        days = mv.days.GetValue()
-        wh = mv.state.warehouse
+        days = self.mv.days.GetValue()
+        wh = self.mv.state.warehouse
         assert wh is not None
-        res = calc_quantity(times, dose, days, wh.sale_unit)
+        res = calc_quantity(times, dose, days, wh.sale_unit, self.mv.config)
         if res is not None:
             self.SetValue(str(res))
         else:

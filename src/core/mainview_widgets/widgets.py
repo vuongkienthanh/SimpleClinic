@@ -1,27 +1,26 @@
 from core import mainview as mv
-from misc import weekdays, num_to_str_price
-from core.init import config
+from misc import vn_weekdays, num_to_str_price
 import wx
 
 
 class DaysCtrl(wx.SpinCtrl):
     """Changing DaysCtrl Value also changes RecheckCtrl Value"""
 
-    def __init__(self, parent: "mv.MainView", **kwargs):
+    def __init__(self, mv: "mv.MainView", **kwargs):
         super().__init__(
-            parent,
+            mv,
             style=wx.SP_ARROW_KEYS,
-            initial=config.default_days_for_prescription,
+            initial=mv.config.default_days_for_prescription,
             **kwargs,
         )
-        self.mv = parent
+        self.mv = mv
         self.SetRange(0, 100)
         self.Disable()
         self.Bind(wx.EVT_SPINCTRL, self.onSpin)
 
     def onSpin(self, e: wx.SpinEvent):
         self.mv.recheck.SetValue(e.GetPosition())
-        self.mv.recheck_weekday.SetLabel(weekdays(e.GetPosition()))
+        self.mv.recheck_weekday.SetLabel(vn_weekdays(e.GetPosition()))
         self.mv.updatequantitybtn.Enable()
         if self.mv.order_book.page0.check_wh_do_ti_filled():
             self.mv.order_book.page0.quantity.FetchQuantity()
@@ -30,11 +29,11 @@ class DaysCtrl(wx.SpinCtrl):
 class RecheckCtrl(wx.SpinCtrl):
     """Independant of DaysCtrl"""
 
-    def __init__(self, parent: "mv.MainView", **kwargs):
+    def __init__(self, mv: "mv.MainView", **kwargs):
         super().__init__(
-            parent,
+            mv,
             style=wx.SP_ARROW_KEYS,
-            initial=config.default_days_for_prescription,
+            initial=mv.config.default_days_for_prescription,
             **kwargs,
         )
         self.SetRange(0, 100)
@@ -51,7 +50,7 @@ class PriceCtrl(wx.TextCtrl):
 
     def FetchPrice(self):
         """Display new price"""
-        price: int = config.checkup_price
+        price: int = self.mv.config.checkup_price
         price += sum(
             item.sale_price * item.quantity
             for item in self.mv.order_book.page0.drug_list.d_list
@@ -60,7 +59,7 @@ class PriceCtrl(wx.TextCtrl):
         self.ChangeValue(num_to_str_price(price))
 
     def Clear(self):
-        self.ChangeValue(num_to_str_price(config.checkup_price))
+        self.ChangeValue(num_to_str_price(self.mv.config.checkup_price))
 
 
 class Follow(wx.ComboBox):
@@ -70,21 +69,21 @@ class Follow(wx.ComboBox):
     - when print use full_value
     """
 
-    def __init__(self, parent: "mv.MainView", **kwargs):
+    def __init__(self, mv: "mv.MainView", **kwargs):
         super().__init__(
-            parent,
+            mv,
             style=wx.CB_DROPDOWN,
-            choices=list(config.follow_choices.keys()),
+            choices=list(mv.config.follow_choices.keys()),
             **kwargs,
         )
-        self.mv = parent
+        self.mv = mv
         self.SetDefault()
 
     def full_value(self) -> str:
         "return `key: value` from `key`"
         k = self.GetValue().strip()
-        if k in config.follow_choices.keys():
-            return f"{k}: {config.follow_choices[k]}"
+        if k in self.mv.config.follow_choices.keys():
+            return f"{k}: {self.mv.config.follow_choices[k]}"
         else:
             return k
 

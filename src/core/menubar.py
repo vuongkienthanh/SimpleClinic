@@ -203,7 +203,7 @@ class MyMenuBar(wx.MenuBar):
             assert v is not None
             assert p is not None
             try:
-                mv.con.delete(Visit, v.id)
+                mv.connection.delete(Visit, v.id)
                 wx.MessageBox("Xóa thành công", "OK")
                 mv.state.visitlist = mv.state.get_visits_by_patient_id(p.id)
                 mv.state.visit = None
@@ -224,7 +224,7 @@ class MyMenuBar(wx.MenuBar):
             assert p is not None
             assert mv.patient_book.GetSelection() == 0
             try:
-                with mv.con as con:
+                with mv.connection as con:
                     con.execute(
                         f"DELETE FROM {Queue.table_name} WHERE patient_id = {p.id}"
                     )
@@ -346,7 +346,7 @@ class MyMenuBar(wx.MenuBar):
 
     def onVacuum(self, _):
         mv: "mainview.MainView" = self.GetFrame()
-        pre, post = mv.con.vacuum()
+        pre, post = mv.connection.vacuum()
         wx.MessageBox(
             f"Kích thước trước khi thu gọn: {pre} bytes\nKích thước sau khi thu gọn: {post} bytes",
             "Thu gọn dữ liệu",

@@ -1,4 +1,3 @@
-from core.init import size
 from core import mainview
 from db import Patient, Visit
 import wx
@@ -33,10 +32,10 @@ class PatientListCtrl(wx.ListCtrl):
         super().__init__(parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
         self.parent = parent
         self.mv = parent.mv
-        self.AppendColumn("Mã BN", width=size(0.03))
-        self.AppendColumn("Họ tên", width=size(0.1))
-        self.AppendColumn("Giới", width=size(0.03))
-        self.AppendColumn("Ngày sinh", width=size(0.05))
+        self.AppendColumn("Mã BN", width=self.mv.config.header_width(0.03))
+        self.AppendColumn("Họ tên", width=self.mv.config.header_width(0.1))
+        self.AppendColumn("Giới", width=self.mv.config.header_width(0.03))
+        self.AppendColumn("Ngày sinh", width=self.mv.config.header_width(0.05))
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onSelect)
         self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onDeselect)
         self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onDoubleClick)
@@ -69,8 +68,7 @@ class QueuingPatientList(PatientListCtrl):
 
     def __init__(self, parent: PatientBook):
         super().__init__(parent)
-        _, _, w, _ = self.GetClientRect()
-        self.AppendColumn("Giờ đăng ký", width=size(0.075))
+        self.AppendColumn("Giờ đăng ký", width=self.mv.config.header_width(0.075))
 
     def append_ui(self, row: sqlite3.Row):
         self.Append(
@@ -86,9 +84,9 @@ class QueuingPatientList(PatientListCtrl):
     def onSelect(self, e: wx.ListEvent):
         idx: int = e.Index
         pid: int = self.mv.state.queuelist[idx]["pid"]
-        self.mv.state.patient = self.mv.con.select(Patient, pid)
+        self.mv.state.patient = self.mv.connection.select(Patient, pid)
 
-    def onDeselect(self, e: wx.ListEvent):
+    def onDeselect(self, _):
         self.mv.state.patient = None
 
 
@@ -97,7 +95,7 @@ class TodayPatientList(PatientListCtrl):
 
     def __init__(self, parent: PatientBook):
         super().__init__(parent)
-        self.AppendColumn("Giờ khám", width=size(0.075))
+        self.AppendColumn("Giờ khám", width=self.mv.config.header_width(0.075))
 
     def append_ui(self, row: sqlite3.Row):
         self.Append(
@@ -113,12 +111,12 @@ class TodayPatientList(PatientListCtrl):
     def onSelect(self, e: wx.ListEvent):
         idx: int = e.Index
         pid: int = self.mv.state.todaylist[idx]["pid"]
-        self.mv.state.patient = self.mv.con.select(Patient, pid)
+        self.mv.state.patient = self.mv.connection.select(Patient, pid)
         vid: int = self.mv.state.todaylist[idx]["vid"]
-        self.mv.state.visit = self.mv.con.select(Visit, vid)
+        self.mv.state.visit = self.mv.connection.select(Visit, vid)
         self.SetFocus()
 
-    def onDeselect(self, e: wx.ListEvent):
+    def onDeselect(self, _):
         self.mv.state.patient = None
         self.mv.state.visit = None
         self.SetFocus()

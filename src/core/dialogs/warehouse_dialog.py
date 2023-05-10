@@ -1,4 +1,3 @@
-from core.init import size, config
 from db import Warehouse
 from misc import check_none_to_blank, check_blank_to_none
 from core import mainview
@@ -8,34 +7,34 @@ import wx
 
 
 class WarehouseDialog(wx.Dialog):
-    def __init__(self, parent: "mainview.MainView"):
+    def __init__(self, mv: "mainview.MainView"):
         """
         `_list`: internal list to keep track of filtered Warehouse in dialog
         """
         super().__init__(
-            parent=parent,
+            mv,
             title="Kho thuốc",
             style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.MAXIMIZE_BOX,
         )
-        self.mv = parent
+        self.mv = mv
         self._list: list[Warehouse] = []
 
         self.search = wx.SearchCtrl(self)
         self.search.SetHint("Tên thuốc hoặc thành phần thuốc")
         self.lc = wx.ListCtrl(self, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
 
-        self.lc.AppendColumn("Mã", width=size(0.03))
-        self.lc.AppendColumn("Tên", width=size(0.1))
-        self.lc.AppendColumn("Thành phần", width=size(0.1))
-        self.lc.AppendColumn("Số lượng", width=size(0.04))
-        self.lc.AppendColumn("Đơn vị sử dụng", width=size(0.06))
-        self.lc.AppendColumn("Cách sử dụng", width=size(0.06))
-        self.lc.AppendColumn("Giá mua", width=size(0.03))
-        self.lc.AppendColumn("Giá bán", width=size(0.03))
-        self.lc.AppendColumn("Đơn vị bán", width=size(0.04))
-        self.lc.AppendColumn("Ngày hết hạn", width=size(0.05))
-        self.lc.AppendColumn("Xuất xứ", width=size(0.06))
-        self.lc.AppendColumn("Ghi chú", width=size(0.06))
+        self.lc.AppendColumn("Mã", width=self.mv.config.header_width(0.03))
+        self.lc.AppendColumn("Tên", width=self.mv.config.header_width(0.1))
+        self.lc.AppendColumn("Thành phần", width=self.mv.config.header_width(0.1))
+        self.lc.AppendColumn("Số lượng", width=self.mv.config.header_width(0.04))
+        self.lc.AppendColumn("Đơn vị sử dụng", width=self.mv.config.header_width(0.06))
+        self.lc.AppendColumn("Cách sử dụng", width=self.mv.config.header_width(0.06))
+        self.lc.AppendColumn("Giá mua", width=self.mv.config.header_width(0.03))
+        self.lc.AppendColumn("Giá bán", width=self.mv.config.header_width(0.03))
+        self.lc.AppendColumn("Đơn vị bán", width=self.mv.config.header_width(0.04))
+        self.lc.AppendColumn("Ngày hết hạn", width=self.mv.config.header_width(0.05))
+        self.lc.AppendColumn("Xuất xứ", width=self.mv.config.header_width(0.06))
+        self.lc.AppendColumn("Ghi chú", width=self.mv.config.header_width(0.06))
         self.newbtn = wx.Button(self, label="Thêm mới")
         self.editbtn = wx.Button(self, label="Cập nhật")
         self.delbtn = wx.Button(self, label="Xóa")
@@ -142,7 +141,7 @@ class WarehouseDialog(wx.Dialog):
 
     def check_min_quantity(self, wh: Warehouse, idx: int):
         "conditional recolor"
-        if wh.quantity <= config.minimum_drug_quantity_alert:
+        if wh.quantity <= self.mv.config.minimum_drug_quantity_alert:
             self.lc.SetItemTextColour(idx, wx.Colour(252, 3, 57))
 
     def onSearch(self, e: wx.CommandEvent):
@@ -177,9 +176,9 @@ class WarehouseDialog(wx.Dialog):
         idx: int = self.lc.GetFirstSelected()
         wh = self._list[idx]
         try:
-            rowcount = self.mv.con.delete(Warehouse, wh.id)
+            rowcount = self.mv.connection.delete(Warehouse, wh.id)
             assert rowcount == 1
-            self.mv.state.warehouselist = self.mv.con.selectall(Warehouse)
+            self.mv.state.warehouselist = self.mv.connection.selectall(Warehouse)
             self.delete(idx)
             drug_list = self.mv.order_book.page0.drug_list
             if drug_list.ItemCount > 0:
@@ -325,7 +324,7 @@ class NewDialog(BaseDialog):
                 "note": check_blank_to_none(self.note.Value),
             }
             try:
-                lastrowid = self.mv.con.insert(Warehouse, wh)
+                lastrowid = self.mv.connection.insert(Warehouse, wh)
                 assert lastrowid is not None
                 wx.MessageBox("Thêm mới thành công", "Thêm mới")
                 new_wh = Warehouse(id=lastrowid, **wh)
@@ -376,7 +375,7 @@ class EditDialog(BaseDialog):
             self.wh.made_by = check_blank_to_none(self.made_by.Value)
             self.wh.note = check_blank_to_none(self.note.Value)
             try:
-                self.mv.con.update(self.wh)
+                self.mv.connection.update(self.wh)
                 wx.MessageBox("Cập nhật thành công", "Cập nhật")
                 self.parent.rebuild(self.parent.get_search_value())
                 drug_list = self.mv.order_book.page0.drug_list

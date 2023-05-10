@@ -1,7 +1,7 @@
 from db import Warehouse
 from core.mainview_widgets import order_book
-from core.init import size, config
 import wx
+from core import mainview
 
 
 class DrugPopup(wx.ComboPopup):
@@ -10,16 +10,17 @@ class DrugPopup(wx.ComboPopup):
         self._list = []
 
     def Create(self, parent):
+        self.mv: "mainview.MainView" = self.ComboCtrl.mv
         self.lc = wx.ListCtrl(
             parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL | wx.SIMPLE_BORDER
         )
-        self.lc.AppendColumn("Thuốc", width=size(0.08))
-        self.lc.AppendColumn("Thành phần", width=size(0.08))
-        self.lc.AppendColumn("Số lượng", width=size(0.035))
-        self.lc.AppendColumn("Đơn vị", width=size(0.03))
-        self.lc.AppendColumn("Đơn giá", width=size(0.03))
-        self.lc.AppendColumn("Cách dùng", width=size(0.04))
-        self.lc.AppendColumn("Hạn sử dụng", width=size(0.055))
+        self.lc.AppendColumn("Thuốc", width=self.mv.config.header_width(0.08))
+        self.lc.AppendColumn("Thành phần", width=self.mv.config.header_width(0.08))
+        self.lc.AppendColumn("Số lượng", width=self.mv.config.header_width(0.035))
+        self.lc.AppendColumn("Đơn vị", width=self.mv.config.header_width(0.03))
+        self.lc.AppendColumn("Đơn giá", width=self.mv.config.header_width(0.03))
+        self.lc.AppendColumn("Cách dùng", width=self.mv.config.header_width(0.04))
+        self.lc.AppendColumn("Hạn sử dụng", width=self.mv.config.header_width(0.055))
         self.lc.Bind(wx.EVT_MOTION, self.OnMotion)
         self.lc.Bind(wx.EVT_LEFT_DOWN, self.OnLeftDown)
         self.lc.Bind(wx.EVT_CHAR, self.onChar)
@@ -41,16 +42,15 @@ class DrugPopup(wx.ComboPopup):
         return ""
 
     def GetAdjustedSize(self, minWidth, prefHeight, maxHeight):
-        return super().GetAdjustedSize(size(0.4), -1, -1)
+        return super().GetAdjustedSize(self.mv.config.header_width(0.4), -1, -1)
 
     def fetch_list(self, s: str):
         s = s.casefold()
-        cc: DrugPicker = self.GetComboCtrl()
         self._list = list(
             filter(
                 lambda item: (s in item.name.casefold())
                 or (s in item.element.casefold()),
-                cc.parent.parent.mv.state.warehouselist,
+                self.mv.state.warehouselist,
             )
         )
 
@@ -77,12 +77,12 @@ class DrugPopup(wx.ComboPopup):
         )
 
     def check_min_quantity(self, item, index):
-        if item.quantity <= config.minimum_drug_quantity_alert:
+        if item.quantity <= self.mv.config.minimum_drug_quantity_alert:
             self.lc.SetItemTextColour(index, wx.Colour(252, 3, 57))
 
     def OnPopup(self):
         self.lc.DeleteAllItems()
-        cc: DrugPicker = self.GetComboCtrl()
+        cc: DrugPicker = self.ComboCtrl
         s: str = cc.Value
         self.fetch_list(s.strip())
         self.build()
@@ -95,8 +95,8 @@ class DrugPopup(wx.ComboPopup):
 
     def OnLeftDown(self, e):
         self.Dismiss()
-        cc: DrugPicker = self.GetComboCtrl()
-        cc.parent.parent.mv.state.warehouse = self._list[self.curitem]
+        cc: DrugPicker = self.ComboCtrl
+        self.mv.state.warehouse = self._list[self.curitem]
         cc.parent.times.SetFocus()
 
     def onChar(self, e: wx.KeyEvent):
@@ -130,14 +130,14 @@ class DrugPopup(wx.ComboPopup):
 
     def KeyESC(self):
         self.Dismiss()
-        cc: DrugPicker = self.GetComboCtrl()
-        cc.parent.parent.mv.state.warehouse = None
+        self.mv.state.warehouse = None
 
 
 class DrugPicker(wx.ComboCtrl):
     def __init__(self, parent: "order_book.PrescriptionPage"):
         super().__init__(parent, style=wx.TE_PROCESS_ENTER)
         self.parent = parent
+        self.mv = parent.mv
         self.SetPopupControl(DrugPopup())
         self.Bind(wx.EVT_CHAR, self.onChar)
         self.Bind(wx.EVT_TEXT, self.onText)

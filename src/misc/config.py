@@ -6,6 +6,7 @@ from collections import namedtuple
 from dataclasses import dataclass
 import dataclasses
 import datetime as dt
+from wx import DisplaySize, Colour
 
 
 Color = namedtuple("Color", ["r", "g", "b"])
@@ -70,8 +71,8 @@ class Config:
             maximize_at_start=config_json["maximize_at_start"],
             listctrl_header_scale=config_json["listctrl_header_scale"],
             background_color={
-                name: Color(r,g,b)
-                for (name, [r,g,b]) in config_json["background_color"].items()
+                name: Color(r, g, b)
+                for (name, [r, g, b]) in config_json["background_color"].items()
             },
         )
 
@@ -85,3 +86,16 @@ class Config:
         bak = CONFIG_PATH + dt.datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + ".bak"
         shutil.copyfile(CONFIG_PATH, bak)
         shutil.copyfile(DEFAULT_CONFIG_PATH, CONFIG_PATH)
+
+    def header_width(self, p: float) -> int:
+        w: int = DisplaySize()[0]
+        return round(w * p * self.listctrl_header_scale)
+
+    def header_size(self, p: float) -> tuple[int, int]:
+        return (self.header_width(p), -1)
+
+    def get_background_color(self, name:str) -> Colour:
+        try:
+            return Colour(*self.background_color[name])
+        except KeyError:
+            return Colour(255, 255, 255)

@@ -1,4 +1,4 @@
-from core.init import k_number, k_special, k_tab, k_decimal, k_hash, k_slash
+from misc import k_number, k_special, k_tab, k_decimal, k_hash, k_slash
 from misc import bd_to_vn_age
 from db import Gender
 import wx

@@ -1,5 +1,6 @@
-from core.init import size
 from db import Procedure
+from core import mainview
+from core.mainview_widgets import order_book
 import wx
 import sqlite3
 
@@ -14,9 +15,10 @@ class ProcedureListItem:
 
 
 class ProcedureListCtrl(wx.ListCtrl):
-    def __init__(self, parent):
+    def __init__(self, parent:"order_book.ProcedurePage"):
         super().__init__(parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
-        self.AppendColumn("Tên thủ thuật", width=size(0.2))
+        self.mv :"mainview.MainView" = parent.mv
+        self.AppendColumn("Tên thủ thuật", width=self.mv.config.header_width(0.2))
         self.pr_list: list[ProcedureListItem] = []
 
     def clear(self):

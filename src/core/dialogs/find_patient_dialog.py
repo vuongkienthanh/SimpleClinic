@@ -1,4 +1,3 @@
-from core.init import size
 from core import mainview
 from misc import check_blank_to_none
 from core.dialogs.patient_dialog import EditPatientDialog
@@ -15,10 +14,11 @@ class SearchPatientList(wx.ListCtrl):
         super().__init__(
             parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL, size=(-1, 26 * num_of_lines)
         )
-        self.AppendColumn("Mã BN", width=size(0.03))
-        self.AppendColumn("Họ tên", width=size(0.1))
-        self.AppendColumn("Giới", width=size(0.03))
-        self.AppendColumn("Ngày sinh", width=size(0.06))
+        self.mv = parent.mv
+        self.AppendColumn("Mã BN", width=self.mv.config.header_width(0.03))
+        self.AppendColumn("Họ tên", width=self.mv.config.header_width(0.1))
+        self.AppendColumn("Giới", width=self.mv.config.header_width(0.03))
+        self.AppendColumn("Ngày sinh", width=self.mv.config.header_width(0.06))
         self.num_of_lines = num_of_lines
         self.page_index: int = 0
         self.saved_pages: list[list] = []
@@ -189,7 +189,7 @@ class FindPatientDialog(wx.Dialog):
         "Enter (EVT_SEARCH) to activate"
         s: str = e.GetString()
         s = s.upper()
-        self.cur = self.mv.con.execute(
+        self.cur = self.mv.connection.execute(
             f"""
             SELECT id AS pid, name, gender, birthdate
             FROM {Patient.table_name}
@@ -255,7 +255,7 @@ class FindPatientDialog(wx.Dialog):
         e.Skip()
 
     def onAll(self, e: wx.CommandEvent):
-        self.cur = self.mv.con.execute(
+        self.cur = self.mv.connection.execute(
             f"""
             SELECT id AS pid, name, gender, birthdate
             FROM {Patient.table_name}
@@ -267,7 +267,7 @@ class FindPatientDialog(wx.Dialog):
         dlg = DatePickerDialog(self.mv)
         if dlg.ShowModal() == wx.ID_OK:
             d = dlg.GetDate()
-            self.cur = self.mv.con.execute(
+            self.cur = self.mv.connection.execute(
                 f"""
                 SELECT p.id AS pid, name, gender, birthdate
                 FROM {Visit.table_name} as v
@@ -293,7 +293,7 @@ class FindPatientDialog(wx.Dialog):
         pid = self.lc.pid
         assert pid is not None
         try:
-            self.mv.con.insert(Queue, {"patient_id": pid})
+            self.mv.connection.insert(Queue, {"patient_id": pid})
             wx.MessageBox("Thêm vào danh sách chờ thành công", "OK")
             self.mv.state.queuelist = self.mv.state.get_queuelist()
         except sqlite3.IntegrityError as error:
@@ -320,7 +320,7 @@ class FindPatientDialog(wx.Dialog):
             pid = self.lc.pid
             assert pid is not None
             try:
-                self.mv.con.delete(Patient, pid)
+                self.mv.connection.delete(Patient, pid)
                 wx.MessageBox("Xóa thành công", "OK")
                 self.mv.state.refresh()
                 self.clear()
@@ -343,7 +343,7 @@ class EditFindPatientDialog(EditPatientDialog):
     def get_patient(self) -> Patient:
         pid = self.parent.lc.pid
         assert pid is not None
-        p = self.mv.con.select(Patient, pid)
+        p = self.mv.connection.select(Patient, pid)
         assert p is not None
         return p
 
@@ -362,7 +362,7 @@ class EditFindPatientDialog(EditPatientDialog):
                 past_history=check_blank_to_none(self.past_history.Value),
             )
             try:
-                self.mv.con.update(p)
+                self.mv.connection.update(p)
                 wx.MessageBox("Cập nhật thành công", "OK")
                 self.parent.clear()
                 page: wx.ListCtrl = self.mv.patient_book.GetCurrentPage()

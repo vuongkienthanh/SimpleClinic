@@ -1,7 +1,6 @@
 from db import *
 from core import mainview
-from misc import bd_to_vn_age, weekdays
-from core.init import config
+from misc import bd_to_vn_age, vn_weekdays
 from core import menubar
 import sqlite3
 import wx
@@ -23,11 +22,11 @@ class State:
         self._lineprocedurelist: list[sqlite3.Row] = []
         self._queuelist: list[sqlite3.Row] = self.get_queuelist()
         self._todaylist: list[sqlite3.Row] = self.get_todaylist()
-        self.warehouselist: list[Warehouse] = self.mv.con.selectall(Warehouse)
-        self.sampleprescriptionlist: list[SamplePrescription] = self.mv.con.selectall(
+        self.warehouselist: list[Warehouse] = self.mv.connection.selectall(Warehouse)
+        self.sampleprescriptionlist: list[SamplePrescription] = self.mv.connection.selectall(
             SamplePrescription
         )
-        self.procedurelist: list[Procedure] = self.mv.con.selectall(Procedure)
+        self.procedurelist: list[Procedure] = self.mv.connection.selectall(Procedure)
 
     def refresh(self) -> None:
         self.patient = None
@@ -38,9 +37,9 @@ class State:
         self.lineprocedurelist = []
         self.queuelist = self.get_queuelist()
         self.todaylist = self.get_todaylist()
-        self.warehouselist = self.mv.con.selectall(Warehouse)
-        self.sampleprescriptionlist = self.mv.con.selectall(SamplePrescription)
-        self.procedurelist = self.mv.con.selectall(Procedure)
+        self.warehouselist = self.mv.connection.selectall(Warehouse)
+        self.sampleprescriptionlist = self.mv.connection.selectall(SamplePrescription)
+        self.procedurelist = self.mv.connection.selectall(Procedure)
         self.mv.order_book.SetSelection(0)
 
     @property
@@ -131,7 +130,7 @@ class State:
         self.mv.vnote.ChangeValue(v.vnote or "")
         self.mv.weight.SetValue(v.weight)
         self.mv.days.SetValue(v.days)
-        self.mv.recheck_weekday.SetLabel(weekdays(v.days))
+        self.mv.recheck_weekday.SetLabel(vn_weekdays(v.days))
         self.mv.recheck.SetValue(v.recheck)
         self.mv.follow.SetFollow(v.follow)
         self.linedruglist = self.get_linedrugs_by_visit_id(v.id)
@@ -157,12 +156,12 @@ class State:
         self.mv.diagnosis.Clear()
         self.mv.vnote.Clear()
         self.mv.weight.SetValue(0)
-        self.mv.days.SetValue(config.default_days_for_prescription)
+        self.mv.days.SetValue(self.mv.config.default_days_for_prescription)
         self.mv.recheck_weekday.SetLabel(
-            weekdays(config.default_days_for_prescription)
+            vn_weekdays(self.mv.config.default_days_for_prescription)
         )
         self.mv.updatequantitybtn.Disable()
-        self.mv.recheck.SetValue(config.default_days_for_prescription)
+        self.mv.recheck.SetValue(self.mv.config.default_days_for_prescription)
         self.mv.follow.SetDefault()
         self.linedruglist = []
         self.lineprocedurelist = []
@@ -262,12 +261,12 @@ class State:
                 return wh
 
     def get_queuelist(self) -> list[sqlite3.Row]:
-        return self.mv.con.execute(
+        return self.mv.connection.execute(
             f"SELECT * FROM {Queue.table_name}_view"
         ).fetchall()
 
     def get_todaylist(self) -> list[sqlite3.Row]:
-        return self.mv.con.execute(
+        return self.mv.connection.execute(
             f"SELECT * FROM {SeenToday.table_name}_view"
         ).fetchall()
 
@@ -278,11 +277,11 @@ class State:
             WHERE {Visit.table_name}.patient_id = {pid}
             ORDER BY exam_datetime DESC
         """
-        if config.display_recent_visit_count >= 0:
+        if self.mv.config.display_recent_visit_count >= 0:
             query += f"""
-                LIMIT {config.display_recent_visit_count}
+                LIMIT {self.mv.config.display_recent_visit_count}
             """
-        return self.mv.con.execute(query).fetchall()
+        return self.mv.connection.execute(query).fetchall()
 
     def get_linedrugs_by_visit_id(self, vid: int) -> list[sqlite3.Row]:
         query = f"""
@@ -299,7 +298,7 @@ class State:
             JOIN {Warehouse.table_name} AS wh
             ON wh.id = ld.drug_id
         """
-        return self.mv.con.execute(query).fetchall()
+        return self.mv.connection.execute(query).fetchall()
 
     def get_lineprocedures_by_visit_id(self, vid: int) -> list[sqlite3.Row]:
         query = f"""
@@ -311,4 +310,4 @@ class State:
             JOIN {Procedure.table_name} AS pr
             ON pr.id = lp.procedure_id
         """
-        return self.mv.con.execute(query).fetchall()
+        return self.mv.connection.execute(query).fetchall()

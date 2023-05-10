@@ -1,6 +1,5 @@
 from misc import bd_to_vn_age, get_usage_note_str
 from core import mainview as mv
-from core.init import config
 import textwrap as tw
 import datetime as dt
 import wx
@@ -29,7 +28,7 @@ class PrintOut(wx.Printout):
         "Relative to `num_of_ld`"
         x, y = divmod(
             self.mv.order_book.page0.drug_list.ItemCount,
-            config.number_of_drugs_in_one_page,
+            self.mv.config.number_of_drugs_in_one_page,
         )
         if page <= (x + bool(y)):
             return True
@@ -45,12 +44,12 @@ class PrintOut(wx.Printout):
         else:
             x, y = divmod(
                 self.mv.order_book.page0.drug_list.ItemCount,
-                config.number_of_drugs_in_one_page,
+                self.mv.config.number_of_drugs_in_one_page,
             )
         return (1, x + bool(y), 1, x + bool(y))
 
     def OnPrintPage(self, page):
-        num_of_ld = config.number_of_drugs_in_one_page
+        num_of_ld = self.mv.config.number_of_drugs_in_one_page
         d_list = self.mv.order_book.page0.drug_list.d_list
         state = self.mv.state
         p = state.patient
@@ -59,9 +58,9 @@ class PrintOut(wx.Printout):
         dc: wx.DC = self.GetDC()
         dcx, dcy = dc.Size
         if self.preview:
-            scale = config.preview_scale
+            scale = self.mv.config.preview_scale
         else:
-            scale = config.print_scale
+            scale = self.mv.config.print_scale
         dcx, dcy = round(dcx * scale), round(dcy * scale)
 
         space = round(dcx * 0.002)
@@ -100,9 +99,9 @@ class PrintOut(wx.Printout):
 
             with wx.DCFontChanger(dc, heading):
                 x = atx(0.085)
-                dc.DrawText(config.clinic_name, x, row(0))
-                dc.DrawText("Địa chỉ: " + config.clinic_address, x, row(1))
-                dc.DrawText("SĐT: " + config.clinic_phone_number, x, row(2))
+                dc.DrawText(self.mv.config.clinic_name, x, row(0))
+                dc.DrawText("Địa chỉ: " + self.mv.config.clinic_address, x, row(1))
+                dc.DrawText("SĐT: " + self.mv.config.clinic_phone_number, x, row(2))
             with wx.DCFontChanger(dc, title):
                 draw_centered_text("ĐƠN THUỐC", round(dcx / 2), row(3))
 
@@ -151,7 +150,7 @@ class PrintOut(wx.Printout):
                     aty(0.735),
                 )
                 dc.DrawText("Bác sĩ khám bệnh", atx(0.63), aty(0.765))
-                draw_centered_text(config.doctor_name, atx(0.75), aty(0.865))
+                draw_centered_text(self.mv.config.doctor_name, atx(0.75), aty(0.865))
 
             row_y = round(dcy * 0.02)
             y = aty(0.72)
@@ -160,7 +159,7 @@ class PrintOut(wx.Printout):
                 return y + row_y * i
 
             with wx.DCFontChanger(dc, heading):
-                if config.print_price:
+                if self.mv.config.print_price:
                     t = f"Tổng cộng: {self.mv.price.GetValue()}"
                     if self.mv.order_book.page1.procedure_list.ItemCount > 0:
                         t += " (đã gồm tiền thủ thuật)"

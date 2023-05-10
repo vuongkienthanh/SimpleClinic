@@ -1,5 +1,4 @@
 from core import mainview
-from core.init import size
 from core.generic import DoseTextCtrl, NumberTextCtrl
 from db import *
 import wx
@@ -8,13 +7,13 @@ from typing import Any
 
 
 class SampleDialog(wx.Dialog):
-    def __init__(self, parent: "mainview.MainView"):
+    def __init__(self, mv: "mainview.MainView"):
         super().__init__(
-            parent=parent,
+            parent=mv,
             title="Toa mẫu",
             style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.MAXIMIZE_BOX,
         )
-        self.mv = parent
+        self.mv = mv
 
         self.samplelist = SampleList(self, name="Danh sách toa mẫu")
         self.addsamplebtn = AddSampleButton(self)
@@ -80,7 +79,8 @@ class SampleList(wx.ListCtrl):
             parent, style=wx.LC_SINGLE_SEL | wx.LC_REPORT | wx.LC_NO_HEADER, name=name
         )
         self.parent = parent
-        self.AppendColumn("name", width=size(0.2))
+        self.mv = parent.mv
+        self.AppendColumn("name", width=self.mv.config.header_width(0.2))
         self.DeleteAllItems()
         for sp in self.parent.mv.state.sampleprescriptionlist:
             self.append(sp)
@@ -117,7 +117,7 @@ class AddSampleButton(wx.Button):
         s = wx.GetTextFromUser("Tên toa mẫu mới", "Thêm toa mẫu")
         if s != "":
             sp = {"name": s}
-            lastrowid = self.parent.mv.con.insert(SamplePrescription, sp)
+            lastrowid = self.parent.mv.connection.insert(SamplePrescription, sp)
             assert lastrowid is not None
             sp = SamplePrescription(id=lastrowid, name=s)
             self.parent.mv.state.sampleprescriptionlist.append(sp)
@@ -136,7 +136,7 @@ class DeleteSampleButton(wx.Button):
         assert idx >= 0
         sp = self.parent.mv.state.sampleprescriptionlist[idx]
         try:
-            rowcount = self.parent.mv.con.delete(SamplePrescription, sp.id)
+            rowcount = self.parent.mv.connection.delete(SamplePrescription, sp.id)
             assert rowcount is not None
             self.parent.mv.state.sampleprescriptionlist.pop(idx)
             self.parent.samplelist.DeleteItem(idx)
@@ -208,7 +208,7 @@ class AddDrugButton(wx.Button):
             "dose": dose,
         }
         try:
-            lastrowid = self.parent.mv.con.insert(LineSamplePrescription, lsp)
+            lastrowid = self.parent.mv.connection.insert(LineSamplePrescription, lsp)
             assert lastrowid is not None
             self.parent.itemlist.append(
                 {
@@ -237,7 +237,7 @@ class DeleteDrugButton(wx.Button):
     def onClick(self, e: wx.CommandEvent):
         idx: int = self.parent.itemlist.GetFirstSelected()
         lsp_id = self.parent.itemlist.pop(idx)
-        self.parent.mv.con.delete(LineSamplePrescription, lsp_id)
+        self.parent.mv.connection.delete(LineSamplePrescription, lsp_id)
         self.Disable()
 
 
@@ -245,16 +245,17 @@ class ItemList(wx.ListCtrl):
     def __init__(self, parent: SampleDialog, name: str):
         super().__init__(parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL, name=name)
         self.parent = parent
+        self.mv = parent.mv
         self._list_id: list[int] = []
-        self.AppendColumn("Tên thuốc", width=size(0.1))
-        self.AppendColumn("Thành phần", width=size(0.1))
-        self.AppendColumn("Số cữ", width=size(0.05))
-        self.AppendColumn("Liều 1 cữ", width=size(0.05))
+        self.AppendColumn("Tên thuốc", width=self.mv.config.header_width(0.1))
+        self.AppendColumn("Thành phần", width=self.mv.config.header_width(0.1))
+        self.AppendColumn("Số cữ", width=self.mv.config.header_width(0.05))
+        self.AppendColumn("Liều 1 cữ", width=self.mv.config.header_width(0.05))
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onSelect)
         self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onDeselect)
 
     def build(self, sp_id: int):
-        for lsp in self.parent.mv.con.execute(
+        for lsp in self.parent.mv.connection.execute(
             f"""
             SELECT lsp.id, wh.name, wh.element, lsp.times, lsp.dose
             FROM (

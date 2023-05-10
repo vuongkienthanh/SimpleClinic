@@ -1,5 +1,4 @@
 from core import mainview as mv
-from core.init import size
 from db import Visit
 import wx
 import sqlite3
@@ -11,9 +10,9 @@ class VisitList(wx.ListCtrl):
     def __init__(self, parent: "mv.MainView"):
         super().__init__(parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
         self.mv = parent
-        self.AppendColumn("Mã lượt khám", width=size(0.07))
-        self.AppendColumn("Ngày giờ khám", width=size(0.075))
-        self.AppendColumn("Chẩn đoán", width=size(0.15))
+        self.AppendColumn("Mã lượt khám", width=self.mv.config.header_width(0.07))
+        self.AppendColumn("Ngày giờ khám", width=self.mv.config.header_width(0.075))
+        self.AppendColumn("Chẩn đoán", width=self.mv.config.header_width(0.15))
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onSelect)
         self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onDeselect)
 
@@ -36,7 +35,7 @@ class VisitList(wx.ListCtrl):
 
     def onSelect(self, e: wx.ListEvent):
         vid = self.mv.state.visitlist[e.Index]["vid"]
-        self.mv.state.visit = self.mv.con.select(Visit, vid)
+        self.mv.state.visit = self.mv.connection.select(Visit, vid)
 
-    def onDeselect(self, e: wx.ListEvent):
+    def onDeselect(self, _):
         self.mv.state.visit = None

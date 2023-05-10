@@ -29,8 +29,8 @@ def platform_settings():
 
 
 if __name__ == "__main__":
-    con = db.Connection(MY_DATABASE_PATH)
-    con.make_db()
-    con.update_last_open_date()
+    connection = db.Connection(MY_DATABASE_PATH)
+    connection.make_db()
+    connection.update_last_open_date()
     platform_settings()
-    App(con)
+    App(connection)

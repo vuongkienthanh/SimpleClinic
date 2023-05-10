@@ -3,7 +3,6 @@ from db import LineProcedure, Visit, Patient, LineDrug, SeenToday
 from misc import calc_quantity, check_blank_to_none
 from core import mainview as mv
 from core.printer import PrintOut, printdata
-from core.init import config
 
 import sqlite3
 import wx
@@ -19,11 +18,11 @@ class GetWeightBtn(wx.BitmapButton):
         self.Bind(wx.EVT_BUTTON, self.onClick)
         self.Disable()
 
-    def onClick(self, e: wx.CommandEvent):
+    def onClick(self, _):
         visit_count = self.mv.visit_list.GetItemCount()
         if self.mv.state.patient and (visit_count > 0):
             self.mv.weight.SetWeight(
-                self.mv.con.execute(
+                self.mv.connection.execute(
                     f"""
                 SELECT weight
                 FROM {Visit.table_name}
@@ -58,7 +57,7 @@ class UpdateQuantityBtn(wx.BitmapButton):
         self.Bind(wx.EVT_BUTTON, self.onClick)
         self.Disable()
 
-    def onClick(self, e: wx.CommandEvent):
+    def onClick(self, _):
         self.update_quantity()
 
     def update_quantity(self):
@@ -70,6 +69,7 @@ class UpdateQuantityBtn(wx.BitmapButton):
                 dose=item.dose,
                 days=self.mv.days.GetValue(),
                 sale_unit=item.sale_unit,
+                config=self.mv.config
             )
             assert q is not None
             item.quantity = q
@@ -87,7 +87,7 @@ class NewVisitBtn(wx.Button):
         self.Bind(wx.EVT_BUTTON, self.onClick)
         self.Disable()
 
-    def onClick(self, e: wx.CommandEvent):
+    def onClick(self, _):
         idx: int = self.mv.visit_list.GetFirstSelected()
         self.mv.visit_list.Select(idx, 0)
 
@@ -101,7 +101,7 @@ class SaveBtn(wx.Button):
         self.Disable()
         self.Bind(wx.EVT_BUTTON, self.onClick)
 
-    def onClick(self, e: wx.CommandEvent):
+    def onClick(self, _):
         if self.mv.state.visit:
             self.update_visit()
         else:
@@ -123,7 +123,7 @@ class SaveBtn(wx.Button):
                 "follow": self.mv.follow.GetFollow(),
             }
             try:
-                with self.mv.con as con:
+                with self.mv.connection as con:
                     con.execute(
                         f"""
                         UPDATE {Patient.table_name} SET past_history = ?
@@ -181,7 +181,7 @@ class SaveBtn(wx.Button):
                         (p.id,),
                     )
                     wx.MessageBox("Lưu lượt khám mới thành công", "Lưu lượt khám mới")
-                    if config.ask_print:
+                    if self.mv.config.ask_print:
                         if (
                             wx.MessageBox("In toa về?", "In toa", style=wx.YES | wx.NO)
                             == wx.YES
@@ -260,7 +260,7 @@ class SaveBtn(wx.Button):
             ]
 
             try:
-                with self.mv.con as con:
+                with self.mv.connection as con:
                     con.execute(
                         f"""
                         UPDATE {Patient.table_name} SET past_history = ?
@@ -306,7 +306,7 @@ class SaveBtn(wx.Button):
                         insert_lp,
                     )
                 wx.MessageBox("Cập nhật lượt khám thành công", "Cập nhật lượt khám")
-                if config.ask_print:
+                if self.mv.config.ask_print:
                     if (
                         wx.MessageBox("In toa về?", "In toa", style=wx.YES | wx.NO)
                         == wx.YES

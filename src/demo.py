@@ -100,6 +100,6 @@ def sample_con():
 
 
 if __name__ == "__main__":
-    con = sample_con()
+    connection = sample_con()
     platform_settings()
-    App(con)
+    App(connection)

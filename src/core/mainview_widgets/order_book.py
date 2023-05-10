@@ -22,6 +22,7 @@ class PrescriptionPage(wx.Panel):
     def __init__(self, parent: OrderBook):
         super().__init__(parent)
         self.parent = parent
+        self.mv = parent.mv
 
         self.drug_picker = DrugPicker(self)
         self.usage = wx.StaticText(

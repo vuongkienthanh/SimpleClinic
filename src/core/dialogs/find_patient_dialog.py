@@ -2,7 +2,7 @@ from core import mainview
 from misc import check_blank_to_none
 from core.dialogs.patient_dialog import EditPatientDialog
 from db import Patient, Queue, Visit
-from core.generic import DatePickerDialog
+from core.dialogs.picker_dialog import DatePickerDialog
 import wx
 import sqlite3
 
@@ -192,7 +192,7 @@ class FindPatientDialog(wx.Dialog):
         self.cur = self.mv.connection.execute(
             f"""
             SELECT id AS pid, name, gender, birthdate
-            FROM {Patient.table_name}
+            FROM {Patient.__tablename__}
             WHERE name LIKE ?
         """,
             ("%" + s + "%",),
@@ -258,7 +258,7 @@ class FindPatientDialog(wx.Dialog):
         self.cur = self.mv.connection.execute(
             f"""
             SELECT id AS pid, name, gender, birthdate
-            FROM {Patient.table_name}
+            FROM {Patient.__tablename__}
         """
         )
         self.rebuild()
@@ -270,8 +270,8 @@ class FindPatientDialog(wx.Dialog):
             self.cur = self.mv.connection.execute(
                 f"""
                 SELECT p.id AS pid, name, gender, birthdate
-                FROM {Visit.table_name} as v
-                JOIN {Patient.table_name} as p
+                FROM {Visit.__tablename__} as v
+                JOIN {Patient.__tablename__} as p
                 ON p.id = v.patient_id
                 WHERE DATE(v.exam_datetime) = '{d.strftime("%Y-%m-%d")}'
             """
@@ -295,7 +295,7 @@ class FindPatientDialog(wx.Dialog):
         try:
             self.mv.connection.insert(Queue, {"patient_id": pid})
             wx.MessageBox("Thêm vào danh sách chờ thành công", "OK")
-            self.mv.state.queuelist = self.mv.state.get_queuelist()
+            self.mv.state.queue = self.mv.state.fetch_queue_view()
         except sqlite3.IntegrityError as error:
             wx.MessageBox(f"Đã có tên trong danh sách chờ.\n{error}", "Lỗi")
         finally:

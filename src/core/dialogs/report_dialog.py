@@ -62,17 +62,17 @@ class DayReportDialog(wx.Dialog):
                         ld.quantity AS ldquantity,
                         lp.procedure_id AS lpprocedure_id
                     FROM (
-                        SELECT id FROM {Visit.table_name}
+                        SELECT id FROM {Visit.__tablename__}
                         WHERE DATE(exam_datetime) = '{date.isoformat()}'
                     ) AS v
-                    LEFT JOIN {LineDrug.table_name} AS ld
+                    LEFT JOIN {LineDrug.__tablename__} AS ld
                     ON ld.visit_id = v.id
-                    LEFT JOIN {LineProcedure.table_name} AS lp
+                    LEFT JOIN {LineProcedure.__tablename__} AS lp
                     ON lp.visit_id = v.id
                 ) as vdp
-                LEFT JOIN {Warehouse.table_name} AS wh
+                LEFT JOIN {Warehouse.__tablename__} AS wh
                 ON vdp.lddrug_id = wh.id
-                LEFT JOIN {Procedure.table_name} AS pr
+                LEFT JOIN {Procedure.__tablename__} AS pr
                 ON vdp.lpprocedure_id = pr.id
             )
         """
@@ -133,20 +133,20 @@ class MonthReportDialog(wx.Dialog):
                         ld.quantity AS ldquantity,
                         lp.procedure_id AS lpprocedure_id
                     FROM (
-                        SELECT id FROM {Visit.table_name}
+                        SELECT id FROM {Visit.__tablename__}
                         WHERE (
                             STRFTIME('%m', exam_datetime) = '{month:>02}' AND
                             STRFTIME('%Y', exam_datetime) = '{year}'
                         )
                     ) AS v
-                    LEFT JOIN {LineDrug.table_name} AS ld
+                    LEFT JOIN {LineDrug.__tablename__} AS ld
                     ON ld.visit_id = v.id
-                    LEFT JOIN {LineProcedure.table_name} AS lp
+                    LEFT JOIN {LineProcedure.__tablename__} AS lp
                     ON lp.visit_id = v.id
                 ) as vdp
-                LEFT JOIN {Warehouse.table_name} AS wh
+                LEFT JOIN {Warehouse.__tablename__} AS wh
                 ON vdp.lddrug_id = wh.id
-                LEFT JOIN {Procedure.table_name} AS pr
+                LEFT JOIN {Procedure.__tablename__} AS pr
                 ON vdp.lpprocedure_id = pr.id
             )
         """
@@ -205,16 +205,16 @@ class MonthWarehouseReportDialog(wx.Dialog):
                 SUM(ld.quantity) AS quantity,
                 wh.sale_unit AS sale_unit,
                 wh.usage_unit AS usage_unit
-            FROM {LineDrug.table_name} AS ld
+            FROM {LineDrug.__tablename__} AS ld
             LEFT JOIN (
-                SELECT id FROM {Visit.table_name}
+                SELECT id FROM {Visit.__tablename__}
                 WHERE (
                     STRFTIME('%m', exam_datetime) = '{month:>02}' AND
                     STRFTIME('%Y', exam_datetime) = '{year}'
                 )
             ) AS v
             ON ld.visit_id = v.id
-            LEFT JOIN {Warehouse.table_name} AS wh
+            LEFT JOIN {Warehouse.__tablename__} AS wh
             ON ld.drug_id = wh.id
             GROUP BY wh.name
         """

@@ -1,7 +1,7 @@
 import db
 from misc import Config, vn_weekdays
 from core.state import State
-from core.generic import AgeCtrl, PhoneTextCtrl, DateTextCtrl, WeightCtrl
+from core.generic_widgets import ReadonlyVNAgeCtrl, PhoneTextCtrl, DateTextCtrl, WeightCtrl
 from core.mainview_widgets import (
     GetWeightBtn,
     DaysCtrl,
@@ -13,7 +13,7 @@ from core.mainview_widgets import (
     NewVisitBtn,
     SaveBtn,
     PatientBook,
-    VisitList,
+    VisitListCtrl,
     OrderBook,
 )
 from core.menubar import MyMenuBar
@@ -34,7 +34,7 @@ class MainView(wx.Frame):
             self.Maximize()
 
         self.patient_book = PatientBook(self)
-        self.visit_list = VisitList(self)
+        self.visit_list = VisitListCtrl(self)
         self.name = wx.TextCtrl(
             self,
             size=self.config.header_size(0.1),
@@ -53,11 +53,10 @@ class MainView(wx.Frame):
             name="Ngày sinh:",
             style=wx.TE_READONLY,
         )
-        self.age = AgeCtrl(
+        self.age = ReadonlyVNAgeCtrl(
             self,
             size=self.config.header_size(0.055),
             name="Tuổi:",
-            style=wx.TE_READONLY,
         )
         self.address = wx.TextCtrl(self, name="Địa chỉ:", style=wx.TE_READONLY)
         self.phone = PhoneTextCtrl(
@@ -108,16 +107,16 @@ class MainView(wx.Frame):
                 (self.weight, "weight"),
                 (self.follow, "follow"),
                 (self.visit_list, "visit_list"),
-                (self.patient_book.page0, "patient_queuelist"),
-                (self.patient_book.page1, "patient_seenlist"),
-                (self.order_book.page0.drug_list, "drug_list"),
-                (self.order_book.page0.drug_picker, "drug_picker"),
-                (self.order_book.page0.times, "drug_times"),
-                (self.order_book.page0.dose, "drug_dose"),
-                (self.order_book.page0.quantity, "drug_quantity"),
-                (self.order_book.page0.note, "drug_note"),
-                (self.order_book.page1.procedure_picker, "procedure_picker"),
-                (self.order_book.page1.procedure_list, "procedure_list"),
+                (self.patient_book.queuepatientlistctrl, "patient_queuelist"),
+                (self.patient_book.seentodaylistctrl, "patient_seenlist"),
+                (self.order_book.prescriptionpage.drug_list, "drug_list"),
+                (self.order_book.prescriptionpage.drug_picker, "drug_picker"),
+                (self.order_book.prescriptionpage.times, "drug_times"),
+                (self.order_book.prescriptionpage.dose, "drug_dose"),
+                (self.order_book.prescriptionpage.quantity, "drug_quantity"),
+                (self.order_book.prescriptionpage.note, "drug_note"),
+                (self.order_book.procedurepage.procedure_picker, "procedure_picker"),
+                (self.order_book.procedurepage.procedure_list, "procedure_list"),
             ]
         )
 
@@ -214,8 +213,8 @@ class MainView(wx.Frame):
         e.Skip()
 
     def start(self):
-        self.patient_book.page0.build(self.state.queuelist)
-        self.patient_book.page1.build(self.state.todaylist)
+        self.patient_book.queuepatientlistctrl.build(self.state.queue)
+        self.patient_book.seentodaylistctrl.build(self.state.seentoday)
 
     def check_filled(self) -> bool:
         diagnosis: str = self.diagnosis.GetValue()

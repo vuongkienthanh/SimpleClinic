@@ -1,7 +1,7 @@
 from db import Warehouse
 from misc import check_none_to_blank, check_blank_to_none
 from core import mainview
-from core.generic import DatePicker, NumberTextCtrl
+from core.generic_widgets import CalendarDatePicker, NumberTextCtrl
 
 import wx
 
@@ -21,8 +21,8 @@ class WarehouseDialog(wx.Dialog):
 
         self.search = wx.SearchCtrl(self)
         self.search.SetHint("Tên thuốc hoặc thành phần thuốc")
-        self.lc = wx.ListCtrl(self, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
 
+        self.lc = wx.ListCtrl(self, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
         self.lc.AppendColumn("Mã", width=self.mv.config.header_width(0.03))
         self.lc.AppendColumn("Tên", width=self.mv.config.header_width(0.1))
         self.lc.AppendColumn("Thành phần", width=self.mv.config.header_width(0.1))
@@ -35,6 +35,7 @@ class WarehouseDialog(wx.Dialog):
         self.lc.AppendColumn("Ngày hết hạn", width=self.mv.config.header_width(0.05))
         self.lc.AppendColumn("Xuất xứ", width=self.mv.config.header_width(0.06))
         self.lc.AppendColumn("Ghi chú", width=self.mv.config.header_width(0.06))
+
         self.newbtn = wx.Button(self, label="Thêm mới")
         self.editbtn = wx.Button(self, label="Cập nhật")
         self.delbtn = wx.Button(self, label="Xóa")
@@ -69,8 +70,7 @@ class WarehouseDialog(wx.Dialog):
         )
         self.SetSizerAndFit(sizer)
 
-        self.search.Bind(wx.EVT_SEARCH, self.onSearch)
-        self.search.Bind(wx.EVT_TEXT, self.onSearchText)
+        self.search.Bind(wx.EVT_SEARCH, self.onSearchEnter)
         self.lc.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onSelect)
         self.lc.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onDeselect)
         self.lc.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onEdit)
@@ -78,42 +78,15 @@ class WarehouseDialog(wx.Dialog):
         self.editbtn.Bind(wx.EVT_BUTTON, self.onEdit)
         self.delbtn.Bind(wx.EVT_BUTTON, self.onDelete)
         self.Maximize()
-        self.build()
-
-    def clear(self):
-        "clear display and internal Warehouse list"
-        self._list = []
-        self.lc.DeleteAllItems()
-
-    def get_search_value(self) -> str:
-        "get search string"
-        s: str = self.search.GetValue()
-        return s.strip().casefold()
-
-    def check_search_str_to_wh(self, wh: Warehouse, s: str) -> bool:
-        "used in filter function"
-        if (s in wh.name.casefold()) or (s in wh.element.casefold()):
-            return True
-        else:
-            return False
-
-    def rebuild(self, s: str = ""):
-        "filter and build"
-        self.clear()
-        for wh in filter(
-            lambda wh: self.check_search_str_to_wh(wh, s), self.mv.state.warehouselist
-        ):
-            self.append(wh)
-
-    def build(self):
-        "build without filtering for optimization"
-        self.clear()
-        for wh in self.mv.state.warehouselist:
-            self.append(wh)
+        self.filtered_build()
 
     def append(self, wh: Warehouse):
         "append to internal list and ui, also conditional recolor"
         self._list.append(wh)
+        self.append_ui(wh)
+        self.check_min_quantity_and_change_color(wh, len(self._list) - 1)
+
+    def append_ui(self, wh: Warehouse):
         self.lc.Append(
             [
                 str(wh.id),
@@ -132,27 +105,40 @@ class WarehouseDialog(wx.Dialog):
                 check_none_to_blank(wh.note),
             ]
         )
-        self.check_min_quantity(wh, len(self._list) - 1)
 
     def delete(self, idx: int):
         "delete from internal list and ui"
         self.lc.DeleteItem(idx)
         self._list.pop(idx)
 
-    def check_min_quantity(self, wh: Warehouse, idx: int):
-        "conditional recolor"
+    def clear(self):
+        "clear display and internal list"
+        self._list.clear()
+        self.lc.DeleteAllItems()
+
+    def filtered_build(self, s: str = ""):
+        self.clear()
+        if s == "":
+            for wh in self.mv.state.allwarehouselist:
+                self.append(wh)
+        else:
+            for wh in filter(
+                lambda wh: self.check_search_str_in_wh(wh, s),
+                self.mv.state.allwarehouselist,
+            ):
+                self.append(wh)
+
+    def check_search_str_in_wh(self, wh: Warehouse, s: str) -> bool:
+        s = s.strip().casefold()
+        return (s in wh.name.casefold()) or (s in wh.element.casefold())
+
+    def check_min_quantity_and_change_color(self, wh: Warehouse, idx: int):
         if wh.quantity <= self.mv.config.minimum_drug_quantity_alert:
             self.lc.SetItemTextColour(idx, wx.Colour(252, 3, 57))
 
-    def onSearch(self, e: wx.CommandEvent):
-        "enter (EVT_SEARCH) to activate"
-        self.rebuild(self.get_search_value())
+    def onSearchEnter(self, e: wx.CommandEvent):
+        self.filtered_build(self.search.Value)
         e.Skip()
-
-    def onSearchText(self, e: wx.CommandEvent):
-        "when delete all text, build from state.warehouselist"
-        if len(self.search.GetValue()) == 0:
-            self.build()
 
     def onSelect(self, e: wx.ListEvent):
         self.editbtn.Enable()
@@ -178,9 +164,9 @@ class WarehouseDialog(wx.Dialog):
         try:
             rowcount = self.mv.connection.delete(Warehouse, wh.id)
             assert rowcount == 1
-            self.mv.state.warehouselist = self.mv.connection.selectall(Warehouse)
+            self.mv.state.allwarehouselist = self.mv.connection.selectall(Warehouse)
             self.delete(idx)
-            drug_list = self.mv.order_book.page0.drug_list
+            drug_list = self.mv.order_book.prescriptionpage.drug_list
             if drug_list.ItemCount > 0:
                 for i, d in enumerate(drug_list.d_list):
                     if d.drug_id == wh.id:
@@ -208,7 +194,7 @@ class BaseDialog(wx.Dialog):
         self.purchase_price = NumberTextCtrl(self, name="Giá mua")
         self.sale_price = NumberTextCtrl(self, name="Giá bán")
         self.sale_unit = wx.TextCtrl(self, name="Đơn vị bán")
-        self.expire_date = DatePicker(self, name="Hạn sử dụng")
+        self.expire_date = CalendarDatePicker(self, name="Hạn sử dụng")
         self.made_by = wx.TextCtrl(self, name="Xuất xứ")
         self.note = wx.TextCtrl(self, style=wx.TE_MULTILINE, name="Ghi chú")
         self.cancelbtn = wx.Button(self, id=wx.ID_CANCEL)
@@ -328,10 +314,8 @@ class NewDialog(BaseDialog):
                 assert lastrowid is not None
                 wx.MessageBox("Thêm mới thành công", "Thêm mới")
                 new_wh = Warehouse(id=lastrowid, **wh)
-                self.mv.state.warehouselist.append(new_wh)
-                if self.parent.check_search_str_to_wh(
-                    new_wh, self.parent.get_search_value()
-                ):
+                self.mv.state.allwarehouselist.append(new_wh)
+                if self.parent.check_search_str_in_wh(new_wh, self.parent.search.Value):
                     self.parent.append(new_wh)
                 e.Skip()
             except Exception as error:
@@ -377,8 +361,8 @@ class EditDialog(BaseDialog):
             try:
                 self.mv.connection.update(self.wh)
                 wx.MessageBox("Cập nhật thành công", "Cập nhật")
-                self.parent.rebuild(self.parent.get_search_value())
-                drug_list = self.mv.order_book.page0.drug_list
+                self.parent.filtered_build(self.parent.search.Value)
+                drug_list = self.mv.order_book.prescriptionpage.drug_list
                 if drug_list.ItemCount > 0:
                     for i, d in enumerate(drug_list.d_list):
                         if d.drug_id == self.wh.id:

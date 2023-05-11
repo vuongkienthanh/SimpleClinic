@@ -27,7 +27,7 @@ class PrintOut(wx.Printout):
     def HasPage(self, page):
         "Relative to `num_of_ld`"
         x, y = divmod(
-            self.mv.order_book.page0.drug_list.ItemCount,
+            self.mv.order_book.prescriptionpage.drug_list.ItemCount,
             self.mv.config.number_of_drugs_in_one_page,
         )
         if page <= (x + bool(y)):
@@ -39,18 +39,18 @@ class PrintOut(wx.Printout):
 
     def GetPageInfo(self):
         "Relative to `num_of_ld`"
-        if self.mv.order_book.page0.drug_list.ItemCount == 0:
+        if self.mv.order_book.prescriptionpage.drug_list.ItemCount == 0:
             return (1, 1, 1, 1)
         else:
             x, y = divmod(
-                self.mv.order_book.page0.drug_list.ItemCount,
+                self.mv.order_book.prescriptionpage.drug_list.ItemCount,
                 self.mv.config.number_of_drugs_in_one_page,
             )
         return (1, x + bool(y), 1, x + bool(y))
 
     def OnPrintPage(self, page):
         num_of_ld = self.mv.config.number_of_drugs_in_one_page
-        d_list = self.mv.order_book.page0.drug_list.d_list
+        d_list = self.mv.order_book.prescriptionpage.drug_list.d_list
         state = self.mv.state
         p = state.patient
         assert p is not None
@@ -161,7 +161,7 @@ class PrintOut(wx.Printout):
             with wx.DCFontChanger(dc, heading):
                 if self.mv.config.print_price:
                     t = f"Tổng cộng: {self.mv.price.GetValue()}"
-                    if self.mv.order_book.page1.procedure_list.ItemCount > 0:
+                    if self.mv.order_book.procedurepage.procedure_list.ItemCount > 0:
                         t += " (đã gồm tiền thủ thuật)"
                     dc.DrawText(t, atx(0.06), row(0))
                 if self.mv.recheck.GetValue() != 0:

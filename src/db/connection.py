@@ -68,7 +68,7 @@ class Connection:
         with self.sqlcon as con:
             cur = con.execute(
                 f"""
-                INSERT INTO {t.table_name} ({t.commna_joined_field_names()})
+                INSERT INTO {t.__tablename__} ({t.commna_joined_field_names()})
                 VALUES ({t.named_style_placeholders()})
             """,
                 base,
@@ -78,7 +78,7 @@ class Connection:
 
     def select(self, t: type[T], id: int) -> T | None:
         row = self.execute(
-            f"SELECT * FROM {t.table_name} WHERE id={id}",
+            f"SELECT * FROM {t.__tablename__} WHERE id={id}",
         ).fetchone()
         if row is None:
             return None
@@ -86,19 +86,19 @@ class Connection:
             return t.parse(row)
 
     def selectall(self, t: type[T]) -> list[T]:
-        rows = self.execute(f"SELECT * FROM {t.table_name}").fetchall()
+        rows = self.execute(f"SELECT * FROM {t.__tablename__}").fetchall()
         return [t.parse(row) for row in rows]
 
     def delete(self, t: type[BASE], id: int) -> int | None:
         with self.sqlcon as con:
-            return con.execute(f"DELETE FROM {t.table_name} WHERE id = {id}").rowcount
+            return con.execute(f"DELETE FROM {t.__tablename__} WHERE id = {id}").rowcount
 
     def update(self, base: BASE) -> int | None:
         t = type(base)
         with self.sqlcon as con:
             return con.execute(
                 f"""
-                UPDATE {t.table_name} SET ({t.commna_joined_field_names()})
+                UPDATE {t.__tablename__} SET ({t.commna_joined_field_names()})
                 = ({t.qmark_style_placeholders()})
                 WHERE id = {base.id}
             """,

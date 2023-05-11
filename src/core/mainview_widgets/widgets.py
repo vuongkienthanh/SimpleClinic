@@ -22,8 +22,8 @@ class DaysCtrl(wx.SpinCtrl):
         self.mv.recheck.SetValue(e.GetPosition())
         self.mv.recheck_weekday.SetLabel(vn_weekdays(e.GetPosition()))
         self.mv.updatequantitybtn.Enable()
-        if self.mv.order_book.page0.check_wh_do_ti_filled():
-            self.mv.order_book.page0.quantity.FetchQuantity()
+        if self.mv.order_book.prescriptionpage.check_wh_do_ti_filled():
+            self.mv.order_book.prescriptionpage.quantity.FetchQuantity()
 
 
 class RecheckCtrl(wx.SpinCtrl):
@@ -53,9 +53,9 @@ class PriceCtrl(wx.TextCtrl):
         price: int = self.mv.config.checkup_price
         price += sum(
             item.sale_price * item.quantity
-            for item in self.mv.order_book.page0.drug_list.d_list
+            for item in self.mv.order_book.prescriptionpage.drug_list.d_list
         )
-        price += sum(pr.price for pr in self.mv.order_book.page1.procedure_list.pr_list)
+        price += sum(pr.price for pr in self.mv.order_book.procedurepage.procedure_list.pr_list)
         self.ChangeValue(num_to_str_price(price))
 
     def Clear(self):

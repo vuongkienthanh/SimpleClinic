@@ -13,7 +13,7 @@ from core.dialogs import (
     MonthReportDialog,
     MonthWarehouseReportDialog,
 )
-from core.generic import MonthPickerDialog, DatePickerDialog
+from core.dialogs.picker_dialog import MonthPickerDialog, DatePickerDialog
 from core.printer import printdata, PrintOut
 import subprocess
 import wx
@@ -65,10 +65,10 @@ class MyMenuBar(wx.MenuBar):
         editMenu.AppendSubMenu(menuVisit, "Lượt khám")
 
         menuQueueList = wx.Menu()
-        self.menuDeleteQueueList: wx.MenuItem = menuQueueList.Append(
+        self.menuDeleteQueue: wx.MenuItem = menuQueueList.Append(
             wx.ID_ANY, "Xóa lượt chờ khám"
         )
-        self.menuDeleteQueueList.Enable(False)
+        self.menuDeleteQueue.Enable(False)
         editMenu.AppendSubMenu(menuQueueList, "Danh sách chờ")
 
         editMenu.AppendSeparator()
@@ -128,7 +128,7 @@ class MyMenuBar(wx.MenuBar):
         self.Bind(wx.EVT_MENU, self.onInsertVisit, self.menuInsertVisit)
         self.Bind(wx.EVT_MENU, self.onUpdateVisit, self.menuUpdateVisit)
         self.Bind(wx.EVT_MENU, self.onDeleteVisit, self.menuDeleteVisit)
-        self.Bind(wx.EVT_MENU, self.onDeleteQueueList, self.menuDeleteQueueList)
+        self.Bind(wx.EVT_MENU, self.onDeleteQueueList, self.menuDeleteQueue)
         self.Bind(wx.EVT_MENU, self.onPrint, id=wx.ID_PRINT)
         self.Bind(wx.EVT_MENU, self.onPreview, id=wx.ID_PREVIEW)
         self.Bind(wx.EVT_MENU, self.onCopyVisitInfo, id=wx.ID_INFO)
@@ -226,7 +226,7 @@ class MyMenuBar(wx.MenuBar):
             try:
                 with mv.connection as con:
                     con.execute(
-                        f"DELETE FROM {Queue.table_name} WHERE patient_id = {p.id}"
+                        f"DELETE FROM {Queue.__tablename__} WHERE patient_id = {p.id}"
                     )
                     wx.MessageBox("Xóa thành công", "OK")
                     mv.state.refresh()
@@ -269,11 +269,11 @@ class MyMenuBar(wx.MenuBar):
                     d.quantity,
                     d.sale_unit or d.usage_unit,
                 )
-                for i, d in enumerate(mv.order_book.page0.drug_list.d_list)
+                for i, d in enumerate(mv.order_book.prescriptionpage.drug_list.d_list)
             )
             prl = "\n".join(
                 "{}/ {} x {}".format(i + 1, p[1], p[2])
-                for i, p in enumerate(mv.order_book.page1.procedure_list.summary())
+                for i, p in enumerate(mv.order_book.procedurepage.procedure_list.summary())
             )
             if prl != "":
                 prl = "\n".join(["Thủ thuật", prl])

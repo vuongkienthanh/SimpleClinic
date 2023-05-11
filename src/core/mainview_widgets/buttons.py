@@ -25,7 +25,7 @@ class GetWeightBtn(wx.BitmapButton):
                 self.mv.connection.execute(
                     f"""
                 SELECT weight
-                FROM {Visit.table_name}
+                FROM {Visit.__tablename__}
                 WHERE (patient_id) = {self.mv.state.patient.id}
                 ORDER BY exam_datetime DESC
                 LIMIT 1
@@ -62,7 +62,7 @@ class UpdateQuantityBtn(wx.BitmapButton):
 
     def update_quantity(self):
         """Update quantity in DrugList, also update price"""
-        drug_list = self.mv.order_book.page0.drug_list
+        drug_list = self.mv.order_book.prescriptionpage.drug_list
         for idx, item in enumerate(drug_list.d_list):
             q = calc_quantity(
                 times=item.times,
@@ -126,21 +126,21 @@ class SaveBtn(wx.Button):
                 with self.mv.connection as con:
                     con.execute(
                         f"""
-                        UPDATE {Patient.table_name} SET past_history = ?
+                        UPDATE {Patient.__tablename__} SET past_history = ?
                         WHERE id = {p.id}
                     """,
                         (past_history,),
                     )
                     vid = con.execute(
                         f"""
-                        INSERT INTO {Visit.table_name} ({Visit.commna_joined_field_names()})
+                        INSERT INTO {Visit.__tablename__} ({Visit.commna_joined_field_names()})
                         VALUES ({Visit.named_style_placeholders()})
                     """,
                         v,
                     ).lastrowid
                     assert vid is not None
                     insert_ld = []
-                    for item in self.mv.order_book.page0.drug_list.d_list:
+                    for item in self.mv.order_book.prescriptionpage.drug_list.d_list:
                         insert_ld.append(
                             {
                                 "drug_id": item.drug_id,
@@ -153,13 +153,13 @@ class SaveBtn(wx.Button):
                         )
                     con.executemany(
                         f"""
-                        INSERT INTO {LineDrug.table_name} ({LineDrug.commna_joined_field_names()})
+                        INSERT INTO {LineDrug.__tablename__} ({LineDrug.commna_joined_field_names()})
                         VALUES ({LineDrug.named_style_placeholders()})
                     """,
                         insert_ld,
                     )
                     insert_lp = []
-                    for item in self.mv.order_book.page1.procedure_list.pr_list:
+                    for item in self.mv.order_book.procedurepage.procedure_list.pr_list:
                         insert_lp.append(
                             {
                                 "procedure_id": item.pr_id,
@@ -168,14 +168,14 @@ class SaveBtn(wx.Button):
                         )
                     con.executemany(
                         f"""
-                        INSERT INTO {LineProcedure.table_name} ({LineProcedure.commna_joined_field_names()})
+                        INSERT INTO {LineProcedure.__tablename__} ({LineProcedure.commna_joined_field_names()})
                         VALUES ({LineProcedure.named_style_placeholders()})
                     """,
                         insert_lp,
                     )
                     con.execute(
                         f"""
-                        INSERT INTO {SeenToday.table_name} ({SeenToday.commna_joined_field_names()})
+                        INSERT INTO {SeenToday.__tablename__} ({SeenToday.commna_joined_field_names()})
                         VALUES ({SeenToday.qmark_style_placeholders()})
                     """,
                         (p.id,),
@@ -219,7 +219,7 @@ class SaveBtn(wx.Button):
             update_drug_id = []
             insert_ld = []
             delete_ld = []
-            drug_list = self.mv.order_book.page0.drug_list.d_list
+            drug_list = self.mv.order_book.prescriptionpage.drug_list.d_list
             lld = self.mv.state.linedruglist
             # update same drug_id
             for drug in drug_list:
@@ -256,21 +256,21 @@ class SaveBtn(wx.Button):
 
             insert_lp = [
                 {"procedure_id": pr.pr_id, "visit_id": v.id}
-                for pr in self.mv.order_book.page1.procedure_list.pr_list
+                for pr in self.mv.order_book.procedurepage.procedure_list.pr_list
             ]
 
             try:
                 with self.mv.connection as con:
                     con.execute(
                         f"""
-                        UPDATE {Patient.table_name} SET past_history = ?
+                        UPDATE {Patient.__tablename__} SET past_history = ?
                         WHERE id = {p.id}
                     """,
                         (past_history,),
                     )
                     con.execute(
                         f"""
-                        UPDATE {Visit.table_name} SET ({Visit.commna_joined_field_names()})
+                        UPDATE {Visit.__tablename__} SET ({Visit.commna_joined_field_names()})
                         = ({Visit.qmark_style_placeholders()})
                         WHERE id = {v.id}
                     """,
@@ -278,29 +278,29 @@ class SaveBtn(wx.Button):
                     )
                     con.executemany(
                         f"""
-                        UPDATE {LineDrug.table_name}
+                        UPDATE {LineDrug.__tablename__}
                         SET (dose, times, quantity, note) = (?,?,?,?)
                         WHERE id=?
                     """,
                         update_ld,
                     )
                     con.executemany(
-                        f"DELETE FROM {LineDrug.table_name} WHERE id = ?", delete_ld
+                        f"DELETE FROM {LineDrug.__tablename__} WHERE id = ?", delete_ld
                     )
                     con.executemany(
                         f"""
-                        INSERT INTO {LineDrug.table_name} ({LineDrug.commna_joined_field_names()})
+                        INSERT INTO {LineDrug.__tablename__} ({LineDrug.commna_joined_field_names()})
                         VALUES ({LineDrug.named_style_placeholders()})
                     """,
                         insert_ld,
                     )
                     con.execute(
-                        f"DELETE FROM {LineProcedure.table_name} WHERE visit_id = ?",
+                        f"DELETE FROM {LineProcedure.__tablename__} WHERE visit_id = ?",
                         (v.id,),
                     )
                     con.executemany(
                         f"""
-                        INSERT INTO {LineProcedure.table_name} ({LineProcedure.commna_joined_field_names()})
+                        INSERT INTO {LineProcedure.__tablename__} ({LineProcedure.commna_joined_field_names()})
                         VALUES ({LineProcedure.named_style_placeholders()})
                     """,
                         insert_lp,

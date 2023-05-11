@@ -19,13 +19,13 @@ class Gender(enum.Enum):
 @dataclass
 class BASE:
     """
-    Base Abstract Class for derived sql table
-    - `table_name`: name of table in sqlite database
-    - `excluded_fields`: names of fields that are excluded by classmethod fields()
+    Base Class for derived sql table
+    - `__table_name__`: name of table in sqlite database
+    - `__excludedfields__`: names of fields that are excluded by classmethod fields()
     """
 
-    table_name: ClassVar[str]
-    excluded_fields: ClassVar[list[str]]
+    __tablename__: ClassVar[str]
+    __excludedfields__: ClassVar[list[str]]
     id: int
 
     @classmethod
@@ -38,7 +38,7 @@ class BASE:
             (
                 f.name
                 for f in dataclasses.fields(cls)
-                if f.name not in cls.excluded_fields
+                if f.name not in cls.__excludedfields__
             )
         )
 
@@ -66,8 +66,8 @@ class BASE:
 class Patient(BASE):
     """Bệnh nhân"""
 
-    table_name = "patients"
-    excluded_fields = ["id"]
+    __tablename__ = "patients"
+    __excludedfields__ = ["id"]
     id: int
     name: str
     gender: Gender
@@ -81,8 +81,8 @@ class Patient(BASE):
 class Queue(BASE):
     """Lượt chờ khám"""
 
-    table_name = "queue"
-    excluded_fields = ["id", "added_datetime"]
+    __tablename__ = "queue"
+    __excludedfields__ = ["id", "added_datetime"]
     id: int
     patient_id: int
     added_datetime: dt.datetime
@@ -92,8 +92,8 @@ class Queue(BASE):
 class SeenToday(BASE):
     """Danh sách đã khám hôm nay"""
 
-    table_name = "seen_today"
-    excluded_fields = ["id"]
+    __tablename__ = "seen_today"
+    __excludedfields__ = ["id"]
     id: int
     patient_id: int
     visit_id: int
@@ -103,8 +103,8 @@ class SeenToday(BASE):
 class Appointment(BASE):
     """Danh sách hẹn tái khám"""
 
-    table_name = "appointments"
-    excluded_fields = ["id"]
+    __tablename__ = "appointments"
+    __excludedfields__ = ["id"]
     id: int
     appointed_date: dt.date
     patient_id: int
@@ -123,8 +123,8 @@ class Visit(BASE):
     - `vnote`: Bệnh sử
     """
 
-    table_name = "visits"
-    excluded_fields = ["id", "exam_datetime"]
+    __tablename__ = "visits"
+    __excludedfields__ = ["id", "exam_datetime"]
     id: int
     exam_datetime: dt.datetime
     diagnosis: str
@@ -145,8 +145,8 @@ class LineDrug(BASE):
     - `quantity`: Số lượng
     """
 
-    table_name = "linedrugs"
-    excluded_fields = ["id"]
+    __tablename__ = "linedrugs"
+    __excludedfields__ = ["id"]
     id: int
     drug_id: int
     dose: str
@@ -172,8 +172,8 @@ class Warehouse(BASE):
     - `note`: Ghi chú
     """
 
-    table_name = "warehouse"
-    excluded_fields = ["id"]
+    __tablename__ = "warehouse"
+    __excludedfields__ = ["id"]
     id: int
     name: str
     element: str
@@ -192,8 +192,8 @@ class Warehouse(BASE):
 class SamplePrescription(BASE):
     """Toa mẫu"""
 
-    table_name = "sampleprescription"
-    excluded_fields = ["id"]
+    __tablename__ = "sampleprescription"
+    __excludedfields__ = ["id"]
     id: int
     name: str
 
@@ -205,8 +205,8 @@ class LineSamplePrescription(BASE):
     - `dose`: Số cữ
     """
 
-    table_name = "linesampleprescription"
-    excluded_fields = ["id"]
+    __tablename__ = "linesampleprescription"
+    __excludedfields__ = ["id"]
     id: int
     drug_id: int
     sample_id: int
@@ -218,8 +218,8 @@ class LineSamplePrescription(BASE):
 class Procedure(BASE):
     """Danh sách thủ thuật"""
 
-    table_name = "procedures"
-    excluded_fields = ["id"]
+    __tablename__ = "procedures"
+    __excludedfields__ = ["id"]
     id: int
     name: str
     price: int
@@ -229,13 +229,11 @@ class Procedure(BASE):
 class LineProcedure(BASE):
     """Thủ thuật của lượt khám"""
 
-    table_name = "lineprocedure"
-    excluded_fields = ["id"]
+    __tablename__ = "lineprocedure"
+    __excludedfields__ = ["id"]
     id: int
     procedure_id: int
     visit_id: int
 
 
 T = TypeVar("T", bound="BASE")
-
-

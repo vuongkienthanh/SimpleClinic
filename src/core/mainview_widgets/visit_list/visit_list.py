@@ -4,8 +4,8 @@ import wx
 import sqlite3
 
 
-class VisitList(wx.ListCtrl):
-    """Set `state.visit` when selected"""
+class VisitListCtrl(wx.ListCtrl):
+    """Set `state.visit` when select visit"""
 
     def __init__(self, parent: "mv.MainView"):
         super().__init__(parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
@@ -34,7 +34,7 @@ class VisitList(wx.ListCtrl):
         )
 
     def onSelect(self, e: wx.ListEvent):
-        vid = self.mv.state.visitlist[e.Index]["vid"]
+        vid: int = self.mv.state.visitlist[e.Index]["vid"]
         self.mv.state.visit = self.mv.connection.select(Visit, vid)
 
     def onDeselect(self, _):

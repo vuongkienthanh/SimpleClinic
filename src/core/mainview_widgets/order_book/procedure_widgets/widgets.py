@@ -1,6 +1,6 @@
 from db import Procedure
 from core import mainview
-from core.mainview_widgets import order_book
+from core.mainview_widgets.order_book import order_book
 import wx
 import sqlite3
 

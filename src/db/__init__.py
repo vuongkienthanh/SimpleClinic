@@ -1,2 +1,2 @@
-from db.classes import *
-from db.connection import *
+from .classes import *
+from .connection import *

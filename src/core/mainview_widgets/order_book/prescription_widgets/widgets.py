@@ -1,7 +1,7 @@
 from core import mainview as mv
-from core.mainview_widgets import order_book
+from core.mainview_widgets.order_book import order_book
 from misc import get_usage_note_str, calc_quantity, k_tab, k_special, k_number
-from core.generic import NumberTextCtrl, DoseTextCtrl
+from core.generic_widgets import NumberTextCtrl, DoseTextCtrl
 import wx
 import sqlite3
 
@@ -62,7 +62,7 @@ class DrugListItem:
     @classmethod
     def from_mv(cls, mv: "mv.MainView") -> "DrugListItem":
         wh = mv.state.warehouse
-        page = mv.order_book.page0
+        page = mv.order_book.prescriptionpage
         assert wh is not None
         return cls(
             drug_id=wh.id,

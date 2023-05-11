@@ -1,4 +1,4 @@
-from core.mainview_widgets import order_book
+from core.mainview_widgets.order_book import order_book
 from misc import plus_bm, minus_bm
 
 import wx
@@ -14,7 +14,7 @@ class AddProcedureButton(wx.BitmapButton):
     def onClick(self, e: wx.CommandEvent):
         idx: int = self.parent.procedure_picker.GetSelection()
         if idx != wx.NOT_FOUND:
-            pr = self.mv.state.procedurelist[idx]
+            pr = self.mv.state.allprocedurelist[idx]
             self.parent.procedure_list.append(pr)
             self.mv.price.FetchPrice()
             self.parent.procedure_picker.SetSelection(-1)

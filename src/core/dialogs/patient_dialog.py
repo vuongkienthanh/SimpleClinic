@@ -1,5 +1,5 @@
 from db import Patient, Patient, Queue
-from core.generic import DateTextCtrl, DatePicker, AgeCtrl, PhoneTextCtrl, GenderChoice
+from core.generic_widgets import DateTextCtrl, CalendarDatePicker, ReadonlyVNAgeCtrl, PhoneTextCtrl, GenderChoice
 from misc import check_blank_to_none, check_none_to_blank
 from core import mainview
 import sqlite3
@@ -17,11 +17,11 @@ class BasePatientDialog(wx.Dialog):
         self.name = wx.TextCtrl(self, size=(300, -1), name="Họ tên")
         self.gender = GenderChoice(self, name="Giới tính")
         self.birthdate_text = DateTextCtrl(self, name="Ngày sinh")
-        self.birthdate = DatePicker(self, name="")
+        self.birthdate = CalendarDatePicker(self, name="")
         self.birthdate.SetDateRange(
             wx.DateTime.Today() - wx.DateSpan(years=100), wx.DateTime.Today()
         )
-        self.age = AgeCtrl(self, name="Tuổi", style=wx.TE_READONLY)
+        self.age = ReadonlyVNAgeCtrl(self, name="Tuổi")
         self.address = wx.TextCtrl(self, style=wx.TE_MULTILINE, name="Địa chỉ")
         self.phone = PhoneTextCtrl(self, name="Điện thoại")
         self.past_history = wx.TextCtrl(
@@ -152,7 +152,7 @@ class NewPatientDialog(BasePatientDialog):
                     ):
                         self.mv.connection.insert(Queue, {"patient_id": lastrowid})
                         wx.MessageBox("Thêm vào danh sách chờ thành công", "OK")
-                        self.mv.state.queuelist = self.mv.state.get_queuelist()
+                        self.mv.state.queue = self.mv.state.fetch_queue_view()
                 except sqlite3.IntegrityError as error:
                     wx.MessageBox(f"Đã có tên trong danh sách chờ.\n{error}", "Lỗi")
                 e.Skip()
@@ -197,8 +197,8 @@ class EditPatientDialog(BasePatientDialog):
                 wx.MessageBox("Cập nhật thành công", "OK")
                 page: wx.ListCtrl = self.mv.patient_book.GetCurrentPage()
                 idx: int = page.GetFirstSelected()
-                self.mv.state.queuelist = self.mv.state.get_queuelist()
-                self.mv.state.todaylist = self.mv.state.get_todaylist()
+                self.mv.state.queue = self.mv.state.fetch_queue_view()
+                self.mv.state.seentoday = self.mv.state.fetch_seentoday_view()
                 page.EnsureVisible(idx)
                 page.Select(idx)
                 e.Skip()

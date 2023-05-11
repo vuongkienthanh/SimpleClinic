@@ -77,7 +77,7 @@ def sample_con():
         with con.sqlcon as sqlcon:
             sqlcon.executemany(
                 f"""
-                INSERT INTO {reader.t.table_name} ({','.join(reader.fields)})
+                INSERT INTO {reader.t.__tablename__} ({','.join(reader.fields)})
                 VALUES ({','.join(['?']* len(reader.fields))})
             """,
                 (tuple(getattr(row, attr) for attr in reader.fields) for row in reader),

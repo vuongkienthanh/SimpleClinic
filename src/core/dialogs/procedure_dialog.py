@@ -1,5 +1,5 @@
 from core import mainview as mv
-from core.generic import NumberTextCtrl
+from core.generic_widgets import NumberTextCtrl
 from db import Procedure
 from misc import num_to_str_price
 import wx
@@ -37,7 +37,7 @@ class ProcedureDialog(wx.Dialog):
             ]
         )
         self.SetSizerAndFit(sizer)
-        for pr in self.mv.state.procedurelist:
+        for pr in self.mv.state.allprocedurelist:
             self.procedurelist.append(pr)
 
 
@@ -104,16 +104,16 @@ class DeleteBtn(wx.Button):
         try:
             idx: int = self.parent.procedurelist.GetFirstSelected()
             assert idx >= 0
-            pr = self.mv.state.procedurelist.pop(idx)
+            pr = self.mv.state.allprocedurelist.pop(idx)
             self.parent.procedurelist.pop(idx)
-            self.mv.order_book.page1.procedure_picker.Delete(idx)
-            if self.mv.order_book.page1.procedure_list.ItemCount > 0:
-                for i in range(self.mv.order_book.page1.procedure_list.ItemCount):
+            self.mv.order_book.procedurepage.procedure_picker.Delete(idx)
+            if self.mv.order_book.procedurepage.procedure_list.ItemCount > 0:
+                for i in range(self.mv.order_book.procedurepage.procedure_list.ItemCount):
                     if (
-                        self.mv.order_book.page1.procedure_list.GetItemText(i, 0)
+                        self.mv.order_book.procedurepage.procedure_list.GetItemText(i, 0)
                         == pr.name
                     ):
-                        self.mv.order_book.page1.procedure_list.DeleteItem(i)
+                        self.mv.order_book.procedurepage.procedure_list.DeleteItem(i)
                 self.mv.price.FetchPrice()
         except Exception as error:
             wx.MessageBox(f"{error}", "Lỗi")
@@ -170,8 +170,8 @@ class AddDialog(BaseDialog):
             assert lastrowid is not None
             new_pr = Procedure(lastrowid, name, price)
             self.parent.procedurelist.append(new_pr)
-            self.mv.state.procedurelist.append(new_pr)
-            self.mv.order_book.page1.procedure_picker.Append(name)
+            self.mv.state.allprocedurelist.append(new_pr)
+            self.mv.order_book.procedurepage.procedure_picker.Append(name)
             e.Skip()
         except Exception as error:
             wx.MessageBox(f"{error}", "Lỗi")
@@ -182,7 +182,7 @@ class UpdateDialog(BaseDialog):
         super().__init__(parent, title="Thêm thủ thuật mới")
         self.idx: int = self.parent.procedurelist.GetFirstSelected()
         assert self.idx >= 0
-        self.pr = self.mv.state.procedurelist[self.idx]
+        self.pr = self.mv.state.allprocedurelist[self.idx]
         self.name.ChangeValue(self.pr.name)
         self.price.ChangeValue(str(self.pr.price))
 
@@ -192,8 +192,8 @@ class UpdateDialog(BaseDialog):
             self.pr.price = int(self.price.Value.strip())
             self.mv.connection.update(self.pr)
             self.parent.procedurelist.update(self.idx, self.pr)
-            self.mv.order_book.page1.procedure_picker.SetString(self.idx, self.pr.name)
-            procedurelist = self.mv.order_book.page1.procedure_list
+            self.mv.order_book.procedurepage.procedure_picker.SetString(self.idx, self.pr.name)
+            procedurelist = self.mv.order_book.procedurepage.procedure_list
             if len(procedurelist.pr_list) > 0:
                 procedurelist.update(self.pr)
                 self.mv.price.FetchPrice()

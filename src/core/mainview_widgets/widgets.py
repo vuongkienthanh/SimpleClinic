@@ -55,7 +55,9 @@ class PriceCtrl(wx.TextCtrl):
             item.sale_price * item.quantity
             for item in self.mv.order_book.prescriptionpage.drug_list.d_list
         )
-        price += sum(pr.price for pr in self.mv.order_book.procedurepage.procedure_list.pr_list)
+        price += sum(
+            pr.price for pr in self.mv.order_book.procedurepage.procedure_list.pr_list
+        )
         self.ChangeValue(num_to_str_price(price))
 
     def Clear(self):
@@ -65,7 +67,6 @@ class PriceCtrl(wx.TextCtrl):
 class Follow(wx.ComboBox):
     """A Combobox which is able to:
     - use only the `key` in `follow_choices`
-    - return `None` if text in empty
     - when print use full_value
     """
 
@@ -79,28 +80,13 @@ class Follow(wx.ComboBox):
         self.mv = mv
         self.SetDefault()
 
-    def full_value(self) -> str:
-        "return `key: value` from `key`"
+    def expand_when_print(self) -> str:
+        "expand `key` -> `key: value`"
         k = self.GetValue().strip()
         if k in self.mv.config.follow_choices.keys():
             return f"{k}: {self.mv.config.follow_choices[k]}"
         else:
             return k
-
-    def SetFollow(self, val: str | None):
-        "use when select visit"
-        if val is None:
-            self.SetValue("")
-        else:
-            self.SetValue(val)
-
-    def GetFollow(self) -> str | None:
-        "use when save/update visit"
-        val: str = self.GetValue().strip()
-        if val == "":
-            return None
-        else:
-            return val
 
     def SetDefault(self):
         "use when visit is `None`"

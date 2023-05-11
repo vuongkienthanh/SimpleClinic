@@ -94,7 +94,7 @@ class Config:
     def header_size(self, p: float) -> tuple[int, int]:
         return (self.header_width(p), -1)
 
-    def get_background_color(self, name:str) -> Colour:
+    def get_background_color(self, name: str) -> Colour:
         try:
             return Colour(*self.background_color[name])
         except KeyError:

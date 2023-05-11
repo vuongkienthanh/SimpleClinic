@@ -170,7 +170,7 @@ class PrintOut(wx.Printout):
                         atx(0.06),
                         row(1),
                     )
-                follow = tw.wrap(self.mv.follow.full_value(), width=40)
+                follow = tw.wrap(self.mv.follow.expand_when_print(), width=40)
                 for i, line in enumerate(follow):
                     dc.DrawText(line, atx(0.06), row(2) + row_y * i)
 

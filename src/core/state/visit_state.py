@@ -1,8 +1,8 @@
 from db import Visit
 from core import state
 from core import menubar
-from misc import vn_weekdays
-import wx
+from misc import vn_weekdays, check_none_to_blank
+from .linedrugs_list_state import LineDrugListState
 
 
 class VisitState:
@@ -12,21 +12,21 @@ class VisitState:
     def __set__(self, obj: "state.State", value: Visit | None):
         obj._visit = value
         if value:
-            self.onSelect(obj, value)
+            self.onSet(obj, value)
         else:
-            self.onDeselect(obj)
+            self.onUnset(obj)
 
-    def onSelect(self, obj:"state.State",v: Visit) -> None:
+    def onSet(self, obj: "state.State", v: Visit) -> None:
         mv = obj.mv
         mv.diagnosis.ChangeValue(v.diagnosis)
-        mv.vnote.ChangeValue(v.vnote or "")
+        mv.vnote.ChangeValue(check_none_to_blank(v.vnote))
         mv.weight.SetValue(v.weight)
         mv.days.SetValue(v.days)
         mv.recheck_weekday.SetLabel(vn_weekdays(v.days))
         mv.recheck.SetValue(v.recheck)
-        mv.follow.SetFollow(v.follow)
-        obj.linedruglist = obj.get_linedrugs_by_visit_id(v.id)
-        obj.lineprocedurelist = obj.get_lineprocedures_by_visit_id(v.id)
+        mv.follow.SetValue(check_none_to_blank(v.follow))
+        obj.linedrug_list = LineDrugListState.fetch(v, mv.connection)
+        obj.lineprocedure_list = obj.get_lineprocedures_by_visit_id(v.id)
         mv.savebtn.SetLabel("Cập nhật")
         mv.price.FetchPrice()
         if mv.patient_book.GetSelection() == 0:
@@ -35,8 +35,8 @@ class VisitState:
         menubar: "menubar.MyMenuBar" = mv.MenuBar
         menubar.menuNewVisit.Enable()
         if obj.patient:
-            menubar.menuInsertVisit.Enable(False)
             mv.order_book.prescriptionpage.use_sample_prescription_btn.Disable()
+            menubar.menuInsertVisit.Enable(False)
         menubar.menuUpdateVisit.Enable()
         menubar.menuDeleteVisit.Enable()
         menubar.menuPrint.Enable()
@@ -44,7 +44,10 @@ class VisitState:
         menubar.menuCopyVisitInfo.Enable()
         mv.visit_list.SetFocus()
 
-    def onDeselect(self, obj:"state.State",) -> None:
+    def onUnset(
+        self,
+        obj: "state.State",
+    ) -> None:
         mv = obj.mv
         mv.diagnosis.Clear()
         mv.vnote.Clear()
@@ -56,8 +59,8 @@ class VisitState:
         mv.updatequantitybtn.Disable()
         mv.recheck.SetValue(mv.config.default_days_for_prescription)
         mv.follow.SetDefault()
-        obj.linedruglist = []
-        obj.lineprocedurelist = []
+        obj.linedrug_list = []
+        obj.lineprocedure_list = []
         mv.price.Clear()
         mv.newvisitbtn.Disable()
         mv.savebtn.SetLabel("Lưu")
@@ -69,5 +72,7 @@ class VisitState:
             menubar.menuInsertVisit.Enable()
         menubar.menuUpdateVisit.Enable(False)
         menubar.menuDeleteVisit.Enable(False)
+        menubar.menuPrint.Enable(False)
+        menubar.menuPreview.Enable(False)
         menubar.menuCopyVisitInfo.Enable(False)
         obj.warehouse = None

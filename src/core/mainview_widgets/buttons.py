@@ -69,7 +69,7 @@ class UpdateQuantityBtn(wx.BitmapButton):
                 dose=item.dose,
                 days=self.mv.days.GetValue(),
                 sale_unit=item.sale_unit,
-                config=self.mv.config
+                config=self.mv.config,
             )
             assert q is not None
             item.quantity = q
@@ -108,19 +108,18 @@ class SaveBtn(wx.Button):
             self.insert_visit()
 
     def insert_visit(self):
-        diagnosis: str = self.mv.diagnosis.GetValue()
         if self.mv.check_filled():
             p = self.mv.state.patient
             assert p is not None
             past_history = check_blank_to_none(self.mv.past_history.GetValue())
             v = {
-                "diagnosis": diagnosis.strip(),
+                "diagnosis": self.mv.diagnosis.GetValue().strip(),
                 "weight": self.mv.weight.GetWeight(),
                 "days": self.mv.days.GetValue(),
                 "recheck": self.mv.recheck.GetValue(),
                 "patient_id": p.id,
                 "vnote": check_blank_to_none(self.mv.vnote.GetValue()),
-                "follow": self.mv.follow.GetFollow(),
+                "follow": check_blank_to_none(self.mv.follow.GetValue()),
             }
             try:
                 with self.mv.connection as con:
@@ -213,33 +212,33 @@ class SaveBtn(wx.Button):
             v.days = self.mv.days.GetValue()
             v.recheck = self.mv.recheck.GetValue()
             v.vnote = check_blank_to_none(self.mv.vnote.GetValue())
-            v.follow = self.mv.follow.GetFollow()
+            v.follow = check_blank_to_none(self.mv.follow.GetValue())
             update_ld = []
             update_ld_id = []
             update_drug_id = []
             insert_ld = []
             delete_ld = []
             drug_list = self.mv.order_book.prescriptionpage.drug_list.d_list
-            lld = self.mv.state.linedruglist
+            lld = self.mv.state.linedrug_list
             # update same drug_id
             for drug in drug_list:
                 for origin in lld:
-                    if drug.drug_id == origin["drug_id"]:
+                    if drug.drug_id == origin.drug_id:
                         update_ld.append(
                             (
                                 drug.dose,
                                 drug.times,
                                 drug.quantity,
                                 drug.note,
-                                origin["id"],
+                                origin.id,
                             )
                         )
-                        update_ld_id.append(origin["id"])
-                        update_drug_id.append(origin["drug_id"])
+                        update_ld_id.append(origin.id)
+                        update_drug_id.append(origin.drug_id)
             # delete those in lld but not in update
             for origin in lld:
-                if origin["id"] not in update_ld_id:
-                    delete_ld.append((origin["id"],))
+                if origin.id not in update_ld_id:
+                    delete_ld.append((origin.id,))
             # insert those in drug_list but not in update
             for drug in drug_list:
                 if drug.drug_id not in update_drug_id:

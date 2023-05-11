@@ -42,15 +42,14 @@ class ReuseDrugListButton(wx.Button):
         super().__init__(parent, label="Lượt khám mới với toa cũ này")
         self.parent = parent
         self.mv = parent.parent.mv
-        self.Disable()
         self.Bind(wx.EVT_BUTTON, self.onClick)
 
     def onClick(self, e: wx.CommandEvent):
-        lld = self.mv.state.linedruglist
+        _list = self.mv.state.linedrug_list
         weight = self.mv.weight.GetWeight()
         self.mv.state.visit = None
         self.mv.weight.SetWeight(weight)
-        self.parent.drug_list.rebuild(lld)
+        self.parent.drug_list.rebuild(_list)
         self.mv.updatequantitybtn.update_quantity()
 
 
@@ -59,7 +58,6 @@ class UseSamplePrescriptionBtn(wx.Button):
         super().__init__(parent, label="Sử dụng toa mẫu")
         self.parent = parent
         self.mv = parent.parent.mv
-        self.Disable()
         self.Bind(wx.EVT_BUTTON, self.onClick)
 
     def onClick(self, e: wx.CommandEvent):

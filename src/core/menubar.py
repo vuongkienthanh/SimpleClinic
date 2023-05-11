@@ -1,4 +1,10 @@
-from misc import APP_DIR, MY_DATABASE_PATH, DEFAULT_CONFIG_PATH, CONFIG_PATH
+from misc import (
+    APP_DIR,
+    MY_DATABASE_PATH,
+    DEFAULT_CONFIG_PATH,
+    CONFIG_PATH,
+    check_none_to_blank,
+)
 from db import *
 from core import mainview
 from core.dialogs import (
@@ -42,7 +48,6 @@ class MyMenuBar(wx.MenuBar):
         self.menuUpdatePatient: wx.MenuItem = menuPatient.Append(
             wx.ID_EDIT, "Cập nhật thông tin bệnh nhân\tCTRL+U"
         )
-        self.menuUpdatePatient.Enable(False)
         editMenu.AppendSubMenu(menuPatient, "Bệnh nhân")
 
         menuVisit = wx.Menu()
@@ -57,18 +62,12 @@ class MyMenuBar(wx.MenuBar):
             wx.ID_ANY, "Xóa lượt khám cũ"
         )
 
-        self.menuNewVisit.Enable(False)
-        self.menuInsertVisit.Enable(False)
-        self.menuUpdateVisit.Enable(False)
-        self.menuDeleteVisit.Enable(False)
-
         editMenu.AppendSubMenu(menuVisit, "Lượt khám")
 
         menuQueueList = wx.Menu()
         self.menuDeleteQueue: wx.MenuItem = menuQueueList.Append(
             wx.ID_ANY, "Xóa lượt chờ khám"
         )
-        self.menuDeleteQueue.Enable(False)
         editMenu.AppendSubMenu(menuQueueList, "Danh sách chờ")
 
         editMenu.AppendSeparator()
@@ -79,14 +78,11 @@ class MyMenuBar(wx.MenuBar):
         self.menuPreview: wx.MenuItem = editMenu.Append(
             wx.ID_PREVIEW, "Xem trước bản in\tCTRL+SHIFT+P"
         )
-        self.menuPrint.Enable(False)
-        self.menuPreview.Enable(False)
 
         editMenu.AppendSeparator()
         self.menuCopyVisitInfo: wx.MenuItem = editMenu.Append(
             wx.ID_INFO, "Copy thông tin lượt khám vào Clipboard\tCTRL+SHIFT+C"
         )
-        self.menuCopyVisitInfo.Enable(False)
 
         manageMenu = wx.Menu()
         menuWarehouse: wx.MenuItem = manageMenu.Append(wx.ID_ANY, "Kho thuốc")
@@ -205,8 +201,7 @@ class MyMenuBar(wx.MenuBar):
             try:
                 mv.connection.delete(Visit, v.id)
                 wx.MessageBox("Xóa thành công", "OK")
-                mv.state.visitlist = mv.state.get_visits_by_patient_id(p.id)
-                mv.state.visit = None
+                mv.state.patient = p
             except sqlite3.Error as error:
                 wx.MessageBox("Lỗi không xóa được\n" + str(error), "Lỗi")
 
@@ -273,12 +268,14 @@ class MyMenuBar(wx.MenuBar):
             )
             prl = "\n".join(
                 "{}/ {} x {}".format(i + 1, p[1], p[2])
-                for i, p in enumerate(mv.order_book.procedurepage.procedure_list.summary())
+                for i, p in enumerate(
+                    mv.order_book.procedurepage.procedure_list.summary()
+                )
             )
             if prl != "":
                 prl = "\n".join(["Thủ thuật", prl])
             recheck = f"Tái khám sau {mv.recheck.GetValue()} ngày"
-            follow = f"Dặn dò: {mv.follow.GetFollow() or ''}"
+            follow = f"Dặn dò: {check_none_to_blank(mv.follow.Value)}"
             price = f"Tiền khám: {mv.price.GetValue()}"
             t = "\n".join(
                 (

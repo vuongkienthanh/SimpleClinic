@@ -113,7 +113,7 @@ class ReadonlyVNAgeCtrl(wx.TextCtrl):
     """Used to display VN age"""
 
     def __init__(self, parent: wx.Window, **kwargs):
-        super().__init__(parent, style=wx.TE_READONLY,**kwargs)
+        super().__init__(parent, style=wx.TE_READONLY, **kwargs)
 
     def SetBirthdate(self, bd: dt.date):
         self.ChangeValue(bd_to_vn_age(bd))

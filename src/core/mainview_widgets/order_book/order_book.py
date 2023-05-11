@@ -117,8 +117,8 @@ class ProcedurePage(wx.Panel):
         self.procedure_picker = wx.Choice(
             self,
             choices=[
-                f"{pr.name} ({num_to_str_price(pr.price)})"
-                for pr in self.mv.state.allprocedurelist
+                # f"{pr.name} ({num_to_str_price(pr.price)})"
+                # for pr in self.mv.state.allprocedurelist
             ],
         )
         self.addbtn = AddProcedureButton(self)

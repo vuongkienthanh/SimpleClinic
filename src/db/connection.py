@@ -60,9 +60,7 @@ class Connection:
 
     def update_last_open_date(self) -> dt.date | None:
         with self.sqlcon as con:
-            con.execute(
-                "UPDATE singleton SET last_open_date = ?", (dt.date.today(),)
-            )
+            con.execute("UPDATE singleton SET last_open_date = ?", (dt.date.today(),))
 
     def insert(self, t: type[T], base: dict) -> int | None:
         with self.sqlcon as con:
@@ -91,7 +89,9 @@ class Connection:
 
     def delete(self, t: type[BASE], id: int) -> int | None:
         with self.sqlcon as con:
-            return con.execute(f"DELETE FROM {t.__tablename__} WHERE id = {id}").rowcount
+            return con.execute(
+                f"DELETE FROM {t.__tablename__} WHERE id = {id}"
+            ).rowcount
 
     def update(self, base: BASE) -> int | None:
         t = type(base)

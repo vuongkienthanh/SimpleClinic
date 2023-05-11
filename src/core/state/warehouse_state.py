@@ -12,11 +12,11 @@ class WarehouseState:
     def __set__(self, obj: "state.State", value: Warehouse | None):
         obj._warehouse = value
         if value:
-            self.onSelect(obj, value)
+            self.onSet(obj, value)
         else:
-            self.onDeselect(obj)
+            self.onUnset(obj)
 
-    def onSelect(self, obj: "state.State", wh: Warehouse) -> None:
+    def onSet(self, obj: "state.State", wh: Warehouse) -> None:
         pg = obj.mv.order_book.prescriptionpage
         pg.drug_picker.SetValue(wh.name)
         pg.usage.SetLabel(wh.usage)
@@ -24,7 +24,7 @@ class WarehouseState:
         pg.sale_unit.SetLabel(wh.sale_unit if wh.sale_unit else wh.usage_unit)
         pg.drug_picker.SelectAll()
 
-    def onDeselect(self, obj: "state.State") -> None:
+    def onUnset(self, obj: "state.State") -> None:
         pg = obj.mv.order_book.prescriptionpage
         pg.drug_picker.ChangeValue("")
         pg.usage.SetLabel("{Cách dùng}")

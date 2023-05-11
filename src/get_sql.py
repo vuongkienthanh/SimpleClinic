@@ -5,5 +5,5 @@ import os.path
 
 dst = os.path.join(SRC_DIR, "output.sql")
 
-with open(dst, 'w') as f:
+with open(dst, "w") as f:
     f.write(create_table_sql)

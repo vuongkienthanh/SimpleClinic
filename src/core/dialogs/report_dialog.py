@@ -24,7 +24,9 @@ class DayReportDialog(wx.Dialog):
             [
                 w(f"Số ca khám: {res['visit_count']}"),
                 w(f"Doanh thu: {num_to_str_price(res['revenue'])}"),
-                w(f"Tổng tiền thuốc (giá mua): {num_to_str_price(res['drug_purchase'])}"),
+                w(
+                    f"Tổng tiền thuốc (giá mua): {num_to_str_price(res['drug_purchase'])}"
+                ),
                 w(f"Tổng tiền thuốc (giá bán): {num_to_str_price(res['drug_sale'])}"),
                 w(f"Lợi nhuận từ thuốc: {num_to_str_price(res['profit_from_drug'])}"),
                 w(f"Lợi nhuận từ thủ thuật: {num_to_str_price(res['procedure'])}"),
@@ -95,7 +97,9 @@ class MonthReportDialog(wx.Dialog):
             [
                 w(f"Số ca khám: {res['visit_count']}"),
                 w(f"Doanh thu: {num_to_str_price(res['revenue'])}"),
-                w(f"Tổng tiền thuốc (giá mua): {num_to_str_price(res['drug_purchase'])}"),
+                w(
+                    f"Tổng tiền thuốc (giá mua): {num_to_str_price(res['drug_purchase'])}"
+                ),
                 w(f"Tổng tiền thuốc (giá bán): {num_to_str_price(res['drug_sale'])}"),
                 w(f"Lợi nhuận từ thuốc: {num_to_str_price(res['profit_from_drug'])}"),
                 w(f"Lợi nhuận từ thủ thuật: {num_to_str_price(res['procedure'])}"),

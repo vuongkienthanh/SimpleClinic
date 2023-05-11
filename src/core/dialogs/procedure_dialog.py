@@ -108,9 +108,13 @@ class DeleteBtn(wx.Button):
             self.parent.procedurelist.pop(idx)
             self.mv.order_book.procedurepage.procedure_picker.Delete(idx)
             if self.mv.order_book.procedurepage.procedure_list.ItemCount > 0:
-                for i in range(self.mv.order_book.procedurepage.procedure_list.ItemCount):
+                for i in range(
+                    self.mv.order_book.procedurepage.procedure_list.ItemCount
+                ):
                     if (
-                        self.mv.order_book.procedurepage.procedure_list.GetItemText(i, 0)
+                        self.mv.order_book.procedurepage.procedure_list.GetItemText(
+                            i, 0
+                        )
                         == pr.name
                     ):
                         self.mv.order_book.procedurepage.procedure_list.DeleteItem(i)
@@ -124,7 +128,9 @@ class BaseDialog(wx.Dialog):
         super().__init__(parent, title=title)
         self.parent = parent
         self.mv = parent.mv
-        self.name = wx.TextCtrl(self, size=self.mv.config.header_size(0.15), name="Tên thủ thuật:")
+        self.name = wx.TextCtrl(
+            self, size=self.mv.config.header_size(0.15), name="Tên thủ thuật:"
+        )
         self.price = NumberTextCtrl(self, name="Giá tiền:")
         self.cancelbtn = wx.Button(self, id=wx.ID_CANCEL)
         self.okbtn = wx.Button(self, id=wx.ID_OK)
@@ -166,7 +172,9 @@ class AddDialog(BaseDialog):
         try:
             name = self.name.Value.strip()
             price = int(self.price.Value.strip())
-            lastrowid = self.mv.connection.insert(Procedure, {"name": name, "price": price})
+            lastrowid = self.mv.connection.insert(
+                Procedure, {"name": name, "price": price}
+            )
             assert lastrowid is not None
             new_pr = Procedure(lastrowid, name, price)
             self.parent.procedurelist.append(new_pr)
@@ -192,7 +200,9 @@ class UpdateDialog(BaseDialog):
             self.pr.price = int(self.price.Value.strip())
             self.mv.connection.update(self.pr)
             self.parent.procedurelist.update(self.idx, self.pr)
-            self.mv.order_book.procedurepage.procedure_picker.SetString(self.idx, self.pr.name)
+            self.mv.order_book.procedurepage.procedure_picker.SetString(
+                self.idx, self.pr.name
+            )
             procedurelist = self.mv.order_book.procedurepage.procedure_list
             if len(procedurelist.pr_list) > 0:
                 procedurelist.update(self.pr)

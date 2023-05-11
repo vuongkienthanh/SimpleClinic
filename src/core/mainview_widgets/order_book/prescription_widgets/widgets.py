@@ -1,4 +1,5 @@
 from core import mainview as mv
+from core.state.linedrugs_list_state import LineDrugListStateItem
 from core.mainview_widgets.order_book import order_book
 from misc import get_usage_note_str, calc_quantity, k_tab, k_special, k_number
 from core.generic_widgets import NumberTextCtrl, DoseTextCtrl
@@ -6,96 +7,27 @@ import wx
 import sqlite3
 
 
-class DrugListItem:
-    __slots__ = [
-        "drug_id",
-        "times",
-        "dose",
-        "quantity",
-        "name",
-        "note",
-        "usage",
-        "usage_unit",
-        "sale_unit",
-        "sale_price",
-    ]
-
-    def __init__(
-        self,
-        drug_id: int,
-        times: int,
-        dose: str,
-        quantity: int,
-        name: str,
-        note: str | None,
-        usage: str,
-        usage_unit: str,
-        sale_unit: str | None,
-        sale_price: int,
-    ):
-        self.drug_id = drug_id
-        self.times = times
-        self.dose = dose
-        self.quantity = quantity
-        self.name = name
-        self.note = note
-        self.usage = usage
-        self.usage_unit = usage_unit
-        self.sale_unit = sale_unit
-        self.sale_price = sale_price
-
-    @classmethod
-    def from_row(cls, row: sqlite3.Row) -> "DrugListItem":
-        return cls(
-            drug_id=int(row["drug_id"]),
-            times=int(row["times"]),
-            dose=row["dose"],
-            quantity=int(row["quantity"]),
-            name=row["name"],
-            note=row["note"],
-            usage=row["usage"],
-            usage_unit=row["usage_unit"],
-            sale_unit=row["sale_unit"],
-            sale_price=int(row["sale_price"]),
-        )
-
-    @classmethod
-    def from_mv(cls, mv: "mv.MainView") -> "DrugListItem":
-        wh = mv.state.warehouse
-        page = mv.order_book.prescriptionpage
-        assert wh is not None
-        return cls(
-            drug_id=wh.id,
-            name=wh.name,
-            times=int(page.times.Value.strip()),
-            dose=page.dose.Value.strip(),
-            quantity=int(page.quantity.Value.strip()),
-            usage=wh.usage,
-            usage_unit=wh.usage_unit,
-            sale_unit=wh.sale_unit,
-            sale_price=wh.sale_price,
-            note=page.note.GetNote(),
-        )
-
-    def expand(self) -> "DrugListItem":
-        return DrugListItem(
-            drug_id=self.drug_id,
-            name=self.name,
-            times=self.times,
-            dose=self.dose,
-            quantity=self.quantity,
-            usage=self.usage,
-            usage_unit=self.usage_unit,
-            sale_unit=self.sale_unit or self.usage_unit,
-            sale_price=self.sale_price,
-            note=self.note
-            or get_usage_note_str(
-                usage=self.usage,
-                times=self.times,
-                dose=self.dose,
-                usage_unit=self.usage_unit,
-            ),
-        )
+# class DrugListItem:
+#
+#
+#     @classmethod
+#     def from_mv(cls, mv: "mv.MainView") -> "DrugListItem":
+#         wh = mv.state.warehouse
+#         page = mv.order_book.prescriptionpage
+#         assert wh is not None
+#         return cls(
+#             drug_id=wh.id,
+#             name=wh.name,
+#             times=int(page.times.Value.strip()),
+#             dose=page.dose.Value.strip(),
+#             quantity=int(page.quantity.Value.strip()),
+#             usage=wh.usage,
+#             usage_unit=wh.usage_unit,
+#             sale_unit=wh.sale_unit,
+#             sale_price=wh.sale_price,
+#             note=page.note.GetNote(),
+#         )
+#
 
 
 class DrugListCtrl(wx.ListCtrl):
@@ -103,7 +35,6 @@ class DrugListCtrl(wx.ListCtrl):
         super().__init__(parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
         self.parent = parent
         self.mv = parent.mv
-        self.d_list: list[DrugListItem] = []
         self.AppendColumn("STT", width=self.mv.config.header_width(0.02))
         self.AppendColumn("Thuốc", width=self.mv.config.header_width(0.1))
         self.AppendColumn("Số cữ", width=self.mv.config.header_width(0.03))
@@ -113,36 +44,25 @@ class DrugListCtrl(wx.ListCtrl):
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onSelect)
         self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onDeselect)
 
-    def clear(self):
+    def build(self, _list: list[LineDrugListStateItem]):
+        for item in _list:
+            self.append_ui(item)
+
+    def rebuild(self, _list: list[LineDrugListStateItem]):
         self.DeleteAllItems()
-        self.d_list.clear()
+        self.build(_list)
 
-    def rebuild(self, lld: list[sqlite3.Row]):
-        self.clear()
-        for item in lld:
-            self.append(DrugListItem.from_row(item))
-
-    def append(self, item: DrugListItem):
-        def append_list(item: DrugListItem):
-            self.d_list.append(item)
-
-        def append_ui(item: DrugListItem):
-            _item = item.expand()
-            assert _item.sale_unit is not None
-            assert _item.note is not None
-            self.Append(
-                [
-                    self.ItemCount + 1,
-                    _item.name,
-                    str(_item.times),
-                    _item.dose + " " + _item.usage_unit,
-                    str(_item.quantity) + " " + _item.sale_unit,
-                    _item.note,
-                ]
-            )
-
-        append_list(item)
-        append_ui(item)
+    def append_ui(self, item: LineDrugListStateItem):
+        self.Append(
+            [
+                self.ItemCount + 1,
+                item.name,
+                str(item.times),
+                item.dose + " " + item.usage_unit,
+                str(item.quantity) + " " + item.sale_unit,
+                item.note,
+            ]
+        )
 
     def update(self, idx: int, item: DrugListItem):
         def update_list(idx: int, item: DrugListItem):

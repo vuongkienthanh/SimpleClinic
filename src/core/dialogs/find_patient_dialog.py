@@ -3,6 +3,7 @@ from misc import check_blank_to_none
 from core.dialogs.patient_dialog import EditPatientDialog
 from db import Patient, Queue, Visit
 from core.dialogs.picker_dialog import DatePickerDialog
+from core.state.queue_state import QueueState
 import wx
 import sqlite3
 
@@ -295,7 +296,7 @@ class FindPatientDialog(wx.Dialog):
         try:
             self.mv.connection.insert(Queue, {"patient_id": pid})
             wx.MessageBox("Thêm vào danh sách chờ thành công", "OK")
-            self.mv.state.queue = self.mv.state.fetch_queue_view()
+            self.mv.state.queue = QueueState.fetch(self.mv.connection)
         except sqlite3.IntegrityError as error:
             wx.MessageBox(f"Đã có tên trong danh sách chờ.\n{error}", "Lỗi")
         finally:

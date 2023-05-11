@@ -1,1 +1,1 @@
-from core.state.main_state import State
+from .main_state import State

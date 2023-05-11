@@ -1,7 +1,12 @@
 import db
 from misc import Config, vn_weekdays
 from core.state import State
-from core.generic_widgets import ReadonlyVNAgeCtrl, PhoneTextCtrl, DateTextCtrl, WeightCtrl
+from core.generic_widgets import (
+    ReadonlyVNAgeCtrl,
+    PhoneTextCtrl,
+    DateTextCtrl,
+    WeightCtrl,
+)
 from core.mainview_widgets import (
     GetWeightBtn,
     DaysCtrl,
@@ -28,7 +33,6 @@ class MainView(wx.Frame):
 
         self.connection = connection
         self.config = Config.load()
-        self.state = State(self)
 
         if self.config.maximize_at_start:
             self.Maximize()
@@ -107,7 +111,7 @@ class MainView(wx.Frame):
                 (self.weight, "weight"),
                 (self.follow, "follow"),
                 (self.visit_list, "visit_list"),
-                (self.patient_book.queuepatientlistctrl, "patient_queuelist"),
+                (self.patient_book.queuelistctrl, "patient_queuelist"),
                 (self.patient_book.seentodaylistctrl, "patient_seenlist"),
                 (self.order_book.prescriptionpage.drug_list, "drug_list"),
                 (self.order_book.prescriptionpage.drug_picker, "drug_picker"),
@@ -205,16 +209,12 @@ class MainView(wx.Frame):
 
         self.SetMenuBar(MyMenuBar())
         self.Bind(wx.EVT_CLOSE, self.onClose)
-        self.start()
+        self.state = State(self)
 
     def onClose(self, e: wx.CloseEvent):
         print("close sqlite3 connection")
         self.connection.close()
         e.Skip()
-
-    def start(self):
-        self.patient_book.queuepatientlistctrl.build(self.state.queue)
-        self.patient_book.seentodaylistctrl.build(self.state.seentoday)
 
     def check_filled(self) -> bool:
         diagnosis: str = self.diagnosis.GetValue()

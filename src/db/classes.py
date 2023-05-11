@@ -1,7 +1,6 @@
 import datetime as dt
 import enum
 from dataclasses import dataclass
-import dataclasses
 from typing import ClassVar, TypeVar
 from decimal import Decimal
 from typing import Any
@@ -21,11 +20,11 @@ class BASE:
     """
     Base Class for derived sql table
     - `__table_name__`: name of table in sqlite database
-    - `__excludedfields__`: names of fields that are excluded by classmethod fields()
+    - `__match_args__`: names of fields for sql query
     """
 
     __tablename__: ClassVar[str]
-    __excludedfields__: ClassVar[list[str]]
+    __match_args__: ClassVar[list[str]]
     id: int
 
     @classmethod
@@ -33,14 +32,8 @@ class BASE:
         return cls(**row)
 
     @classmethod
-    def fields(cls) -> tuple[str]:
-        return tuple(
-            (
-                f.name
-                for f in dataclasses.fields(cls)
-                if f.name not in cls.__excludedfields__
-            )
-        )
+    def fields(cls) -> list[str]:
+        return cls.__match_args__
 
     @classmethod
     def commna_joined_field_names(cls) -> str:
@@ -67,7 +60,14 @@ class Patient(BASE):
     """Bệnh nhân"""
 
     __tablename__ = "patients"
-    __excludedfields__ = ["id"]
+    __match_args__ = [
+        "name",
+        "gender",
+        "birthdate",
+        "address",
+        "phone",
+        "past_history",
+    ]
     id: int
     name: str
     gender: Gender
@@ -82,7 +82,7 @@ class Queue(BASE):
     """Lượt chờ khám"""
 
     __tablename__ = "queue"
-    __excludedfields__ = ["id", "added_datetime"]
+    __match_args__ = ["patient_id"]
     id: int
     patient_id: int
     added_datetime: dt.datetime
@@ -93,7 +93,7 @@ class SeenToday(BASE):
     """Danh sách đã khám hôm nay"""
 
     __tablename__ = "seen_today"
-    __excludedfields__ = ["id"]
+    __match_args__ = ["patient_id", "visit_id"]
     id: int
     patient_id: int
     visit_id: int
@@ -104,10 +104,10 @@ class Appointment(BASE):
     """Danh sách hẹn tái khám"""
 
     __tablename__ = "appointments"
-    __excludedfields__ = ["id"]
+    __match_args__ = ["patient_id", "appointed_date"]
     id: int
-    appointed_date: dt.date
     patient_id: int
+    appointed_date: dt.date
 
 
 @dataclass(slots=True)
@@ -124,7 +124,15 @@ class Visit(BASE):
     """
 
     __tablename__ = "visits"
-    __excludedfields__ = ["id", "exam_datetime"]
+    __match_args__ = [
+        "diagnosis",
+        "weight",
+        "days",
+        "recheck",
+        "patient_id",
+        "follow",
+        "vnote",
+    ]
     id: int
     exam_datetime: dt.datetime
     diagnosis: str
@@ -146,7 +154,15 @@ class LineDrug(BASE):
     """
 
     __tablename__ = "linedrugs"
-    __excludedfields__ = ["id"]
+    __match_args__ = [
+        "drug_id",
+        "dose",
+        "times",
+        "quantity",
+        "visit_id",
+        "note",
+    ]
+
     id: int
     drug_id: int
     dose: str
@@ -173,7 +189,19 @@ class Warehouse(BASE):
     """
 
     __tablename__ = "warehouse"
-    __excludedfields__ = ["id"]
+    __match_args__ = [
+        "name",
+        "element",
+        "quantity",
+        "usage_unit",
+        "usage",
+        "purchase_price",
+        "sale_price",
+        "sale_unit",
+        "expire_date",
+        "made_by",
+        "note",
+    ]
     id: int
     name: str
     element: str
@@ -193,7 +221,7 @@ class SamplePrescription(BASE):
     """Toa mẫu"""
 
     __tablename__ = "sampleprescription"
-    __excludedfields__ = ["id"]
+    __match_args__ = ["name"]
     id: int
     name: str
 
@@ -206,7 +234,12 @@ class LineSamplePrescription(BASE):
     """
 
     __tablename__ = "linesampleprescription"
-    __excludedfields__ = ["id"]
+    __match_args__ = [
+        "drug_id",
+        "sample_id",
+        "times",
+        "dose",
+    ]
     id: int
     drug_id: int
     sample_id: int
@@ -219,7 +252,7 @@ class Procedure(BASE):
     """Danh sách thủ thuật"""
 
     __tablename__ = "procedures"
-    __excludedfields__ = ["id"]
+    __match_args__ = ["name", "price"]
     id: int
     name: str
     price: int
@@ -230,7 +263,7 @@ class LineProcedure(BASE):
     """Thủ thuật của lượt khám"""
 
     __tablename__ = "lineprocedure"
-    __excludedfields__ = ["id"]
+    __match_args__ = ["procedure_id", "visit_id"]
     id: int
     procedure_id: int
     visit_id: int

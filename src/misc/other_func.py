@@ -1,7 +1,5 @@
-import wx
 import datetime as dt
 from fractions import Fraction
-from typing import Any, TypeVar
 from itertools import cycle
 from math import ceil
 from misc import Config
@@ -10,30 +8,35 @@ from misc import Config
 def bd_to_vn_age(bd: dt.date) -> str:
     today = dt.date.today()
     delta = (today - bd).days
-    if delta <= 60:
-        age = f"{delta} ngày tuổi"
-    elif delta <= (30 * 24):
-        age = f"{int(delta / 30)} tháng tuổi"
-    else:
-        age = f"{today.year - bd.year - ((today.month, today.day) < (bd.month, bd.day))} tuổi"
-    return age
-
-
-def get_usage_note_str(usage: str, times: int, dose: str, usage_unit: str) -> str:
-    return f"{usage} ngày {times} lần, lần {dose} {usage_unit}"
+    match delta:
+        case d if d<=60:
+            return f"{d} ngày tuổi"
+        case d if d <= (30 * 24):
+            return f"{d // 30} tháng tuổi";
+        case _:
+            return f"{today.year - bd.year - ((today.month, today.day) < (bd.month, bd.day))} tuổi"
 
 
 def check_blank_to_none(val: str) -> str | None:
-    val = val.strip()
-    return None if val == "" else val
+    match val.strip():
+        case "":
+            return None
+        case v:
+            return v
 
 
-def check_none_to_blank(val: Any | None) -> str:
-    return str(val).strip() if val else ""
+def check_none_to_blank(val: str | None) -> str:
+    match val:
+        case None:
+            return ""
+        case v:
+            return v.strip()
+
+
 
 
 def calc_quantity(
-        times: int, dose: str, days: int, sale_unit: str | None, config: Config
+    times: int, dose: str, days: int, sale_unit: str | None, config: Config
 ) -> int | None:
     def calc(times: int, dose: str, days: int) -> int:
         if "/" in dose:
@@ -92,6 +95,3 @@ def vn_weekdays(d: int):
         6: "Chủ nhật",
     }
     return f"=>{vn[wd]}"
-
-
-TC = TypeVar("TC", bound=wx.TextCtrl)

@@ -1,5 +1,13 @@
+from core.state.seentoday_state import SeenTodayState
 from db import Patient, Patient, Queue
-from core.generic_widgets import DateTextCtrl, CalendarDatePicker, ReadonlyVNAgeCtrl, PhoneTextCtrl, GenderChoice
+from core.state.queue_state import QueueState
+from core.generic_widgets import (
+    DateTextCtrl,
+    CalendarDatePicker,
+    ReadonlyVNAgeCtrl,
+    PhoneTextCtrl,
+    GenderChoice,
+)
 from misc import check_blank_to_none, check_none_to_blank
 from core import mainview
 import sqlite3
@@ -152,7 +160,7 @@ class NewPatientDialog(BasePatientDialog):
                     ):
                         self.mv.connection.insert(Queue, {"patient_id": lastrowid})
                         wx.MessageBox("Thêm vào danh sách chờ thành công", "OK")
-                        self.mv.state.queue = self.mv.state.fetch_queue_view()
+                        self.mv.state.queue = QueueState.fetch(self.mv.connection)
                 except sqlite3.IntegrityError as error:
                     wx.MessageBox(f"Đã có tên trong danh sách chờ.\n{error}", "Lỗi")
                 e.Skip()
@@ -197,8 +205,8 @@ class EditPatientDialog(BasePatientDialog):
                 wx.MessageBox("Cập nhật thành công", "OK")
                 page: wx.ListCtrl = self.mv.patient_book.GetCurrentPage()
                 idx: int = page.GetFirstSelected()
-                self.mv.state.queue = self.mv.state.fetch_queue_view()
-                self.mv.state.seentoday = self.mv.state.fetch_seentoday_view()
+                self.mv.state.queue = QueueState.fetch(self.mv.connection)
+                self.mv.state.seentoday = SeenTodayState.fetch(self.mv.connection)
                 page.EnsureVisible(idx)
                 page.Select(idx)
                 e.Skip()

@@ -70,7 +70,9 @@ class SetupDialog(wx.Dialog):
         self.maximize_at_start = wx.CheckBox(self.scroll, name="Phóng to khi khởi động")
         self.maximize_at_start.SetValue(self.mv.config.maximize_at_start)
         self.mainview_color = wx.ColourPickerCtrl(
-            self.scroll, colour=self.mv.config.get_background_color("mainview"), name="Màu nền chính"
+            self.scroll,
+            colour=self.mv.config.get_background_color("mainview"),
+            name="Màu nền chính",
         )
         self.patient_queuelist_color = wx.ColourPickerCtrl(
             self.scroll,
@@ -88,10 +90,14 @@ class SetupDialog(wx.Dialog):
             name="Màu nền danh sách lượt khám cũ",
         )
         self.name_color = wx.ColourPickerCtrl(
-            self.scroll, colour=self.mv.config.get_background_color("name"), name="Màu nền họ tên"
+            self.scroll,
+            colour=self.mv.config.get_background_color("name"),
+            name="Màu nền họ tên",
         )
         self.gender_color = wx.ColourPickerCtrl(
-            self.scroll, colour=self.mv.config.get_background_color("gender"), name="Màu nền giới tính"
+            self.scroll,
+            colour=self.mv.config.get_background_color("gender"),
+            name="Màu nền giới tính",
         )
         self.birthdate_color = wx.ColourPickerCtrl(
             self.scroll,
@@ -99,13 +105,19 @@ class SetupDialog(wx.Dialog):
             name="Màu nền ngày sinh",
         )
         self.age_color = wx.ColourPickerCtrl(
-            self.scroll, colour=self.mv.config.get_background_color("age"), name="Màu nền tuổi"
+            self.scroll,
+            colour=self.mv.config.get_background_color("age"),
+            name="Màu nền tuổi",
         )
         self.address_color = wx.ColourPickerCtrl(
-            self.scroll, colour=self.mv.config.get_background_color("address"), name="Màu nền địa chỉ"
+            self.scroll,
+            colour=self.mv.config.get_background_color("address"),
+            name="Màu nền địa chỉ",
         )
         self.phone_color = wx.ColourPickerCtrl(
-            self.scroll, colour=self.mv.config.get_background_color("phone"), name="Màu nền điện thoại"
+            self.scroll,
+            colour=self.mv.config.get_background_color("phone"),
+            name="Màu nền điện thoại",
         )
         self.diagnosis_color = wx.ColourPickerCtrl(
             self.scroll,
@@ -113,7 +125,9 @@ class SetupDialog(wx.Dialog):
             name="Màu nền chẩn đoán",
         )
         self.price_color = wx.ColourPickerCtrl(
-            self.scroll, colour=self.mv.config.get_background_color("price"), name="Màu nền giá tiền"
+            self.scroll,
+            colour=self.mv.config.get_background_color("price"),
+            name="Màu nền giá tiền",
         )
         self.drug_list_color = wx.ColourPickerCtrl(
             self.scroll,
@@ -136,7 +150,9 @@ class SetupDialog(wx.Dialog):
             name="Màu nền bệnh sử",
         )
         self.weight_color = wx.ColourPickerCtrl(
-            self.scroll, colour=self.mv.config.get_background_color("weight"), name="Màu nền cân nặng"
+            self.scroll,
+            colour=self.mv.config.get_background_color("weight"),
+            name="Màu nền cân nặng",
         )
         self.days_color = wx.ColourPickerCtrl(
             self.scroll,
@@ -169,7 +185,9 @@ class SetupDialog(wx.Dialog):
             name="Màu nền cách sử dụng thuốc",
         )
         self.recheck_color = wx.ColourPickerCtrl(
-            self.scroll, colour=self.mv.config.get_background_color("recheck"), name="Màu nền tái khám"
+            self.scroll,
+            colour=self.mv.config.get_background_color("recheck"),
+            name="Màu nền tái khám",
         )
         self.follow_color = wx.ColourPickerCtrl(
             self.scroll,

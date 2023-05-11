@@ -1,18 +1,21 @@
 from core import mainview
 from core.dialogs import EditPatientDialog
+from core.state.queue_state import QueueStateItem
+from core.state.seentoday_state import SeenTodayStateItem
 from db import Patient, Visit
 import wx
-import sqlite3
+
+StateList = list[QueueStateItem] | list[SeenTodayStateItem]
+StateItem = QueueStateItem | SeenTodayStateItem
 
 
 class PatientBook(wx.Notebook):
-
     def __init__(self, parent: "mainview.MainView"):
         super().__init__(parent)
         self.mv = parent
-        self.queuepatientlistctrl = QueuePatientListCtrl(self)
-        self.seentodaylistctrl = SeenTodayPatientListCtrl(self)
-        self.AddPage(page=self.queuepatientlistctrl, text="Danh sách chờ khám", select=True)
+        self.queuelistctrl = QueuePatientListCtrl(self)
+        self.seentodaylistctrl = SeenTodayListCtrl(self)
+        self.AddPage(page=self.queuelistctrl, text="Danh sách chờ khám", select=True)
         self.AddPage(page=self.seentodaylistctrl, text="Danh sách đã khám hôm nay")
         self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGING, self.onChanging)
 
@@ -26,7 +29,6 @@ class PatientBook(wx.Notebook):
 
 
 class BasePatientListCtrl(wx.ListCtrl):
-
     def __init__(self, parent: PatientBook):
         super().__init__(parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
         self.parent = parent
@@ -39,80 +41,89 @@ class BasePatientListCtrl(wx.ListCtrl):
         self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onDeselect)
         self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onDoubleClick)
 
-    def build(self, _list: list[sqlite3.Row]):
+    def build(self, _list: StateList):
         for item in _list:
             self.append_ui(item)
 
-    def rebuild(self, _list: list[sqlite3.Row]):
+    def rebuild(self, _list: StateList):
         self.DeleteAllItems()
         self.build(_list)
 
-    def append_ui(self, item: sqlite3.Row):
+    def append_ui(self, item: StateItem):
         ...
 
-    def onSelect(self, e: wx.ListEvent):
+    def onSelect(self, _):
         ...
 
-    def onDeselect(self, e: wx.ListEvent):
+    def onDeselect(self, _):
         ...
 
-    def onDoubleClick(self, e: wx.ListEvent):
-
+    def onDoubleClick(self, _):
         EditPatientDialog(self.mv).ShowModal()
 
 
 class QueuePatientListCtrl(BasePatientListCtrl):
-    "First page, set `state.patient` when selected"
+    "Set `state.patient` when select item"
 
     def __init__(self, parent: PatientBook):
         super().__init__(parent)
         self.AppendColumn("Giờ đăng ký", width=self.mv.config.header_width(0.075))
 
-    def append_ui(self, row: sqlite3.Row):
+    def append_ui(self, item: QueueStateItem):
         self.Append(
             [
-                row["pid"],
-                row["name"],
-                str(row["gender"]),
-                row["birthdate"].strftime("%d/%m/%Y"),
-                row["added_datetime"].strftime("%d/%m/%Y %H:%M"),
+                item.pid,
+                item.name,
+                str(item.gender),
+                item.birthdate.strftime("%d/%m/%Y"),
+                item.added_datetime.strftime("%d/%m/%Y %H:%M"),
             ]
         )
 
     def onSelect(self, e: wx.ListEvent):
         idx: int = e.Index
-        pid: int = self.mv.state.queue[idx]["pid"]
-        self.mv.state.patient = self.mv.connection.select(Patient, pid)
+        item = self.mv.state.queue[idx]
+        pid = item.pid
+        p = self.mv.connection.select(Patient, pid)
+        assert p is not None
+        self.mv.state.patient = p
+        self.SetFocus()
 
     def onDeselect(self, _):
         self.mv.state.patient = None
+        self.SetFocus()
 
 
-class SeenTodayPatientListCtrl(BasePatientListCtrl):
-    """Set `state.patient` and `state.visit` when select patient"""
+class SeenTodayListCtrl(BasePatientListCtrl):
+    "Set `state.patient` and `state.visit` when select item"
 
     def __init__(self, parent: PatientBook):
         super().__init__(parent)
         self.AppendColumn("Giờ khám", width=self.mv.config.header_width(0.075))
 
-    def append_ui(self, row: sqlite3.Row):
+    def append_ui(self, item: SeenTodayStateItem):
         self.Append(
             [
-                row["pid"],
-                row["name"],
-                str(row["gender"]),
-                row["birthdate"].strftime("%d/%m/%Y"),
-                row["exam_datetime"].strftime("%d/%m/%Y %H:%M"),
+                item.pid,
+                item.name,
+                str(item.gender),
+                item.birthdate.strftime("%d/%m/%Y"),
+                item.exam_datetime.strftime("%d/%m/%Y %H:%M"),
             ]
         )
 
     def onSelect(self, e: wx.ListEvent):
         idx: int = e.Index
         target = self.mv.state.seentoday[idx]
-        pid: int = target["pid"]
-        vid: int = target["vid"]
-        self.mv.state.patient = self.mv.connection.select(Patient, pid)
-        self.mv.state.visit = self.mv.connection.select(Visit, vid)
+        pid: int = target.pid
+        vid: int = target.vid
+
+        p = self.mv.connection.select(Patient, pid)
+        v = self.mv.connection.select(Visit, vid)
+        assert p is not None
+        assert v is not None
+        self.mv.state.patient = p
+        self.mv.state.visit = v
         self.SetFocus()
 
     def onDeselect(self, _):

@@ -9,10 +9,10 @@ def bd_to_vn_age(bd: dt.date) -> str:
     today = dt.date.today()
     delta = (today - bd).days
     match delta:
-        case d if d<=60:
+        case d if d <= 60:
             return f"{d} ngày tuổi"
         case d if d <= (30 * 24):
-            return f"{d // 30} tháng tuổi";
+            return f"{d // 30} tháng tuổi"
         case _:
             return f"{today.year - bd.year - ((today.month, today.day) < (bd.month, bd.day))} tuổi"
 
@@ -33,6 +33,8 @@ def check_none_to_blank(val: str | None) -> str:
             return v.strip()
 
 
+def note_str(usage: str, times: int, dose: str, usage_unit: str) -> str:
+    return f"{usage} ngày {times} lần, lần {dose} {usage_unit}"
 
 
 def calc_quantity(

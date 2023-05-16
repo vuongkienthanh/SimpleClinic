@@ -1,24 +1,63 @@
-from .linedrugs_list_state import LineDrugListStateItem
+from misc.other_func import note_str
 from . import main_state
-from .warehouse_state import  WarehouseState
+from dataclasses import dataclass
+from db import Connection, Visit, LineDrug, Warehouse
+
+
+@dataclass(slots=True, match_args=False)
+class NewLineDrugListStateItem:
+    warehouse_id: int
+    times: int
+    dose: str
+    quantity: int
+    note: str | None
+
+
+@dataclass(slots=True, match_args=False)
+class OldLineDrugListStateItem:
+    id: int
+    warehouse_id: int
+    times: int
+    dose: str
+    quantity: int
+    note: str | None
+
+
+LineDrugListStateItem = OldLineDrugListStateItem | NewLineDrugListStateItem
 
 
 class LineDrugState:
-    def __get__(self, obj: "main_state.State", objtype=None) -> LineDrugListStateItem | None:
+    def __get__(
+        self, obj: "main_state.State", objtype=None
+    ) -> LineDrugListStateItem | None:
         return obj._linedrug
 
-    def __set__(self, obj: "main_state.State", value: LineDrugListStateItem | None):
+    def __set__(
+        self, obj: "main_state.State", value: LineDrugListStateItem | None
+    ) -> None:
         obj._linedrug = value
-        if value:
-            self.onSet(obj, value)
-        else:
-            self.onUnset(obj)
+        match value:
+            case None:
+                self.onUnset(obj)
+            case item:
+                self.onSet(obj, item)
 
     def onSet(self, obj: "main_state.State", item: LineDrugListStateItem) -> None:
         mv = obj.mv
         page = mv.order_book.prescriptionpage
-        obj.warehouse =  WarehouseState.get_from_state(item.drug_id, obj)
-        
+        obj.warehouse = obj.all_warehouse[item.warehouse_id]
+        page.times.ChangeValue(str(item.times))
+        page.dose.ChangeValue(item.dose)
+        page.quantity.ChangeValue(str(item.quantity))
+        page.note.ChangeValue(
+            note_str(
+                obj.warehouse.usage,
+                item.times,
+                item.dose,
+                obj.warehouse.usage_unit,
+                item.note,
+            )
+        )
         page.SetFocus()
 
     def onUnset(
@@ -27,4 +66,43 @@ class LineDrugState:
     ) -> None:
         mv = obj.mv
         page = mv.order_book.prescriptionpage
+        obj.warehouse = None
+        page.times.Clear()
+        page.dose.Clear()
+        page.quantity.Clear()
+        page.note.Clear()
         page.SetFocus()
+
+
+class NewLineDrugListState:
+    def __get__(
+        self, obj: "main_state.State", objtype=None
+    ) -> list[NewLineDrugListStateItem]:
+        return obj._new_linedrug_list
+
+
+class OldLineDrugListState:
+    def __get__(
+        self, obj: "main_state.State", objtype=None
+    ) -> list[OldLineDrugListStateItem]:
+        return obj._old_linedrug_list
+
+    def __set__(self, obj: "main_state.State", _list: list[OldLineDrugListStateItem]):
+        obj._old_linedrug_list = _list
+        obj.mv.order_book.prescriptionpage.drug_list.rebuild(_list)
+
+    @staticmethod
+    def fetch(v: Visit, connection: Connection):
+        query = f"""
+            SELECT 
+                ld.id, ld.drug_id as warehouse_id, 
+                ld.times, ld.dose,
+                ld.quantity, ld.note
+            FROM (SELECT * FROM {LineDrug.__tablename__}
+                  WHERE visit_id = {v.id}
+            ) AS ld
+            JOIN {Warehouse.__tablename__} AS wh
+            ON wh.id = ld.drug_id
+        """
+        rows = connection.execute(query).fetchall()
+        return [OldLineDrugListStateItem(*row) for row in rows]

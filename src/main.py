@@ -9,7 +9,7 @@ import sys
 class App(wx.App):
     def __init__(self, con: db.Connection):
         super().__init__()
-        from core.mainview import MainView
+        from ui.mainview import MainView
 
         mv = MainView(con)
         self.SetTopWindow(mv)

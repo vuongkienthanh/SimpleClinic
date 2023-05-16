@@ -1,13 +1,13 @@
 import db
 from misc import Config, vn_weekdays
 from state import State
-from core.generic_widgets import (
+from ui.generic_widgets import (
     ReadonlyVNAgeCtrl,
     PhoneTextCtrl,
     DateTextCtrl,
     WeightCtrl,
 )
-from core.mainview_widgets import (
+from ui.mainview_widgets import (
     GetWeightBtn,
     DaysCtrl,
     UpdateQuantityBtn,
@@ -21,7 +21,7 @@ from core.mainview_widgets import (
     VisitListCtrl,
     OrderBook,
 )
-from core.menubar import MyMenuBar
+from ui.menubar import MyMenuBar
 import wx
 
 
@@ -33,6 +33,7 @@ class MainView(wx.Frame):
 
         self.connection = connection
         self.config = Config.load()
+        self.state = State(self)
 
         if self.config.maximize_at_start:
             self.Maximize()
@@ -119,8 +120,8 @@ class MainView(wx.Frame):
                 (self.order_book.prescriptionpage.dose, "drug_dose"),
                 (self.order_book.prescriptionpage.quantity, "drug_quantity"),
                 (self.order_book.prescriptionpage.note, "drug_note"),
-                (self.order_book.procedurepage.procedure_picker, "procedure_picker"),
-                (self.order_book.procedurepage.procedure_list, "procedure_list"),
+                # (self.order_book.procedurepage.procedure_picker, "procedure_picker"),
+                # (self.order_book.procedurepage.procedure_list, "procedure_list"),
             ]
         )
 
@@ -209,7 +210,7 @@ class MainView(wx.Frame):
 
         self.SetMenuBar(MyMenuBar())
         self.Bind(wx.EVT_CLOSE, self.onClose)
-        self.state = State(self)
+        self.state.refresh()
 
     def onClose(self, e: wx.CloseEvent):
         print("close sqlite3 connection")

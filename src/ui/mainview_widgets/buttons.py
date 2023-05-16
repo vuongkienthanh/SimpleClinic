@@ -1,6 +1,6 @@
 from misc import weight_bm, update_druglist_bm
 from db import LineProcedure, Visit, Patient, LineDrug, SeenToday
-from misc import calc_quantity, check_blank_to_none
+from misc import calc_quantity, check_blank_to_none, sale_unit_str
 from ui import mainview as mv
 from misc.printer import PrintOut, printdata
 
@@ -62,18 +62,22 @@ class UpdateQuantityBtn(wx.BitmapButton):
 
     def update_quantity(self):
         """Update quantity in DrugList, also update price"""
+        state = self.mv.state
         drug_list = self.mv.order_book.prescriptionpage.drug_list
-        for idx, item in enumerate(drug_list.d_list):
-            q = calc_quantity(
+        for idx, item in enumerate(state.old_linedrug_list + state.new_linedrug_list):
+            wh = state.all_warehouse[item.warehouse_id]
+            item.quantity = calc_quantity(
                 times=item.times,
                 dose=item.dose,
                 days=self.mv.days.GetValue(),
-                sale_unit=item.sale_unit,
+                sale_unit=wh.sale_unit,
                 config=self.mv.config,
             )
-            assert q is not None
-            item.quantity = q
-            drug_list.SetItem(idx, 4, f"{q} {item.sale_unit or item.usage_unit}")
+            drug_list.SetItem(
+                idx,
+                4,
+                f"{item.quantity} {sale_unit_str(wh.sale_unit , wh.usage_unit)}",
+            )
         self.mv.price.FetchPrice()
         self.Disable()
 
@@ -219,11 +223,11 @@ class SaveBtn(wx.Button):
             insert_ld = []
             delete_ld = []
             drug_list = self.mv.order_book.prescriptionpage.drug_list.d_list
-            lld = self.mv.state.linedrug_list
+            lld = self.mv.state.old_linedrug_list
             # update same drug_id
             for drug in drug_list:
                 for origin in lld:
-                    if drug.drug_id == origin.drug_id:
+                    if drug.drug_id == origin.warehouse_id:
                         update_ld.append(
                             (
                                 drug.dose,
@@ -234,7 +238,7 @@ class SaveBtn(wx.Button):
                             )
                         )
                         update_ld_id.append(origin.id)
-                        update_drug_id.append(origin.drug_id)
+                        update_drug_id.append(origin.warehouse_id)
             # delete those in lld but not in update
             for origin in lld:
                 if origin.id not in update_ld_id:

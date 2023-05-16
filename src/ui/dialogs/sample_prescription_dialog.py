@@ -82,7 +82,7 @@ class SampleList(wx.ListCtrl):
         self.mv = parent.mv
         self.AppendColumn("name", width=self.mv.config.header_width(0.2))
         self.DeleteAllItems()
-        for sp in self.parent.mv.state.allsampleprescriptionlist:
+        for sp in self.parent.mv.state.all_sampleprescription:
             self.append(sp)
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onSelect)
         self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onDeselect)
@@ -96,7 +96,7 @@ class SampleList(wx.ListCtrl):
         self.parent.dose.Enable()
         self.parent.times.Enable()
         idx: int = e.GetIndex()
-        sp = self.parent.mv.state.allsampleprescriptionlist[idx]
+        sp = self.parent.mv.state.all_sampleprescription[idx]
         self.parent.itemlist.build(sp.id)
 
     def onDeselect(self, e: wx.ListEvent):
@@ -120,7 +120,7 @@ class AddSampleButton(wx.Button):
             lastrowid = self.parent.mv.connection.insert(SamplePrescription, sp)
             assert lastrowid is not None
             sp = SamplePrescription(id=lastrowid, name=s)
-            self.parent.mv.state.allsampleprescriptionlist.append(sp)
+            self.parent.mv.state.all_sampleprescription.append(sp)
             self.parent.samplelist.append(sp)
 
 
@@ -134,11 +134,11 @@ class DeleteSampleButton(wx.Button):
     def onClick(self, e) -> None:
         idx: int = self.parent.samplelist.GetFirstSelected()
         assert idx >= 0
-        sp = self.parent.mv.state.allsampleprescriptionlist[idx]
+        sp = self.parent.mv.state.all_sampleprescription[idx]
         try:
             rowcount = self.parent.mv.connection.delete(SamplePrescription, sp.id)
             assert rowcount is not None
-            self.parent.mv.state.allsampleprescriptionlist.pop(idx)
+            self.parent.mv.state.all_sampleprescription.pop(idx)
             self.parent.samplelist.DeleteItem(idx)
             self.Disable()
         except Exception as error:
@@ -150,7 +150,7 @@ class Picker(wx.Choice):
         super().__init__(
             parent,
             choices=[
-                f"{wh.name}({wh.element})" for wh in parent.mv.state.allwarehouselist
+                f"{wh.name}({wh.element})" for wh in parent.mv.state.all_warehouse
             ],
             name=name,
         )
@@ -193,9 +193,9 @@ class AddDrugButton(wx.Button):
 
     def onClick(self, e: wx.CommandEvent):
         idx: int = self.parent.picker.GetCurrentSelection()
-        wh = self.parent.mv.state.allwarehouselist[idx]
+        wh = self.parent.mv.state.all_warehouse[idx]
         idx: int = self.parent.samplelist.GetFirstSelected()
-        sp = self.parent.mv.state.allsampleprescriptionlist[idx]
+        sp = self.parent.mv.state.all_sampleprescription[idx]
 
         times_str: str = self.parent.times.GetValue()
         times = int(times_str.strip())

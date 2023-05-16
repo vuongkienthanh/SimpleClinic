@@ -1,13 +1,27 @@
-from .linedrug_state import LineDrugState
 from .patient_state import PatientState
 from .visit_state import VisitState
 from .warehouse_state import WarehouseState
 from .visit_list_state import VisitListState, VisitListStateItem
-from .linedrugs_list_state import LineDrugListState, LineDrugListStateItem
+from .linedrug_state import (
+    LineDrugState,
+    OldLineDrugListState,
+    OldLineDrugListStateItem,
+    NewLineDrugListState,
+    NewLineDrugListStateItem,
+    LineDrugListStateItem,
+)
+from .lineprocedure_state import (
+    OldLineProcedureListState,
+    OldLineProcedureListStateItem,
+    NewLineProcedureListState,
+    NewLineProcedureListStateItem,
+    LineProcedureListStateItem,
+    LineProcedureState,
+)
 from .queue_state import QueueState, QueueStateItem
 from .seentoday_state import SeenTodayState, SeenTodayStateItem
 from db import *
-from core import mainview
+from ui import mainview
 import sqlite3
 
 
@@ -17,64 +31,67 @@ class State:
     patient = PatientState()
     visit = VisitState()
     warehouse = WarehouseState()
-    linedrug = LineDrugState()
     visit_list = VisitListState()
-    linedrug_list = LineDrugListState()
+
+    linedrug = LineDrugState()
+    old_linedrug_list = OldLineDrugListState()
+    new_linedrug_list = NewLineDrugListState()
+
+    lineprocedure = LineProcedureState()
+    old_lineprocedure_list = OldLineProcedureListState()
+    new_lineprocedure_list = NewLineProcedureListState()
+
     queue = QueueState()
 
     def __init__(self, mv: "mainview.MainView") -> None:
         self.mv = mv
         self.Init()
-        self.refresh()
 
     def Init(self) -> None:
         self._patient: Patient | None = None
         self._visit: Visit | None = None
         self._warehouse: Warehouse | None = None
         self._visit_list: list[VisitListStateItem] = []
+
         self._linedrug: LineDrugListStateItem | None = None
-        self._linedrug_list: list[LineDrugListStateItem] = []
-        self._lineprocedure_list: list[sqlite3.Row] = []
+        self._old_linedrug_list: list[OldLineDrugListStateItem] = []
+        self._new_linedrug_list: list[NewLineDrugListStateItem] = []
+
+        self._lineprocedure: LineProcedureListStateItem | None = None
+        self._old_lineprocedure_list: list[OldLineProcedureListStateItem] = []
+        self._new_lineprocedure_list: list[NewLineProcedureListStateItem] = []
+
         self._queue: list[QueueStateItem] = []
         self._seentoday: list[SeenTodayStateItem] = []
-        self.allwarehouselist: list[Warehouse] = []
-        self.allsampleprescriptionlist: list[SamplePrescription] = []
-        self.allprocedurelist: list[Procedure] = []
+
+        self.all_warehouse: dict[int, Warehouse] = self.mv.connection.selectall(
+            Warehouse
+        )
+        self.all_sampleprescription: dict[
+            int, SamplePrescription
+        ] = self.mv.connection.selectall(SamplePrescription)
+        self.all_procedure: dict[int, Procedure] = self.mv.connection.selectall(
+            Procedure
+        )
 
     def refresh(self) -> None:
         self.patient = None
         self.visit = None
         self.warehouse = None
         self.visit_list = []
-        self.linedrug_list = []
-        self.lineprocedure_list = []
+
+        self.linedrug = None
+        self.old_linedrug_list = []
+        self.new_linedrug_list = []
+
+        self.lineprocedure = None
+        self.old_lineprocedure_list = []
+        self.new_lineprocedure_list = []
+
         self.queue = QueueState.fetch(self.mv.connection)
         self.seentoday = SeenTodayState.fetch(self.mv.connection)
-        self.allwarehouselist = self.mv.connection.selectall(Warehouse)
-        self.allsampleprescriptionlist = self.mv.connection.selectall(
-            SamplePrescription
-        )
-        self.allprocedurelist = self.mv.connection.selectall(Procedure)
+
+        self.all_warehouse = self.mv.connection.selectall(Warehouse)
+        self.all_sampleprescription = self.mv.connection.selectall(SamplePrescription)
+        self.all_procedure = self.mv.connection.selectall(Procedure)
         self.mv.order_book.SetSelection(0)
-
-    @property
-    def lineprocedure_list(self) -> list[sqlite3.Row]:
-        return self._lineprocedure_list
-
-    @lineprocedure_list.setter
-    def lineprocedure_list(self, llp: list[sqlite3.Row]):
-        self._lineprocedure_list = llp
-        self.mv.order_book.procedurepage.procedure_list.rebuild(llp)
-
-
-    def get_lineprocedures_by_visit_id(self, vid: int) -> list[sqlite3.Row]:
-        query = f"""
-            SELECT 
-                lp.id, pr.id AS pr_id, pr.name, pr.price
-            FROM (SELECT * FROM {LineProcedure.__tablename__}
-                  WHERE visit_id = {vid}
-            ) AS lp
-            JOIN {Procedure.__tablename__} AS pr
-            ON pr.id = lp.procedure_id
-        """
-        return self.mv.connection.execute(query).fetchall()

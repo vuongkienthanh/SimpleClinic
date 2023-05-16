@@ -37,7 +37,7 @@ class ProcedureDialog(wx.Dialog):
             ]
         )
         self.SetSizerAndFit(sizer)
-        for pr in self.mv.state.allprocedurelist:
+        for pr in self.mv.state.all_procedure:
             self.procedurelist.append(pr)
 
 
@@ -104,7 +104,7 @@ class DeleteBtn(wx.Button):
         try:
             idx: int = self.parent.procedurelist.GetFirstSelected()
             assert idx >= 0
-            pr = self.mv.state.allprocedurelist.pop(idx)
+            pr = self.mv.state.all_procedure.pop(idx)
             self.parent.procedurelist.pop(idx)
             self.mv.order_book.procedurepage.procedure_picker.Delete(idx)
             if self.mv.order_book.procedurepage.procedure_list.ItemCount > 0:
@@ -178,7 +178,7 @@ class AddDialog(BaseDialog):
             assert lastrowid is not None
             new_pr = Procedure(lastrowid, name, price)
             self.parent.procedurelist.append(new_pr)
-            self.mv.state.allprocedurelist.append(new_pr)
+            self.mv.state.all_procedure.append(new_pr)
             self.mv.order_book.procedurepage.procedure_picker.Append(name)
             e.Skip()
         except Exception as error:
@@ -190,7 +190,7 @@ class UpdateDialog(BaseDialog):
         super().__init__(parent, title="Thêm thủ thuật mới")
         self.idx: int = self.parent.procedurelist.GetFirstSelected()
         assert self.idx >= 0
-        self.pr = self.mv.state.allprocedurelist[self.idx]
+        self.pr = self.mv.state.all_procedure[self.idx]
         self.name.ChangeValue(self.pr.name)
         self.price.ChangeValue(str(self.pr.price))
 

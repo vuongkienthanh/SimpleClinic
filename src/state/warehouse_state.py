@@ -27,13 +27,3 @@ class WarehouseState:
         pg.usage.SetLabel("{Cách dùng}")
         pg.usage_unit.SetLabel("{Đơn vị}")
         pg.sale_unit.SetLabel("{Đơn vị}")
-        pg.times.Clear()
-        pg.dose.Clear()
-        pg.quantity.Clear()
-        pg.note.Clear()
-
-    @staticmethod
-    def get_from_state(drug_id: int, state : "main_state.State") -> Warehouse | None:
-        for wh in state.allwarehouselist:
-            if drug_id == wh.id:
-                return wh

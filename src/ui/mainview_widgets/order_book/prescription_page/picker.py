@@ -7,7 +7,7 @@ from ui import mainview
 class DrugPopup(wx.ComboPopup):
     def __init__(self):
         super().__init__()
-        self._list = []
+        self._list : list[Warehouse] = []
 
     def Create(self, parent):
         self.mv: "mainview.MainView" = self.ComboCtrl.mv
@@ -45,19 +45,19 @@ class DrugPopup(wx.ComboPopup):
         return super().GetAdjustedSize(self.mv.config.header_width(0.4), -1, -1)
 
     def fetch_list(self, s: str):
-        s = s.casefold()
+        s = s.strip().casefold()
         self._list = list(
             filter(
                 lambda item: (s in item.name.casefold())
                 or (s in item.element.casefold()),
-                self.mv.state.allwarehouselist,
+                self.mv.state.all_warehouse.values(),
             )
         )
 
     def build(self):
         for index, item in enumerate(self._list):
             self.append_ui(item)
-            self.check_min_quantity(item, index)
+            self.check_min_quantity_and_color(item, index)
 
     def append_ui(self, item: Warehouse):
         if item.expire_date is None:
@@ -76,7 +76,7 @@ class DrugPopup(wx.ComboPopup):
             ]
         )
 
-    def check_min_quantity(self, item, index):
+    def check_min_quantity_and_color(self, item, index):
         if item.quantity <= self.mv.config.minimum_drug_quantity_alert:
             self.lc.SetItemTextColour(index, wx.Colour(252, 3, 57))
 
@@ -84,16 +84,16 @@ class DrugPopup(wx.ComboPopup):
         self.lc.DeleteAllItems()
         cc: DrugPicker = self.ComboCtrl
         s: str = cc.Value
-        self.fetch_list(s.strip())
+        self.fetch_list(s)
         self.build()
 
     def OnMotion(self, e):
-        index, flags = self.lc.HitTest(e.GetPosition())
+        index, _ = self.lc.HitTest(e.GetPosition())
         if index >= 0:
             self.lc.Select(index)
             self.curitem = index
 
-    def OnLeftDown(self, e):
+    def OnLeftDown(self, _):
         self.Dismiss()
         cc: DrugPicker = self.ComboCtrl
         self.mv.state.warehouse = self._list[self.curitem]
@@ -131,6 +131,7 @@ class DrugPopup(wx.ComboPopup):
     def KeyESC(self):
         self.Dismiss()
         self.mv.state.warehouse = None
+        self.mv.state.linedrug = None
 
 
 class DrugPicker(wx.ComboCtrl):
@@ -151,6 +152,7 @@ class DrugPicker(wx.ComboCtrl):
 
     def onText(self, e: wx.CommandEvent):
         if self.GetValue() == "":
-            self.parent.parent.mv.state.warehouse = None
+            self.mv.state.warehouse = None
+            self.mv.state.linedrug = None
         else:
             e.Skip()

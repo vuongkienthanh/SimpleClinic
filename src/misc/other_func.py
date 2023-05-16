@@ -33,13 +33,40 @@ def check_none_to_blank(val: str | None) -> str:
             return v.strip()
 
 
-def note_str(usage: str, times: int, dose: str, usage_unit: str) -> str:
-    return f"{usage} ngày {times} lần, lần {dose} {usage_unit}"
+def note_str(usage: str, times: int | str, dose: str, usage_unit: str,note:str | None) -> str:
+    match note:
+        case None: return f"{usage} ngày {times} lần, lần {dose} {usage_unit}"
+        case n: return n
+
+
+def sale_unit_str(sale_unit: str | None, usage_unit: str) -> str:
+    match sale_unit:
+        case None:
+            return usage_unit
+        case str(v):
+            return v
+
+
+def times_dose_quantity_note_str(
+    usage: str,
+    times: int | str,
+    dose: str,
+    quantity: int,
+    usage_unit: str,
+    sale_unit: str | None,
+    note:str | None
+) -> tuple[str, str, str, str]:
+    return (
+        str(times),
+        f"{dose} {usage_unit}",
+        f"{quantity} {sale_unit_str(sale_unit, usage_unit)}",
+        note_str(usage, times, dose, usage_unit,note),
+    )
 
 
 def calc_quantity(
     times: int, dose: str, days: int, sale_unit: str | None, config: Config
-) -> int | None:
+) -> int:
     def calc(times: int, dose: str, days: int) -> int:
         if "/" in dose:
             numer, denom = [int(i) for i in dose.split("/")]
@@ -47,18 +74,15 @@ def calc_quantity(
         else:
             return ceil(times * float(dose) * days)
 
-    try:
-        if sale_unit is not None:
-            if sale_unit.casefold() in (
-                item.casefold() for item in config.single_sale_units
-            ):
-                return 1
-            else:
-                return calc(times, dose, days)
+    if sale_unit is not None:
+        if sale_unit.casefold() in (
+            item.casefold() for item in config.single_sale_units
+        ):
+            return 1
         else:
             return calc(times, dose, days)
-    except Exception as _:
-        return None
+    else:
+        return calc(times, dose, days)
 
 
 def num_to_str_price(price: int) -> str:

@@ -1,4 +1,4 @@
-from misc import bd_to_vn_age, note_str
+from misc import bd_to_vn_age
 from ui import mainview
 import textwrap as tw
 import datetime as dt
@@ -50,7 +50,7 @@ class PrintOut(wx.Printout):
 
     def OnPrintPage(self, page):
         num_of_ld = self.mv.config.number_of_drugs_in_one_page
-        d_list = self.mv.order_book.prescriptionpage.drug_list.d_list
+        drug_list = self.mv.order_book.prescriptionpage.drug_list
         state = self.mv.state
         p = state.patient
         assert p is not None
@@ -187,28 +187,38 @@ class PrintOut(wx.Printout):
 
             i = 0
             if first:
-                _list = d_list[:num_of_ld]
+                _list = [
+                    {
+                        "name": drug_list.GetItemText(i, 1),
+                        "quantity": drug_list.GetItemText(i, 4),
+                        "note": drug_list.GetItemText(i, 4),
+                    }
+                    for i in range(num_of_ld)
+                ]
                 added = 0
             else:
-                _list = d_list[num_of_ld:]
+                _list = [
+                    {
+                        "name": drug_list.GetItemText(i, 1),
+                        "quantity": drug_list.GetItemText(i, 4),
+                        "note": drug_list.GetItemText(i, 4),
+                    }
+                    for i in range(num_of_ld, len(drug_list.ItemCount))
+                ]
                 added = num_of_ld
             for dl in _list:
                 with wx.DCFontChanger(dc, list_num):
                     dc.DrawText(f"{i+1+added}/", atx(0.06), row(i))
                 with wx.DCFontChanger(dc, drug_name):
-                    dc.DrawText(f"{dl.name}", atx(0.12), row(i))
-                    t = f"{dl.quantity} {dl.sale_unit or dl.usage_unit}"
-                    dc.DrawText(t, atx(0.7), row(i))
+                    dc.DrawText(dl["name"], atx(0.12), row(i))
+                    dc.DrawText(dl["quantity"], atx(0.7), row(i))
                 with wx.DCFontChanger(dc, info_italic):
-                    t = dl.note or note_str(
-                        dl.usage, dl.times, dl.dose, dl.usage_unit
-                    )
-                    dc.DrawText(t, atx(0.12), row(i) + round(row_y / 2))
+                    dc.DrawText(dl["note"], atx(0.12), row(i) + round(row_y / 2))
                 i += 1
 
         if page == 1:
             draw_top()
-            if len(d_list) != 0:
+            if drug_list.ItemCount != 0:
                 draw_content(first=True)
             draw_bottom()
             if self.HasPage(2):

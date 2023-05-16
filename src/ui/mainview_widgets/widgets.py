@@ -50,14 +50,19 @@ class PriceCtrl(wx.TextCtrl):
 
     def FetchPrice(self):
         """Display new price"""
+        state = self.mv.state
         price: int = self.mv.config.checkup_price
         price += sum(
-            item.sale_price * item.quantity
-            for item in self.mv.order_book.prescriptionpage.drug_list.d_list
+            state.all_warehouse[item.warehouse_id].sale_price * item.quantity
+            for item in state.old_linedrug_list
         )
         price += sum(
-            pr.price for pr in self.mv.order_book.procedurepage.procedure_list.pr_list
+            state.all_warehouse[item.warehouse_id].sale_price * item.quantity
+            for item in state.new_linedrug_list
         )
+        # price += sum(
+        #     pr.price for pr in self.mv.order_book.procedurepage.procedure_list.pr_list
+        # )
         self.ChangeValue(num_to_str_price(price))
 
     def Clear(self):
@@ -67,7 +72,6 @@ class PriceCtrl(wx.TextCtrl):
 class Follow(wx.ComboBox):
     """A Combobox which is able to:
     - use only the `key` in `follow_choices`
-    - when print use full_value
     """
 
     def __init__(self, mv: "mv.MainView", **kwargs):

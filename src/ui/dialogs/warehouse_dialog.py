@@ -119,12 +119,12 @@ class WarehouseDialog(wx.Dialog):
     def filtered_build(self, s: str = ""):
         self.clear()
         if s == "":
-            for wh in self.mv.state.allwarehouselist:
+            for wh in self.mv.state.all_warehouse:
                 self.append(wh)
         else:
             for wh in filter(
                 lambda wh: self.check_search_str_in_wh(wh, s),
-                self.mv.state.allwarehouselist,
+                self.mv.state.all_warehouse,
             ):
                 self.append(wh)
 
@@ -164,7 +164,7 @@ class WarehouseDialog(wx.Dialog):
         try:
             rowcount = self.mv.connection.delete(Warehouse, wh.id)
             assert rowcount == 1
-            self.mv.state.allwarehouselist = self.mv.connection.selectall(Warehouse)
+            self.mv.state.all_warehouse = self.mv.connection.selectall(Warehouse)
             self.delete(idx)
             drug_list = self.mv.order_book.prescriptionpage.drug_list
             if drug_list.ItemCount > 0:
@@ -314,7 +314,7 @@ class NewDialog(BaseDialog):
                 assert lastrowid is not None
                 wx.MessageBox("Thêm mới thành công", "Thêm mới")
                 new_wh = Warehouse(id=lastrowid, **wh)
-                self.mv.state.allwarehouselist.append(new_wh)
+                self.mv.state.all_warehouse.append(new_wh)
                 if self.parent.check_search_str_in_wh(new_wh, self.parent.search.Value):
                     self.parent.append(new_wh)
                 e.Skip()

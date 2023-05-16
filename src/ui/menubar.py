@@ -3,7 +3,6 @@ from misc import (
     MY_DATABASE_PATH,
     DEFAULT_CONFIG_PATH,
     CONFIG_PATH,
-    check_none_to_blank,
 )
 from db import *
 from ui import mainview
@@ -247,24 +246,22 @@ class MyMenuBar(wx.MenuBar):
     def onCopyVisitInfo(self, _):
         cb: wx.Clipboard = wx.TheClipboard  # type:ignore
         mv: "mainview.MainView" = self.GetFrame()
+        drug_list = mv.order_book.prescriptionpage.drug_list
+
         if cb.Open():
             name = f"Tên: {mv.name.GetValue()}"
             gender = f"Giới tính: {mv.gender.GetValue()}"
             bd = f"Ngày sinh: {mv.birthdate.GetValue()}"
             diagnosis = f"Chẩn đoán: {mv.diagnosis.GetValue()}"
-            drug = f"Thuốc {mv.days.GetValue()} ngày:"
+            days = f"Thuốc {mv.days.GetValue()} ngày:"
             dl = "\n".join(
-                "{}/ {} {} ngày {} lần, lần {} {} = {} {}".format(
+                "{}/ {} {} {}".format(
                     i + 1,
-                    d.name,
-                    d.usage,
-                    d.times,
-                    d.dose,
-                    d.usage_unit,
-                    d.quantity,
-                    d.sale_unit or d.usage_unit,
+                    drug_list.GetItemText(i,1),
+                    drug_list.GetItemText(i,4),
+                    drug_list.GetItemText(i,5),
                 )
-                for i, d in enumerate(mv.order_book.prescriptionpage.drug_list.d_list)
+                for i in range(drug_list.ItemCount)
             )
             prl = "\n".join(
                 "{}/ {} x {}".format(i + 1, p[1], p[2])
@@ -274,9 +271,9 @@ class MyMenuBar(wx.MenuBar):
             )
             if prl != "":
                 prl = "\n".join(["Thủ thuật", prl])
-            recheck = f"Tái khám sau {mv.recheck.GetValue()} ngày"
-            follow = f"Dặn dò: {check_none_to_blank(mv.follow.Value)}"
-            price = f"Tiền khám: {mv.price.GetValue()}"
+            recheck = f"Tái khám sau {mv.recheck.Value} ngày"
+            follow = f"Dặn dò: {mv.follow.Value}"
+            price = f"Tiền khám: {mv.price.Value}"
             t = "\n".join(
                 (
                     dt.datetime.now().strftime("%d/%m/%Y, %H:%M"),
@@ -284,7 +281,7 @@ class MyMenuBar(wx.MenuBar):
                     gender,
                     bd,
                     diagnosis,
-                    drug,
+                    days,
                     dl,
                     prl,
                     recheck,

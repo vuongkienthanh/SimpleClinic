@@ -1,32 +1,16 @@
 from ui import mainview as mv
-from state.linedrugs_list_state import LineDrugListStateItem
+from state.linedrug_state import OldLineDrugListStateItem, LineDrugListStateItem
 from ui.mainview_widgets.order_book import order_book
-from misc import calc_quantity, k_tab, k_special, k_number
+from misc import (
+    calc_quantity,
+    k_tab,
+    k_special,
+    k_number,
+    times_dose_quantity_note_str,
+    note_str,
+)
 from ui.generic_widgets import NumberTextCtrl, DoseTextCtrl
 import wx
-
-
-# class DrugListItem:
-#
-#
-#     @classmethod
-#     def from_mv(cls, mv: "mv.MainView") -> "DrugListItem":
-#         wh = mv.state.warehouse
-#         page = mv.order_book.prescriptionpage
-#         assert wh is not None
-#         return cls(
-#             drug_id=wh.id,
-#             name=wh.name,
-#             times=int(page.times.Value.strip()),
-#             dose=page.dose.Value.strip(),
-#             quantity=int(page.quantity.Value.strip()),
-#             usage=wh.usage,
-#             usage_unit=wh.usage_unit,
-#             sale_unit=wh.sale_unit,
-#             sale_price=wh.sale_price,
-#             note=page.note.GetNote(),
-#         )
-#
 
 
 class DrugListCtrl(wx.ListCtrl):
@@ -43,85 +27,76 @@ class DrugListCtrl(wx.ListCtrl):
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onSelect)
         self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onDeselect)
 
-    def build(self, _list: list[LineDrugListStateItem]):
+    def build(self, _list: list[OldLineDrugListStateItem]):
         for item in _list:
             self.append_ui(item)
 
-    def rebuild(self, _list: list[LineDrugListStateItem]):
+    def rebuild(self, _list: list[OldLineDrugListStateItem]):
         self.DeleteAllItems()
         self.build(_list)
 
     def append_ui(self, item: LineDrugListStateItem):
-        parsed = item.parse()
+        wh = self.mv.state.all_warehouse[item.warehouse_id]
+        times, dose, quantity, note = times_dose_quantity_note_str(
+            wh.usage,
+            item.times,
+            item.dose,
+            item.quantity,
+            wh.usage_unit,
+            wh.sale_unit,
+            item.note,
+        )
+
         self.Append(
             [
                 self.ItemCount + 1,
-                parsed.name,
-                str(item.times),
-                parsed.dose + " " + parsed.usage_unit,
-                str(parsed.quantity) + " " + parsed.sale_unit,
-                parsed.note,
+                wh.name,
+                times,
+                dose,
+                quantity,
+                note,
             ]
         )
 
     def update_ui(self, idx: int, item: LineDrugListStateItem):
-        parsed = item.parse()
-        assert parsed.sale_unit is not None
-        assert parsed.note is not None
-        self.SetItem(idx, 2, str(parsed.times))
-        self.SetItem(idx, 3, parsed.dose + " " + parsed.usage_unit)
-        self.SetItem(idx, 4, str(parsed.quantity) + " " + parsed.sale_unit)
-        self.SetItem(idx, 5, parsed.note)
+        wh = self.mv.state.all_warehouse[item.warehouse_id]
+        times, dose, quantity, note = times_dose_quantity_note_str(
+            wh.usage,
+            item.times,
+            item.dose,
+            item.quantity,
+            wh.usage_unit,
+            wh.sale_unit,
+            item.note,
+        )
+        self.SetItem(idx, 2, times)
+        self.SetItem(idx, 3, dose)
+        self.SetItem(idx, 4, quantity)
+        self.SetItem(idx, 5, note)
 
-    def remove_ui(self, idx: int):
+    def pop_ui(self, idx: int):
         assert idx >= 0
-        # self.d_list.pop(idx)
         self.DeleteItem(idx)
         for i in range(idx, self.ItemCount):
             self.SetItem(i, 0, str(i + 1))
 
-    def upsert_ui(self):
-        wh = self.mv.state.warehouse
-        assert wh is not None
-        item = DrugListItem.from_mv(self.mv)
-        try:
-            # update
-            index: int = [d.drug_id for d in self.d_list].index(wh.id)
-            self.update_ui(index, item)
-        except ValueError:
-            # insert
-            self.append_ui(item)
-    # def update(self, idx: int, item: DrugListItem):
-    #     def update_list(idx: int, item: DrugListItem):
-    #         self.d_list[idx].name = item.name
-    #         self.d_list[idx].times = item.times
-    #         self.d_list[idx].dose = item.dose
-    #         self.d_list[idx].quantity = item.quantity
-    #         self.d_list[idx].usage = item.usage
-    #         self.d_list[idx].usage_unit = item.usage_unit
-    #         self.d_list[idx].sale_price = item.sale_price
-    #         self.d_list[idx].sale_unit = item.sale_unit
-    #         self.d_list[idx].note = item.note
-    #
-    #     assert idx >= 0
-    #     update_list(idx, item)
-    #     update_ui(idx, item)
-
-
     def onSelect(self, e: wx.ListEvent):
         idx: int = e.Index
-        item = self.d_list[idx]
+        old = self.mv.state.old_linedrug_list
+        new = self.mv.state.new_linedrug_list
+        if idx < len(old):
+            target = old
+        else:
+            idx -= len(old)
+            target = new
+        item = target[idx]
         state = self.mv.state
-        state.warehouse = state.get_wh_by_id(item.drug_id)
-        assert state.warehouse is not None
-        self.parent.times.ChangeValue(str(item.times))
-        self.parent.dose.ChangeValue(item.dose)
-        self.parent.quantity.ChangeValue(str(item.quantity))
-        self.parent.note.SetNote(item.note)
+        state.warehouse = state.all_warehouse[item.warehouse_id]
+        state.linedrug = item
 
     def onDeselect(self, e: wx.ListEvent):
         self.mv.state.warehouse = None
-
+        self.mv.state.linedrug = None
 
 
 class Times(NumberTextCtrl):
@@ -172,7 +147,7 @@ class Quantity(NumberTextCtrl):
         if res is not None:
             self.SetValue(str(res))
         else:
-            self.SetValue("")
+            self.Clear()
 
     def onChar(self, e: wx.KeyEvent):
         kc = e.KeyCode
@@ -204,37 +179,11 @@ class Note(wx.TextCtrl):
         wh = self.parent.parent.mv.state.warehouse
         assert wh is not None
         self.ChangeValue(
-            get_usage_note_str(
-                usage=wh.usage,
-                times=self.parent.times.GetValue(),
-                dose=self.parent.dose.GetValue(),
-                usage_unit=wh.usage_unit,
+            note_str(
+                wh.usage,
+                self.parent.times.GetValue(),
+                self.parent.dose.GetValue(),
+                wh.usage_unit,
+                None,
             )
         )
-
-    def SetNote(self, s: str | None):
-        if s is None:
-            wh = self.parent.parent.mv.state.warehouse
-            assert wh is not None
-            s = get_usage_note_str(
-                usage=wh.usage,
-                times=self.parent.times.Value,
-                dose=self.parent.dose.Value,
-                usage_unit=wh.usage_unit,
-            )
-        self.ChangeValue(s)
-
-    def GetNote(self) -> str | None:
-        _s: str = self.GetValue()
-        s = _s.strip()
-        wh = self.parent.parent.mv.state.warehouse
-        assert wh is not None
-        if s == "" or s == get_usage_note_str(
-            usage=wh.usage,
-            times=self.parent.times.Value,
-            dose=self.parent.dose.Value,
-            usage_unit=wh.usage_unit,
-        ):
-            return None
-        else:
-            return s

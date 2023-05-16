@@ -1,6 +1,6 @@
 from db import Patient
 from . import main_state
-from core import menubar
+from ui import menubar
 from .visit_list_state import VisitListState
 from misc import bd_to_vn_age, check_none_to_blank
 import wx
@@ -32,7 +32,7 @@ class PatientState:
         mv.days.Enable()
         mv.recheck.Enable()
         mv.norecheck.Enable()
-        mv.order_book.prescriptionpage.use_sample_prescription_btn.Enable()
+        # mv.order_book.prescriptionpage.use_sample_prescription_btn.Enable()
         obj.visit = None
         obj.visit_list = VisitListState.fetch(p, mv.connection, mv.config)
         if len(obj.visit_list) > 0:
@@ -68,7 +68,7 @@ class PatientState:
         mv.days.Disable()
         mv.recheck.Disable()
         mv.norecheck.Disable()
-        mv.order_book.prescriptionpage.use_sample_prescription_btn.Disable()
+        # mv.order_book.prescriptionpage.use_sample_prescription_btn.Disable()
         obj.visit = None
         obj.visit_list = []
 

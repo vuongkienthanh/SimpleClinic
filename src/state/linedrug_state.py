@@ -27,9 +27,7 @@ LineDrugListStateItem = OldLineDrugListStateItem | NewLineDrugListStateItem
 
 
 class LineDrugState:
-    def __get__(
-        self, obj: "main_state.State", objtype=None
-    ) -> LineDrugListStateItem | None:
+    def __get__(self, obj: "main_state.State", _) -> LineDrugListStateItem | None:
         return obj._linedrug
 
     def __set__(
@@ -75,16 +73,12 @@ class LineDrugState:
 
 
 class NewLineDrugListState:
-    def __get__(
-        self, obj: "main_state.State", objtype=None
-    ) -> list[NewLineDrugListStateItem]:
+    def __get__(self, obj: "main_state.State", _) -> list[NewLineDrugListStateItem]:
         return obj._new_linedrug_list
 
 
 class OldLineDrugListState:
-    def __get__(
-        self, obj: "main_state.State", objtype=None
-    ) -> list[OldLineDrugListStateItem]:
+    def __get__(self, obj: "main_state.State", _) -> list[OldLineDrugListStateItem]:
         return obj._old_linedrug_list
 
     def __set__(self, obj: "main_state.State", _list: list[OldLineDrugListStateItem]):

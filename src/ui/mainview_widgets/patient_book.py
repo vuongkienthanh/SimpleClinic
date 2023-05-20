@@ -72,7 +72,7 @@ class QueuePatientListCtrl(BasePatientListCtrl):
     def append_ui(self, item: QueueStateItem):
         self.Append(
             [
-                item.pid,
+                item.patient_id,
                 item.name,
                 str(item.gender),
                 item.birthdate.strftime("%d/%m/%Y"),
@@ -83,7 +83,7 @@ class QueuePatientListCtrl(BasePatientListCtrl):
     def onSelect(self, e: wx.ListEvent):
         idx: int = e.Index
         item = self.mv.state.queue[idx]
-        pid = item.pid
+        pid = item.patient_id
         p = self.mv.connection.select(Patient, pid)
         assert p is not None
         self.mv.state.patient = p
@@ -104,7 +104,7 @@ class SeenTodayListCtrl(BasePatientListCtrl):
     def append_ui(self, item: SeenTodayStateItem):
         self.Append(
             [
-                item.pid,
+                item.patient_id,
                 item.name,
                 str(item.gender),
                 item.birthdate.strftime("%d/%m/%Y"),
@@ -115,8 +115,8 @@ class SeenTodayListCtrl(BasePatientListCtrl):
     def onSelect(self, e: wx.ListEvent):
         idx: int = e.Index
         target = self.mv.state.seentoday[idx]
-        pid: int = target.pid
-        vid: int = target.vid
+        pid: int = target.patient_id
+        vid: int = target.visit_id
 
         p = self.mv.connection.select(Patient, pid)
         v = self.mv.connection.select(Visit, vid)

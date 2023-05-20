@@ -7,16 +7,16 @@ import datetime as dt
 
 @dataclass(slots=True, match_args=False)
 class SeenTodayStateItem:
-    pid: int
+    patient_id: int
     name: str
     gender: Gender
     birthdate: dt.date
-    vid: int
+    visit_id: int
     exam_datetime: dt.datetime
 
 
 class SeenTodayState:
-    def __get__(self, obj: "main_state.State", objtype=None) -> list[SeenTodayStateItem]:
+    def __get__(self, obj: "main_state.State", _) -> list[SeenTodayStateItem]:
         return obj._seentoday
 
     def __set__(self, obj: "main_state.State", _list: list[SeenTodayStateItem]):
@@ -27,11 +27,11 @@ class SeenTodayState:
     def fetch(connection: Connection):
         query = f"""
             SELECT
-                p.id AS pid,
+                p.id AS patient_id,
                 p.name,
                 p.gender,
                 p.birthdate,
-                v.id as vid,
+                v.id as visit_id,
                 v.exam_datetime
             FROM {SeenToday.__tablename__} AS st
             JOIN {Patient.__tablename__} AS p

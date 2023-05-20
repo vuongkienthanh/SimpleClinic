@@ -8,9 +8,7 @@ import wx
 
 class WarehouseDialog(wx.Dialog):
     def __init__(self, mv: "mainview.MainView"):
-        """
-        `_list`: internal list to keep track of filtered Warehouse in dialog
-        """
+        "`_list`: internal list"
         super().__init__(
             mv,
             title="Kho thuốc",
@@ -83,10 +81,6 @@ class WarehouseDialog(wx.Dialog):
     def append(self, wh: Warehouse):
         "append to internal list and ui, also conditional recolor"
         self._list.append(wh)
-        self.append_ui(wh)
-        self.check_min_quantity_and_change_color(wh, len(self._list) - 1)
-
-    def append_ui(self, wh: Warehouse):
         self.lc.Append(
             [
                 str(wh.id),
@@ -105,6 +99,7 @@ class WarehouseDialog(wx.Dialog):
                 check_none_to_blank(wh.note),
             ]
         )
+        self.check_min_quantity_and_change_color(wh, len(self._list) - 1)
 
     def delete(self, idx: int):
         "delete from internal list and ui"
@@ -119,12 +114,12 @@ class WarehouseDialog(wx.Dialog):
     def filtered_build(self, s: str = ""):
         self.clear()
         if s == "":
-            for wh in self.mv.state.all_warehouse:
+            for wh in self.mv.state.all_warehouse.values():
                 self.append(wh)
         else:
             for wh in filter(
                 lambda wh: self.check_search_str_in_wh(wh, s),
-                self.mv.state.all_warehouse,
+                self.mv.state.all_warehouse.values(),
             ):
                 self.append(wh)
 
@@ -140,23 +135,23 @@ class WarehouseDialog(wx.Dialog):
         self.filtered_build(self.search.Value)
         e.Skip()
 
-    def onSelect(self, e: wx.ListEvent):
+    def onSelect(self, _):
         self.editbtn.Enable()
         self.delbtn.Enable()
 
-    def onDeselect(self, e: wx.ListEvent):
+    def onDeselect(self, _):
         self.editbtn.Disable()
         self.delbtn.Disable()
 
-    def onNew(self, e: wx.CommandEvent):
+    def onNew(self, _):
         NewDialog(self).ShowModal()
 
-    def onEdit(self, e: wx.CommandEvent | wx.ListEvent):
+    def onEdit(self, _):
         idx = self.lc.GetFirstSelected()
         wh = self._list[idx]
         EditDialog(self, wh).ShowModal()
 
-    def onDelete(self, e: wx.CommandEvent):
+    def onDelete(self, _):
         """Delete Warehouse in sql, refresh state, delete in self.lc, delete in prescriptionpage.druglist
         Note: there are restrict constrain on Warehouse"""
         idx: int = self.lc.GetFirstSelected()
@@ -164,14 +159,23 @@ class WarehouseDialog(wx.Dialog):
         try:
             rowcount = self.mv.connection.delete(Warehouse, wh.id)
             assert rowcount == 1
-            self.mv.state.all_warehouse = self.mv.connection.selectall(Warehouse)
+            del self.mv.state.all_warehouse[wh.id]
             self.delete(idx)
+            for state_list in (
+                self.mv.state.old_linedrug_list,
+                self.mv.state.new_linedrug_list,
+                self.mv.state.to_delete_old_linedrug_list,
+            ):
+                for idx, item in enumerate(state_list):
+                    if item.warehouse_id == wh.id:
+                        state_list.pop(idx)
+                        break
+
             drug_list = self.mv.order_book.prescriptionpage.drug_list
-            if drug_list.ItemCount > 0:
-                for i, d in enumerate(drug_list.d_list):
-                    if d.drug_id == wh.id:
-                        drug_list.remove_ui(i)
-                self.mv.price.FetchPrice()
+            drug_list.rebuild(
+                self.mv.state.old_linedrug_list + self.mv.state.new_linedrug_list
+            )
+            self.mv.price.FetchPrice()
             wx.MessageBox(f"Xoá thuốc thành công\n{rowcount}", "Xóa")
         except Exception as error:
             wx.MessageBox(f"Lỗi không xóa được\n{error}", "Lỗi")

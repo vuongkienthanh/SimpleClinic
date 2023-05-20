@@ -7,7 +7,7 @@ from ui import mainview
 class DrugPopup(wx.ComboPopup):
     def __init__(self):
         super().__init__()
-        self._list : list[Warehouse] = []
+        self._list: list[Warehouse] = []
 
     def Create(self, parent):
         self.mv: "mainview.MainView" = self.ComboCtrl.mv

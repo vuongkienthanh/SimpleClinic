@@ -12,10 +12,11 @@ class PatientState:
 
     def __set__(self, obj: "main_state.State", value: Patient | None):
         obj._patient = value
-        if value:
-            self.onSet(obj, value)
-        else:
-            self.onUnset(obj)
+        match value:
+            case None:
+                self.onUnset(obj)
+            case val:
+                self.onSet(obj, val)
 
     def onSet(self, obj: "main_state.State", p: Patient) -> None:
         mv = obj.mv
@@ -32,7 +33,7 @@ class PatientState:
         mv.days.Enable()
         mv.recheck.Enable()
         mv.norecheck.Enable()
-        # mv.order_book.prescriptionpage.use_sample_prescription_btn.Enable()
+        mv.order_book.prescriptionpage.use_sample_prescription_btn.Enable()
         obj.visit = None
         obj.visit_list = VisitListState.fetch(p, mv.connection, mv.config)
         if len(obj.visit_list) > 0:
@@ -68,7 +69,7 @@ class PatientState:
         mv.days.Disable()
         mv.recheck.Disable()
         mv.norecheck.Disable()
-        # mv.order_book.prescriptionpage.use_sample_prescription_btn.Disable()
+        mv.order_book.prescriptionpage.use_sample_prescription_btn.Disable()
         obj.visit = None
         obj.visit_list = []
 

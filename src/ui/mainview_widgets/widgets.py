@@ -1,5 +1,5 @@
 from ui import mainview as mv
-from misc import vn_weekdays, num_to_str_price
+from misc import vn_weekdays, num_to_str_price, str_to_int_price
 import wx
 
 
@@ -49,24 +49,26 @@ class PriceCtrl(wx.TextCtrl):
         self.Clear()
 
     def FetchPrice(self):
-        """Display new price"""
         state = self.mv.state
         price: int = self.mv.config.checkup_price
         price += sum(
             state.all_warehouse[item.warehouse_id].sale_price * item.quantity
-            for item in state.old_linedrug_list
+            for item in state.old_linedrug_list + state.new_linedrug_list
         )
         price += sum(
-            state.all_warehouse[item.warehouse_id].sale_price * item.quantity
-            for item in state.new_linedrug_list
+            state.all_procedure[item.procedure_id].price
+            for item in state.old_lineprocedure_list + state.new_lineprocedure_list
         )
-        # price += sum(
-        #     pr.price for pr in self.mv.order_book.procedurepage.procedure_list.pr_list
-        # )
         self.ChangeValue(num_to_str_price(price))
 
     def Clear(self):
         self.ChangeValue(num_to_str_price(self.mv.config.checkup_price))
+
+    def SetPrice(self, price: int):
+        self.ChangeValue(num_to_str_price(price))
+
+    def GetPrice(self) -> int:
+        return str_to_int_price(self.Value)
 
 
 class Follow(wx.ComboBox):
@@ -85,7 +87,7 @@ class Follow(wx.ComboBox):
         self.SetDefault()
 
     def expand_when_print(self) -> str:
-        "expand `key` -> `key: value`"
+        "expand `key` -> `key: value` in config"
         k = self.GetValue().strip()
         if k in self.mv.config.follow_choices.keys():
             return f"{k}: {self.mv.config.follow_choices[k]}"

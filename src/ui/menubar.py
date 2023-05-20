@@ -47,6 +47,7 @@ class MyMenuBar(wx.MenuBar):
         self.menuUpdatePatient: wx.MenuItem = menuPatient.Append(
             wx.ID_EDIT, "Cập nhật thông tin bệnh nhân\tCTRL+U"
         )
+        menuPatient.Append(wx.ID_OPEN, "Tìm bệnh nhân cũ\tCTRL+O")
         editMenu.AppendSubMenu(menuPatient, "Bệnh nhân")
 
         menuVisit = wx.Menu()
@@ -60,33 +61,31 @@ class MyMenuBar(wx.MenuBar):
         self.menuDeleteVisit: wx.MenuItem = menuVisit.Append(
             wx.ID_ANY, "Xóa lượt khám cũ"
         )
-
         editMenu.AppendSubMenu(menuVisit, "Lượt khám")
 
-        menuQueueList = wx.Menu()
-        self.menuDeleteQueue: wx.MenuItem = menuQueueList.Append(
+        menuQueue = wx.Menu()
+        self.menuDeleteQueue: wx.MenuItem = menuQueue.Append(
             wx.ID_ANY, "Xóa lượt chờ khám"
         )
-        editMenu.AppendSubMenu(menuQueueList, "Danh sách chờ")
+        editMenu.AppendSubMenu(menuQueue, "Danh sách chờ")
 
-        editMenu.AppendSeparator()
-        editMenu.Append(wx.ID_OPEN, "Tìm bệnh nhân cũ\tCTRL+O")
-
-        editMenu.AppendSeparator()
-        self.menuPrint: wx.MenuItem = editMenu.Append(wx.ID_PRINT, "In\tCTRL+P")
-        self.menuPreview: wx.MenuItem = editMenu.Append(
+        menuPrinter = wx.Menu()
+        self.menuPrint: wx.MenuItem = menuPrinter.Append(wx.ID_PRINT, "In\tCTRL+P")
+        self.menuPreview: wx.MenuItem = menuPrinter.Append(
             wx.ID_PREVIEW, "Xem trước bản in\tCTRL+SHIFT+P"
         )
+        editMenu.AppendSubMenu(menuPrinter, "Máy in")
 
-        editMenu.AppendSeparator()
         self.menuCopyVisitInfo: wx.MenuItem = editMenu.Append(
             wx.ID_INFO, "Copy thông tin lượt khám vào Clipboard\tCTRL+SHIFT+C"
         )
 
         manageMenu = wx.Menu()
+
         menuWarehouse: wx.MenuItem = manageMenu.Append(wx.ID_ANY, "Kho thuốc")
         menuSample: wx.MenuItem = manageMenu.Append(wx.ID_ANY, "Toa mẫu")
         menuProcedure: wx.MenuItem = manageMenu.Append(wx.ID_ANY, "Thủ thuật")
+
         menuReport = wx.Menu()
         menuDayReport = menuReport.Append(wx.ID_ANY, "Số lượng bệnh theo ngày")
         menuMonthReport = menuReport.Append(wx.ID_ANY, "Số lượng bệnh theo tháng")
@@ -96,6 +95,7 @@ class MyMenuBar(wx.MenuBar):
         manageMenu.AppendSubMenu(menuReport, "Báo cáo")
 
         settingMenu = wx.Menu()
+
         menuSetupConfig: wx.MenuItem = settingMenu.Append(wx.ID_ANY, "Cài đặt hệ thống")
         menuOpenConfigFolder: wx.MenuItem = settingMenu.Append(
             wx.ID_ANY, "Mở folder cài đặt + dữ liệu"
@@ -194,13 +194,15 @@ class MyMenuBar(wx.MenuBar):
         ):
             mv: "mainview.MainView" = self.GetFrame()
             v = mv.state.visit
-            p = mv.state.patient
             assert v is not None
-            assert p is not None
             try:
                 mv.connection.delete(Visit, v.id)
                 wx.MessageBox("Xóa thành công", "OK")
-                mv.state.patient = p
+                visit_list_idx: int = mv.visit_list.GetFirstSelected()
+                assert visit_list_idx != -1, "visit_list not selected, cant delete"
+                mv.visit_list.DeleteItem(visit_list_idx)
+                mv.state.visit_list.pop(visit_list_idx)
+                mv.state.visit = None
             except sqlite3.Error as error:
                 wx.MessageBox("Lỗi không xóa được\n" + str(error), "Lỗi")
 
@@ -247,43 +249,46 @@ class MyMenuBar(wx.MenuBar):
         cb: wx.Clipboard = wx.TheClipboard  # type:ignore
         mv: "mainview.MainView" = self.GetFrame()
         drug_list = mv.order_book.prescriptionpage.drug_list
+        procedure_list = mv.order_book.procedurepage.procedure_list
 
         if cb.Open():
-            name = f"Tên: {mv.name.GetValue()}"
-            gender = f"Giới tính: {mv.gender.GetValue()}"
-            bd = f"Ngày sinh: {mv.birthdate.GetValue()}"
+            intro = "{date}\n{name}_{gender}_{bd}".format(
+                date=dt.datetime.now().strftime("%d/%m/%Y, %H:%M"),
+                name=f"Tên: {mv.name.GetValue()}",
+                gender=f"Giới tính: {mv.gender.GetValue()}",
+                bd=f"Ngày sinh: {mv.birthdate.GetValue()}",
+            )
             diagnosis = f"Chẩn đoán: {mv.diagnosis.GetValue()}"
-            days = f"Thuốc {mv.days.GetValue()} ngày:"
             dl = "\n".join(
                 "{}/ {} {} {}".format(
                     i + 1,
-                    drug_list.GetItemText(i,1),
-                    drug_list.GetItemText(i,4),
-                    drug_list.GetItemText(i,5),
+                    drug_list.GetItemText(i, 1),
+                    drug_list.GetItemText(i, 4),
+                    drug_list.GetItemText(i, 5),
                 )
                 for i in range(drug_list.ItemCount)
             )
-            prl = "\n".join(
-                "{}/ {} x {}".format(i + 1, p[1], p[2])
-                for i, p in enumerate(
-                    mv.order_book.procedurepage.procedure_list.summary()
+            pl = "\n".join(
+                "{}".format(
+                    procedure_list.GetItemText(i)
+                    for i in range(procedure_list.ItemCount)
                 )
             )
-            if prl != "":
-                prl = "\n".join(["Thủ thuật", prl])
+            if dl != "":
+                dl = "\n".join([f"Thuốc {mv.days.GetValue()} ngày:", dl])
+            else:
+                dl = "Không thuốc"
+            if pl != "":
+                pl = "\n".join(["Thủ thuật:", pl])
             recheck = f"Tái khám sau {mv.recheck.Value} ngày"
             follow = f"Dặn dò: {mv.follow.Value}"
             price = f"Tiền khám: {mv.price.Value}"
             t = "\n".join(
                 (
-                    dt.datetime.now().strftime("%d/%m/%Y, %H:%M"),
-                    name,
-                    gender,
-                    bd,
+                    intro,
                     diagnosis,
-                    days,
                     dl,
-                    prl,
+                    pl,
                     recheck,
                     follow,
                     price,

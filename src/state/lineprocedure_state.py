@@ -22,13 +22,11 @@ LineProcedureListStateItem = (
 
 
 class LineProcedureState:
-    def __get__(
-        self, obj: "main_state.State", objtype=None
-    ) -> LineProcedureListStateItem | None:
+    def __get__(self, obj: "main_state.State", _) -> LineProcedureListStateItem | None:
         return obj._lineprocedure
 
     def __set__(
-        self, obj: "main_state.State", value: LineProcedureListStateItem
+        self, obj: "main_state.State", value: LineProcedureListStateItem | None
     ) -> None:
         obj._lineprocedure = value
         match value:
@@ -50,14 +48,14 @@ class LineProcedureState:
 
 class NewLineProcedureListState:
     def __get__(
-        self, obj: "main_state.State", objtype=None
+        self, obj: "main_state.State", _
     ) -> list[NewLineProcedureListStateItem]:
         return obj._new_lineprocedure_list
 
 
 class OldLineProcedureListState:
     def __get__(
-        self, obj: "main_state.State", objtype=None
+        self, obj: "main_state.State", _
     ) -> list[OldLineProcedureListStateItem]:
         return obj._old_lineprocedure_list
 

@@ -3,18 +3,21 @@ from . import main_state
 from ui import menubar
 from misc import vn_weekdays, check_none_to_blank
 from .linedrug_state import OldLineDrugListState
+from .lineprocedure_state import OldLineProcedureListState
+import wx
 
 
 class VisitState:
-    def __get__(self, obj: "main_state.State", objtype=None) -> Visit | None:
+    def __get__(self, obj: "main_state.State", _) -> Visit | None:
         return obj._visit
 
     def __set__(self, obj: "main_state.State", value: Visit | None):
         obj._visit = value
-        if value:
-            self.onSet(obj, value)
-        else:
-            self.onUnset(obj)
+        match value:
+            case None:
+                self.onUnset(obj)
+            case val:
+                self.onSet(obj, val)
 
     def onSet(self, obj: "main_state.State", v: Visit) -> None:
         mv = obj.mv
@@ -26,16 +29,18 @@ class VisitState:
         mv.recheck.SetValue(v.recheck)
         mv.follow.SetValue(check_none_to_blank(v.follow))
         obj.old_linedrug_list = OldLineDrugListState.fetch(v, mv.connection)
-        obj.lineprocedure_list = obj.get_lineprocedures_by_visit_id(v.id)
+        obj.to_delete_old_linedrug_list.clear()
+        obj.old_lineprocedure_list = OldLineProcedureListState.fetch(v, mv.connection)
+        obj.to_delete_old_lineprocedure_list.clear()
         mv.savebtn.SetLabel("Cập nhật")
-        mv.price.FetchPrice()
+        mv.price.SetPrice(v.price)
         if mv.patient_book.GetSelection() == 0:
             mv.newvisitbtn.Enable()
-        # mv.order_book.prescriptionpage.reuse_druglist_btn.Enable()
+        mv.order_book.prescriptionpage.reuse_druglist_btn.Enable()
         menubar: "menubar.MyMenuBar" = mv.MenuBar
         menubar.menuNewVisit.Enable()
         if obj.patient:
-            # mv.order_book.prescriptionpage.use_sample_prescription_btn.Disable()
+            mv.order_book.prescriptionpage.use_sample_prescription_btn.Disable()
             menubar.menuInsertVisit.Enable(False)
         menubar.menuUpdateVisit.Enable()
         menubar.menuDeleteVisit.Enable()
@@ -60,15 +65,18 @@ class VisitState:
         mv.recheck.SetValue(mv.config.default_days_for_prescription)
         mv.follow.SetDefault()
         obj.old_linedrug_list = []
-        obj.lineprocedure_list = []
+        obj.to_delete_old_linedrug_list.clear()
+        obj.old_lineprocedure_list = []
+        obj.to_delete_old_lineprocedure_list.clear()
         mv.price.Clear()
         mv.newvisitbtn.Disable()
         mv.savebtn.SetLabel("Lưu")
-        # mv.order_book.prescriptionpage.reuse_druglist_btn.Disable()
+        mv.order_book.prescriptionpage.reuse_druglist_btn.Disable()
+        mv.order_book.procedurepage.procedure_picker.Select(wx.NOT_FOUND)
         menubar: "menubar.MyMenuBar" = mv.MenuBar
         menubar.menuNewVisit.Enable(False)
         if obj.patient:
-            # mv.order_book.prescriptionpage.use_sample_prescription_btn.Enable()
+            mv.order_book.prescriptionpage.use_sample_prescription_btn.Enable()
             menubar.menuInsertVisit.Enable()
         menubar.menuUpdateVisit.Enable(False)
         menubar.menuDeleteVisit.Enable(False)
@@ -76,3 +84,5 @@ class VisitState:
         menubar.menuPreview.Enable(False)
         menubar.menuCopyVisitInfo.Enable(False)
         obj.warehouse = None
+        obj.linedrug = None
+        obj.lineprocedure = None

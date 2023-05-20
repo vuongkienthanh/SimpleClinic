@@ -3,15 +3,16 @@ from . import main_state
 
 
 class WarehouseState:
-    def __get__(self, obj: "main_state.State", objtype=None) -> Warehouse | None:
+    def __get__(self, obj: "main_state.State", _) -> Warehouse | None:
         return obj._warehouse
 
     def __set__(self, obj: "main_state.State", value: Warehouse | None):
         obj._warehouse = value
-        if value:
-            self.onSet(obj, value)
-        else:
-            self.onUnset(obj)
+        match value:
+            case None:
+                self.onUnset(obj)
+            case val:
+                self.onSet(obj, val)
 
     def onSet(self, obj: "main_state.State", wh: Warehouse) -> None:
         pg = obj.mv.order_book.prescriptionpage

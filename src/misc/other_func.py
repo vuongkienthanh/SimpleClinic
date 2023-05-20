@@ -3,8 +3,10 @@ from fractions import Fraction
 from itertools import cycle
 from math import ceil
 from misc import Config
+from functools import cache
 
 
+@cache
 def bd_to_vn_age(bd: dt.date) -> str:
     today = dt.date.today()
     delta = (today - bd).days
@@ -33,10 +35,15 @@ def check_none_to_blank(val: str | None) -> str:
             return v.strip()
 
 
-def note_str(usage: str, times: int | str, dose: str, usage_unit: str,note:str | None) -> str:
+@cache
+def note_str(
+    usage: str, times: int | str, dose: str, usage_unit: str, note: str | None
+) -> str:
     match note:
-        case None: return f"{usage} ngày {times} lần, lần {dose} {usage_unit}"
-        case n: return n
+        case None:
+            return f"{usage} ngày {times} lần, lần {dose} {usage_unit}"
+        case n:
+            return n
 
 
 def sale_unit_str(sale_unit: str | None, usage_unit: str) -> str:
@@ -47,6 +54,7 @@ def sale_unit_str(sale_unit: str | None, usage_unit: str) -> str:
             return v
 
 
+@cache
 def times_dose_quantity_note_str(
     usage: str,
     times: int | str,
@@ -54,13 +62,13 @@ def times_dose_quantity_note_str(
     quantity: int,
     usage_unit: str,
     sale_unit: str | None,
-    note:str | None
+    note: str | None,
 ) -> tuple[str, str, str, str]:
     return (
         str(times),
         f"{dose} {usage_unit}",
         f"{quantity} {sale_unit_str(sale_unit, usage_unit)}",
-        note_str(usage, times, dose, usage_unit,note),
+        note_str(usage, times, dose, usage_unit, note),
     )
 
 
@@ -96,6 +104,10 @@ def num_to_str_price(price: int) -> str:
         if res[-1] == ".":
             res = res[:-1]
     return res[::-1]
+
+
+def str_to_int_price(price: str) -> int:
+    return int(price.replace(".", ""))
 
 
 def vn_weekdays(d: int):

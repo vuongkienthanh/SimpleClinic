@@ -1,9 +1,6 @@
 from ui.mainview_widgets.order_book import order_book
 from misc import plus_bm, minus_bm
-from state.lineprocedure_state import (
-    NewLineProcedureListStateItem,
-    OldLineProcedureListStateItem,
-)
+from state.lineprocedure_state import NewLineProcedureListStateItem
 
 import wx
 
@@ -24,7 +21,6 @@ class AddProcedureButton(wx.BitmapButton):
             self.parent.procedure_list.append_ui(item)
             self.mv.price.FetchPrice()
             self.parent.procedure_picker.SetSelection(wx.NOT_FOUND)
-            print(self.mv.state.new_lineprocedure_list)
 
 
 class DelProcedureButton(wx.BitmapButton):
@@ -44,8 +40,8 @@ class DelProcedureButton(wx.BitmapButton):
             else:
                 for old_pr in self.mv.state.old_lineprocedure_list:
                     if old_pr.procedure_id == pr_id:
+                        self.mv.state.to_delete_old_lineprocedure_list.append(old_pr)
                         self.mv.state.old_lineprocedure_list.remove(old_pr)
                         break
             self.parent.procedure_list.pop_ui(pr_list_idx)
             self.mv.price.FetchPrice()
-            print(self.mv.state.new_lineprocedure_list)

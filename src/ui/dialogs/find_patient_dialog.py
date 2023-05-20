@@ -1,9 +1,10 @@
+from db.classes import Gender
+import datetime as dt
 from ui import mainview
-from misc import check_blank_to_none
 from ui.dialogs.patient_dialog import EditPatientDialog
 from db import Patient, Queue, Visit
 from ui.dialogs.picker_dialog import DatePickerDialog
-from state.queue_state import QueueState
+from state.queue_state import QueueStateItem
 import wx
 import sqlite3
 
@@ -33,7 +34,7 @@ class SearchPatientList(wx.ListCtrl):
 
     def onSelect(self, e: wx.ListEvent):
         idx: int = e.Index
-        self.pid = int(self.GetItemText(idx, 0))
+        self.pid = self.cur_page[idx][0]
         e.Skip()
 
     def onDeselect(self, e: wx.ListEvent):
@@ -189,14 +190,13 @@ class FindPatientDialog(wx.Dialog):
     def onSearch(self, e: wx.CommandEvent):
         "Enter (EVT_SEARCH) to activate"
         s: str = e.GetString()
-        s = s.upper()
         self.cur = self.mv.connection.execute(
             f"""
             SELECT id AS pid, name, gender, birthdate
             FROM {Patient.__tablename__}
             WHERE name LIKE ?
         """,
-            ("%" + s + "%",),
+            ("%" + s.upper() + "%",),
         )
         self.rebuild()
 
@@ -255,7 +255,7 @@ class FindPatientDialog(wx.Dialog):
         self.delbtn.Disable()
         e.Skip()
 
-    def onAll(self, e: wx.CommandEvent):
+    def onAll(self, _):
         self.cur = self.mv.connection.execute(
             f"""
             SELECT id AS pid, name, gender, birthdate
@@ -264,7 +264,7 @@ class FindPatientDialog(wx.Dialog):
         )
         self.rebuild()
 
-    def onAtDate(self, e: wx.CommandEvent):
+    def onAtDate(self, _):
         dlg = DatePickerDialog(self.mv)
         if dlg.ShowModal() == wx.ID_OK:
             d = dlg.GetDate()
@@ -279,37 +279,48 @@ class FindPatientDialog(wx.Dialog):
             )
             self.rebuild()
 
-    def onNext(self, e: wx.CommandEvent):
+    def onNext(self, _):
         if (not self.lc.is_done()) and self.lc.is_last():
             self.build()
         else:
             self.lc.next()
         self.next_prev_status_check()
 
-    def onPrev(self, e: wx.CommandEvent):
+    def onPrev(self, _):
         self.lc.prev()
         self.next_prev_status_check()
 
-    def onAddqueue(self, e: wx.CommandEvent):
+    def onAddqueue(self, _):
         pid = self.lc.pid
         assert pid is not None
         try:
-            self.mv.connection.insert(Queue, {"patient_id": pid})
+            qid = self.mv.connection.insert(Queue, {"patient_id": pid})
+            assert qid is not None
             wx.MessageBox("Thêm vào danh sách chờ thành công", "OK")
-            self.mv.state.queue = QueueState.fetch(self.mv.connection)
+            idx: int = self.lc.GetFirstSelected()
+            assert idx != -1
+            item = QueueStateItem(
+                pid,
+                self.lc.GetItemText(idx, 1),
+                Gender.from_s(self.lc.GetItemText(idx, 2)),
+                dt.datetime.strptime(self.lc.GetItemText(idx, 3), "%d/%m/%Y").date(),
+                dt.datetime.now(),
+            )
+            self.mv.state.queue.append(item)
+            self.mv.patient_book.queuelistctrl.append_ui(item)
         except sqlite3.IntegrityError as error:
             wx.MessageBox(f"Đã có tên trong danh sách chờ.\n{error}", "Lỗi")
         finally:
-            item: int = self.lc.GetFirstSelected()
-            self.lc.Select(item, 0)
+            idx: int = self.lc.GetFirstSelected()
+            self.lc.Select(idx, 0)
             self.search.SetFocus()
 
-    def onEdit(self, e: wx.CommandEvent | wx.ListEvent):
+    def onEdit(self, _):
         pid = self.lc.pid
         assert pid is not None
         EditFindPatientDialog(self).ShowModal()
 
-    def onDelete(self, e: wx.CommandEvent):
+    def onDelete(self, _):
         if (
             wx.MessageBox(
                 "Xác nhận?",
@@ -347,31 +358,3 @@ class EditFindPatientDialog(EditPatientDialog):
         p = self.mv.connection.select(Patient, pid)
         assert p is not None
         return p
-
-    def onOkBtn(self, e: wx.CommandEvent):
-        if self.is_valid():
-            name: str = self.name.Value
-            pid = self.parent.lc.pid
-            assert pid is not None
-            p = Patient(
-                id=pid,
-                name=name.strip().upper(),
-                gender=self.gender.GetGender(),
-                birthdate=self.birthdate.GetDate(),
-                address=check_blank_to_none(self.address.Value),
-                phone=check_blank_to_none(self.phone.Value),
-                past_history=check_blank_to_none(self.past_history.Value),
-            )
-            try:
-                self.mv.connection.update(p)
-                wx.MessageBox("Cập nhật thành công", "OK")
-                self.parent.clear()
-                page: wx.ListCtrl = self.mv.patient_book.GetCurrentPage()
-                idx: int = page.GetFirstSelected()
-                self.mv.state.refresh()
-                page.EnsureVisible(idx)
-                page.Select(idx)
-                self.parent.search.SetFocus()
-                e.Skip()
-            except sqlite3.Error as error:
-                wx.MessageBox(f"Lỗi không cập nhật được\n{error}", "Lỗi")

@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS {Visit.__tablename__} (
     weight DECIMAL NOT NULL,
     days INTEGER NOT NULL,
     recheck INTEGER NOT NULL,
+    price INTEGER NOT NULL,
     patient_id INTEGER NOT NULL,
     vnote TEXT,
     follow TEXT,
@@ -75,7 +76,7 @@ CREATE TABLE IF NOT EXISTS {Warehouse.__tablename__} (
 );
 CREATE TABLE IF NOT EXISTS {LineDrug.__tablename__} (
     id INTEGER PRIMARY KEY,
-    drug_id INTEGER NOT NULL,
+    warehouse_id INTEGER NOT NULL,
     times INTEGER NOT NULL,
     dose TEXT NOT NULL,
     quantity INTEGER NOT NULL,
@@ -84,7 +85,7 @@ CREATE TABLE IF NOT EXISTS {LineDrug.__tablename__} (
     FOREIGN KEY (visit_id) REFERENCES {Visit.__tablename__} (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    FOREIGN KEY (drug_id) REFERENCES {Warehouse.__tablename__} (id)
+    FOREIGN KEY (warehouse_id) REFERENCES {Warehouse.__tablename__} (id)
         ON DELETE RESTRICT
         ON UPDATE NO ACTION,
     CHECK ( quantity > 0 AND times > 0 AND dose != '')
@@ -95,18 +96,18 @@ CREATE TABLE IF NOT EXISTS {SamplePrescription.__tablename__} (
 );
 CREATE TABLE IF NOT EXISTS {LineSamplePrescription.__tablename__} (
     id INTEGER PRIMARY KEY,
-    drug_id INTEGER NOT NULL,
+    warehouse_id INTEGER NOT NULL,
     sample_id INTEGER NOT NULL,
     times INTEGER NOT NULL,
     dose TEXT NOT NULL,
-    FOREIGN KEY (drug_id) REFERENCES {Warehouse.__tablename__} (id)
+    FOREIGN KEY (warehouse_id) REFERENCES {Warehouse.__tablename__} (id)
         ON DELETE RESTRICT
         ON UPDATE NO ACTION,
     FOREIGN KEY (sample_id) REFERENCES {SamplePrescription.__tablename__} (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
     CHECK (times > 0 AND dose != ''),
-    UNIQUE (drug_id, sample_id)
+    UNIQUE (warehouse_id, sample_id)
 );
 CREATE TABLE IF NOT EXISTS {Procedure.__tablename__} (
     id INTEGER PRIMARY KEY,
@@ -176,6 +177,7 @@ CREATE TRIGGER IF NOT EXISTS last_open_date_update
 AFTER UPDATE OF last_open_date ON singleton 
 WHEN DATE(OLD.last_open_date, 'localtime') < DATE(NEW.last_open_date, 'localtime')
 BEGIN
+DELETE FROM {Queue.__tablename__};
 DELETE FROM {SeenToday.__tablename__}; 
 DELETE FROM {Appointment.__tablename__} 
     WHERE DATE({Appointment.__tablename__}.appointed_date, 'localtime') < DATE('now','localtime');
@@ -185,29 +187,36 @@ CREATE TRIGGER IF NOT EXISTS linedrug_insert
 BEFORE INSERT ON {LineDrug.__tablename__}
 BEGIN
 UPDATE {Warehouse.__tablename__} SET quantity = quantity - NEW.quantity
-    WHERE id = NEW.drug_id;
+    WHERE id = NEW.warehouse_id;
 END;
 
 CREATE TRIGGER IF NOT EXISTS linedrug_delete
 BEFORE DELETE ON {LineDrug.__tablename__}
 BEGIN
 UPDATE {Warehouse.__tablename__} SET quantity = quantity + OLD.quantity
-    WHERE id = OLD.drug_id;
+    WHERE id = OLD.warehouse_id;
 END;
 
 CREATE TRIGGER IF NOT EXISTS linedrug_update
 BEFORE UPDATE ON {LineDrug.__tablename__}
-WHEN NEW.drug_id = OLD.drug_id
+WHEN NEW.warehouse_id = OLD.warehouse_id
 BEGIN
 UPDATE {Warehouse.__tablename__} SET quantity = quantity + OLD.quantity - NEW.quantity
-    WHERE id = OLD.drug_id;
+    WHERE id = OLD.warehouse_id;
 END;
 
-CREATE TRIGGER IF NOT EXISTS visit_insert
+CREATE TRIGGER IF NOT EXISTS visit_insert_before
 BEFORE INSERT ON {Visit.__tablename__}
 BEGIN
 DELETE FROM {Queue.__tablename__}
     WHERE patient_id = NEW.patient_id;
+END;
+
+CREATE TRIGGER IF NOT EXISTS visit_insert_after
+AFTER INSERT ON {Visit.__tablename__}
+BEGIN
+INSERT INTO {SeenToday.__tablename__} ({SeenToday.commna_joined_field_names()})
+VALUES (NEW.patient_id, NEW.id);
 END;
 
 INSERT OR IGNORE INTO singleton (id, last_open_date) VALUES ( 1, DATE('now', 'localtime'));

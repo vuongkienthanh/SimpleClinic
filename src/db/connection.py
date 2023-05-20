@@ -85,7 +85,7 @@ class Connection:
 
     def selectall(self, t: type[T]) -> dict[int, T]:
         rows = self.execute(f"SELECT * FROM {t.__tablename__}").fetchall()
-        return {row['id']: t.parse(row) for row in rows}
+        return {row["id"]: t.parse(row) for row in rows}
 
     def delete(self, t: type[BASE], id: int) -> int | None:
         with self.sqlcon as con:

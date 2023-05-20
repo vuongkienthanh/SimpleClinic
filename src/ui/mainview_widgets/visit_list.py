@@ -27,7 +27,7 @@ class VisitListCtrl(wx.ListCtrl):
     def append_ui(self, item: "visit_list_state.VisitListStateItem"):
         self.Append(
             [
-                item.vid,
+                item.visit_id,
                 item.exam_datetime.strftime("%d/%m/%Y %H:%M"),
                 item.diagnosis,
             ]

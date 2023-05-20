@@ -4,6 +4,7 @@ from .widgets import *
 from .buttons import *
 from .picker import *
 
+
 class PrescriptionPage(wx.Panel):
     def __init__(self, parent: "order_book.OrderBook"):
         super().__init__(parent)
@@ -21,7 +22,7 @@ class PrescriptionPage(wx.Panel):
         self.sale_unit = wx.StaticText(self, label="{Đơn vị}")
         self.note = Note(self)
         self.add_drug_btn = AddDrugButton(self)
-        self.del_drug_btn = DelDrugButton(self)
+        self.del_drug_btn = DeleteDrugButton(self)
         self.drug_list = DrugListCtrl(self)
         self.reuse_druglist_btn = ReuseDrugListButton(self)
         self.use_sample_prescription_btn = UseSamplePrescriptionBtn(self)
@@ -92,4 +93,3 @@ class PrescriptionPage(wx.Panel):
                 self.quantity.Value.strip() != "",
             ]
         )
-

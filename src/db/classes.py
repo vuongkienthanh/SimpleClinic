@@ -14,6 +14,10 @@ class Gender(enum.Enum):
     def __str__(self):
         return ["Nam", "Nữ"][self.value]
 
+    @classmethod
+    def from_s(cls, s: str):
+        return {"Nam": Gender.m, "Nữ": Gender.f}[s]
+
 
 @dataclass
 class BASE:
@@ -118,6 +122,7 @@ class Visit(BASE):
     - `weight`: Cân nặng
     - `days`: Số ngày cho thuốc
     - `recheck`: Số ngày tái khám
+    - `price`: Giá thu
     - `patient_id`: Mã bệnh nhân
     - `follow`: Lời dặn dò
     - `vnote`: Bệnh sử
@@ -129,6 +134,7 @@ class Visit(BASE):
         "weight",
         "days",
         "recheck",
+        "price",
         "patient_id",
         "follow",
         "vnote",
@@ -139,6 +145,7 @@ class Visit(BASE):
     weight: Decimal
     days: int
     recheck: int
+    price: int
     patient_id: int
     follow: str | None = None
     vnote: str | None = None
@@ -155,7 +162,7 @@ class LineDrug(BASE):
 
     __tablename__ = "linedrugs"
     __match_args__ = [
-        "drug_id",
+        "warehouse_id",
         "dose",
         "times",
         "quantity",
@@ -164,7 +171,7 @@ class LineDrug(BASE):
     ]
 
     id: int
-    drug_id: int
+    warehouse_id: int
     dose: str
     times: int
     quantity: int
@@ -235,13 +242,13 @@ class LineSamplePrescription(BASE):
 
     __tablename__ = "linesampleprescription"
     __match_args__ = [
-        "drug_id",
+        "warehouse_id",
         "sample_id",
         "times",
         "dose",
     ]
     id: int
-    drug_id: int
+    warehouse_id: int
     sample_id: int
     times: int
     dose: str
@@ -262,7 +269,7 @@ class Procedure(BASE):
 class LineProcedure(BASE):
     """Thủ thuật của lượt khám"""
 
-    __tablename__ = "lineprocedure"
+    __tablename__ = "lineprocedures"
     __match_args__ = ["procedure_id", "visit_id"]
     id: int
     procedure_id: int

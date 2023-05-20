@@ -22,7 +22,6 @@ from .queue_state import QueueState, QueueStateItem
 from .seentoday_state import SeenTodayState, SeenTodayStateItem
 from db import *
 from ui import mainview
-import sqlite3
 
 
 class State:
@@ -56,10 +55,12 @@ class State:
         self._linedrug: LineDrugListStateItem | None = None
         self._old_linedrug_list: list[OldLineDrugListStateItem] = []
         self._new_linedrug_list: list[NewLineDrugListStateItem] = []
+        self.to_delete_old_linedrug_list: list[OldLineDrugListStateItem] = []
 
         self._lineprocedure: LineProcedureListStateItem | None = None
         self._old_lineprocedure_list: list[OldLineProcedureListStateItem] = []
         self._new_lineprocedure_list: list[NewLineProcedureListStateItem] = []
+        self.to_delete_old_lineprocedure_list: list[OldLineProcedureListStateItem] = []
 
         self._queue: list[QueueStateItem] = []
         self._seentoday: list[SeenTodayStateItem] = []
@@ -83,10 +84,12 @@ class State:
         self.linedrug = None
         self.old_linedrug_list = []
         self.new_linedrug_list = []
+        self.to_delete_old_linedrug_list = []
 
         self.lineprocedure = None
         self.old_lineprocedure_list = []
         self.new_lineprocedure_list = []
+        self.to_delete_old_lineprocedure_list = []
 
         self.queue = QueueState.fetch(self.mv.connection)
         self.seentoday = SeenTodayState.fetch(self.mv.connection)

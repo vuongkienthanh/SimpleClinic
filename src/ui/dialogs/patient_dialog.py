@@ -172,7 +172,8 @@ class EditPatientDialog(BasePatientDialog):
     def __init__(self, parent: "mainview.MainView"):
         super().__init__(parent, title="Cập nhật thông tin bệnh nhân")
         self.mv = parent
-        self.build(self.get_patient())
+        self.patient = self.get_patient()
+        self.build(self.patient)
 
     def get_patient(self) -> Patient:
         p = self.mv.state.patient
@@ -191,15 +192,15 @@ class EditPatientDialog(BasePatientDialog):
 
     def onOkBtn(self, e):
         if self.is_valid():
-            p = self.mv.state.patient
-            assert p is not None
-            name: str = self.name.Value
-            p.name = name.strip().upper()
-            p.gender = self.gender.GetGender()
-            p.birthdate = self.birthdate.GetDate()
-            p.address = check_blank_to_none(self.address.Value)
-            p.phone = check_blank_to_none(self.phone.Value)
-            p.past_history = check_blank_to_none(self.past_history.Value)
+            p = Patient(
+                id=self.patient.id,
+                name=self.name.Value.strip().upper(),
+                gender=self.gender.GetGender(),
+                birthdate=self.birthdate.GetDate(),
+                address=check_blank_to_none(self.address.Value),
+                phone=check_blank_to_none(self.phone.Value),
+                past_history=check_blank_to_none(self.past_history.Value),
+            )
             try:
                 self.mv.connection.update(p)
                 wx.MessageBox("Cập nhật thành công", "OK")
@@ -210,5 +211,5 @@ class EditPatientDialog(BasePatientDialog):
                 page.EnsureVisible(idx)
                 page.Select(idx)
                 e.Skip()
-            except sqlite3.Error as error:
+            except Exception as error:
                 wx.MessageBox(f"Lỗi không cập nhật được\n{error}", "Lỗi")

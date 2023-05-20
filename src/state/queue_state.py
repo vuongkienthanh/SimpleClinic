@@ -7,7 +7,7 @@ import datetime as dt
 
 @dataclass(slots=True, match_args=False)
 class QueueStateItem:
-    pid: int
+    patient_id: int
     name: str
     gender: Gender
     birthdate: dt.date
@@ -15,7 +15,7 @@ class QueueStateItem:
 
 
 class QueueState:
-    def __get__(self, obj: "main_state.State", objtype=None) -> list[QueueStateItem]:
+    def __get__(self, obj: "main_state.State", _) -> list[QueueStateItem]:
         return obj._queue
 
     def __set__(self, obj: "main_state.State", _list: list[QueueStateItem]):
@@ -26,7 +26,7 @@ class QueueState:
     def fetch(connection: Connection):
         query = f"""
         SELECT
-            p.id AS pid,
+            p.id AS patient_id,
             p.name,
             p.gender,
             p.birthdate,

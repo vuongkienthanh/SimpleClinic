@@ -1,5 +1,5 @@
 from ui.mainview_widgets.order_book import order_book
-from db import Warehouse, LineSamplePrescription
+from db import LineSamplePrescription
 from misc import plus_bm, minus_bm, calc_quantity, note_str
 from ui.dialogs.sample_prescription_dialog import SampleDialog
 from state.linedrug_state import (
@@ -26,7 +26,7 @@ class AddDrugButton(wx.BitmapButton):
         ld = state.linedrug
         if wh is None:
             return
-        note : str | None
+        note: str | None
         match page.note.Value:
             case n if n == note_str(
                 wh.usage, int(page.times.Value), page.dose.Value, wh.usage_unit, None
@@ -37,16 +37,23 @@ class AddDrugButton(wx.BitmapButton):
         if page.check_wh_do_ti_qua_filled():
             if ld is None:
                 new_ld = NewLineDrugListStateItem(
-                    wh.id, int(page.times.Value), page.dose.Value, int(page.quantity.Value), note
+                    wh.id,
+                    int(page.times.Value),
+                    page.dose.Value,
+                    int(page.quantity.Value),
+                    note,
                 )
                 state.new_linedrug_list.append(new_ld)
                 page.drug_list.append_ui(new_ld)
-            elif type(ld) is NewLineDrugListStateItem or type(ld) is OldLineDrugListStateItem:
+            elif (
+                type(ld) is NewLineDrugListStateItem
+                or type(ld) is OldLineDrugListStateItem
+            ):
                 ld.times = int(page.times.Value)
                 ld.dose = page.dose.Value
                 ld.quantity = int(page.quantity.Value)
                 ld.note = note
-                idx :int = page.drug_list.GetFirstSelected()
+                idx: int = page.drug_list.GetFirstSelected()
                 page.drug_list.update_ui(idx, ld)
             state.warehouse = None
             state.linedrug = None
@@ -54,23 +61,23 @@ class AddDrugButton(wx.BitmapButton):
             page.drug_picker.SetFocus()
 
 
-class DelDrugButton(wx.BitmapButton):
+class DeleteDrugButton(wx.BitmapButton):
     def __init__(self, parent: "order_book.PrescriptionPage"):
         super().__init__(parent, bitmap=wx.Bitmap(minus_bm))
         self.parent = parent
         self.Bind(wx.EVT_BUTTON, self.onClick)
 
     def onClick(self, _):
-        idx = self.parent.drug_list.GetFirstSelected()
+        idx: int = self.parent.drug_list.GetFirstSelected()
         if idx != -1:
             old = self.parent.mv.state.old_linedrug_list
             new = self.parent.mv.state.new_linedrug_list
             if idx < len(old):
-                target = old
+                self.parent.mv.state.to_delete_old_linedrug_list.append(old[idx])
+                old.pop(idx)
             else:
                 idx -= len(old)
-                target = new
-            target.pop(idx)
+                new.pop(idx)
             self.parent.drug_list.pop_ui(idx)
             self.parent.mv.state.warehouse = None
             self.parent.mv.state.linedrug = None
@@ -106,39 +113,36 @@ class UseSamplePrescriptionBtn(wx.Button):
             idx: int = dlg.samplelist.GetFirstSelected()
             if idx != -1:
                 self.parent.drug_list.DeleteAllItems()
+                self.mv.state.new_linedrug_list.clear()
                 sp = self.mv.state.all_sampleprescription[idx]
-                llsp = self.mv.connection.execute(
-                    f"""
-                    SELECT lsp.drug_id, wh.name, lsp.times, lsp.dose, wh.usage, wh.usage_unit, wh.sale_unit, wh.sale_price
-                    FROM (
-                        SELECT * FROM {LineSamplePrescription.__tablename__} 
-                        WHERE sample_id = {sp.id}
-                    ) AS lsp
-                    JOIN {Warehouse.__tablename__} as wh
-                    ON wh.id = lsp.drug_id
-                """
-                ).fetchall()
-                for lsp in llsp:
-                    q = calc_quantity(
-                        lsp["times"],
-                        lsp["dose"],
-                        self.mv.days.Value,
-                        lsp["sale_unit"],
-                        self.mv.config,
+                for lsp in (
+                    LineSamplePrescription(*row)
+                    for row in self.mv.connection.execute(
+                        f"""
+                    SELECT 
+                        lsp.id,
+                        lsp.warehouse_id,
+                        lsp.times,
+                        lsp.dose
+                    FROM {LineSamplePrescription.__tablename__} 
+                    WHERE
+                        lsp.sample_id = {sp.id}
+                    """
+                    ).fetchall()
+                ):
+                    item = NewLineDrugListStateItem(
+                        warehouse_id=lsp.warehouse_id,
+                        times=lsp.times,
+                        dose=lsp.dose,
+                        quantity=calc_quantity(
+                            lsp.times,
+                            lsp.dose,
+                            self.mv.days.Value,
+                            self.mv.state.all_warehouse[lsp.warehouse_id].sale_unit,
+                            self.mv.config,
+                        ),
+                        note=None,
                     )
-                    assert q is not None
-                    self.parent.drug_list.append(
-                        prescription_widgets.DrugListItem(
-                            drug_id=lsp["drug_id"],
-                            times=lsp["times"],
-                            dose=lsp["dose"],
-                            quantity=q,
-                            name=lsp["name"],
-                            note=None,
-                            usage=lsp["usage"],
-                            usage_unit=lsp["usage_unit"],
-                            sale_unit=lsp["sale_unit"],
-                            sale_price=lsp["sale_price"],
-                        )
-                    )
-                    self.mv.price.FetchPrice()
+                    self.parent.drug_list.append_ui(item)
+                    self.mv.state.new_linedrug_list.append(item)
+                self.mv.price.FetchPrice()

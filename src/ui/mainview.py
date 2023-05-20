@@ -217,7 +217,7 @@ class MainView(wx.Frame):
         self.connection.close()
         e.Skip()
 
-    def check_filled(self) -> bool:
+    def check_diag_wt_filled(self) -> bool:
         diagnosis: str = self.diagnosis.GetValue()
         weight = self.weight.GetWeight()
         if diagnosis.strip() == "":

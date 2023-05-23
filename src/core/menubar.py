@@ -98,6 +98,7 @@ class MyMenuBar(wx.MenuBar):
         menuMonthWarehouseReport = menuReport.Append(
             wx.ID_ANY, "Tình hình dùng thuốc theo tháng"
         )
+        manageMenu.AppendSubMenu(menuReport,"Báo cáo" )
 
         settingMenu = wx.Menu()
         menuSetupConfig: wx.MenuItem = settingMenu.Append(wx.ID_ANY, "Cài đặt hệ thống")

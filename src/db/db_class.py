@@ -26,6 +26,7 @@ class BASE:
 
     table_name: ClassVar[str]
     not_in_fields: ClassVar[list[str]]
+    id : int
 
     @classmethod
     def parse(cls, row: Mapping[str, Any]):
@@ -290,10 +291,6 @@ CREATE TABLE IF NOT EXISTS {AppointedList.table_name} (
 
 CREATE INDEX IF NOT EXISTS patient_name
   ON {Patient.table_name} (name);
-
-CREATE TABLE IF NOT EXISTS last_open_date (
-    last_open_date DATE
-);
 
 CREATE TABLE IF NOT EXISTS {Visit.table_name} (
   id INTEGER PRIMARY KEY,

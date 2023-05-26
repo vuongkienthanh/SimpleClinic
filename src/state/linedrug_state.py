@@ -10,7 +10,7 @@ class NewLineDrugListStateItem:
     times: int
     dose: str
     quantity: int
-    note: str | None
+    usage_note: str | None
 
 
 @dataclass(slots=True, match_args=False)
@@ -20,7 +20,7 @@ class OldLineDrugListStateItem:
     times: int
     dose: str
     quantity: int
-    note: str | None
+    usage_note: str | None
 
 
 LineDrugListStateItem = OldLineDrugListStateItem | NewLineDrugListStateItem
@@ -53,7 +53,7 @@ class LineDrugState:
                 item.times,
                 item.dose,
                 obj.warehouse.usage_unit,
-                item.note,
+                item.usage_note,
             )
         )
         page.SetFocus()
@@ -91,7 +91,7 @@ class OldLineDrugListState:
             SELECT 
                 ld.id, ld.drug_id as warehouse_id, 
                 ld.times, ld.dose,
-                ld.quantity, ld.note
+                ld.quantity, ld.usage_note
             FROM (SELECT * FROM {LineDrug.__tablename__}
                   WHERE visit_id = {v.id}
             ) AS ld

@@ -96,7 +96,7 @@ class WarehouseDialog(wx.Dialog):
                 if wh.expire_date is not None
                 else "",
                 check_none_to_blank(wh.made_by),
-                check_none_to_blank(wh.note),
+                check_none_to_blank(wh.drug_note),
             ]
         )
         self.check_min_quantity_and_change_color(wh, len(self._list) - 1)
@@ -112,6 +112,7 @@ class WarehouseDialog(wx.Dialog):
         self.lc.DeleteAllItems()
 
     def filtered_build(self, s: str = ""):
+        "build UI warehouse list from state "
         self.clear()
         if s == "":
             for wh in self.mv.state.all_warehouse.values():
@@ -266,7 +267,7 @@ class BaseDialog(wx.Dialog):
 
         self.okbtn.Bind(wx.EVT_BUTTON, self.onOkBtn)
 
-    def onOkBtn(self, e: wx.CommandEvent):
+    def onOkBtn(self, _):
         ...
 
     def is_valid(self) -> bool:
@@ -318,7 +319,7 @@ class NewDialog(BaseDialog):
                 assert lastrowid is not None
                 wx.MessageBox("Thêm mới thành công", "Thêm mới")
                 new_wh = Warehouse(id=lastrowid, **wh)
-                self.mv.state.all_warehouse.append(new_wh)
+                self.mv.state.all_warehouse[lastrowid] = new_wh
                 if self.parent.check_search_str_in_wh(new_wh, self.parent.search.Value):
                     self.parent.append(new_wh)
                 e.Skip()
@@ -347,7 +348,7 @@ class EditDialog(BaseDialog):
         if wh.expire_date is not None:
             self.expire_date.SetDate(wh.expire_date)
         self.made_by.ChangeValue(check_none_to_blank(wh.made_by))
-        self.note.ChangeValue(check_none_to_blank(wh.note))
+        self.note.ChangeValue(check_none_to_blank(wh.drug_note))
 
     def onOkBtn(self, e):
         if self.is_valid():
@@ -361,23 +362,12 @@ class EditDialog(BaseDialog):
             self.wh.sale_unit = self.get_sale_unit()
             self.wh.expire_date = self.expire_date.checked_GetDate()
             self.wh.made_by = check_blank_to_none(self.made_by.Value)
-            self.wh.note = check_blank_to_none(self.note.Value)
+            self.wh.drug_note = check_blank_to_none(self.note.Value)
             try:
                 self.mv.connection.update(self.wh)
                 wx.MessageBox("Cập nhật thành công", "Cập nhật")
                 self.parent.filtered_build(self.parent.search.Value)
-                drug_list = self.mv.order_book.prescriptionpage.drug_list
-                if drug_list.ItemCount > 0:
-                    for i, d in enumerate(drug_list.d_list):
-                        if d.drug_id == self.wh.id:
-                            _item = d.expand()
-                            _item.name = self.wh.name
-                            _item.usage = self.wh.usage
-                            _item.usage_unit = self.wh.usage_unit
-                            _item.sale_price = self.wh.sale_price
-                            _item.sale_unit = self.wh.sale_unit
-                            drug_list.update(i, _item)
-                    self.mv.price.FetchPrice()
+                self.mv.price.FetchPrice()
                 e.Skip()
             except Exception as error:
                 wx.MessageBox(f"Cập nhật thất bại\n{error}", "Cập nhật")

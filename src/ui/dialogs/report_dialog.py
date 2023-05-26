@@ -1,7 +1,7 @@
 from misc import APP_DIR
 from ui import mainview as mv
-from db import LineDrug, LineProcedure, Visit, Warehouse, Procedure
-from misc import num_to_str_price
+from db import LineDrug, LineProcedure, Visit, Warehouse, Procedure, Connection
+from misc import num_to_str_price, Config
 import wx
 import datetime as dt
 import sqlite3
@@ -10,153 +10,116 @@ import os
 import subprocess
 
 
-class DayReportDialog(wx.Dialog):
+def finance_report(connection:Connection, config: Config, *, date: dt.date | None = None, month:int | None = None, year:int|None =None) -> sqlite3.Row:
+    """
+    Số ca khám
+    Doanh thu từ thuốc và tiền công
+    Doanh thu thực tế
+    Tổng tiền thuốc (giá mua)
+    Tổng tiền thuốc (giá bán)
+    Lợi nhuận từ thuốc
+    Lợi nhuận từ thủ thuật
+    """
+    match date, month, year:
+        case dt.date(), None, None :
+            visit_where_clause = f"""WHERE DATE(exam_datetime) = '{date.isoformat()}'"""
+        case None, int(), int():
+            visit_where_clause = f"""
+                WHERE (
+                    STRFTIME('%m', exam_datetime) = '{month:>02}' AND
+                    STRFTIME('%Y', exam_datetime) = '{year}'
+                )
+            """
+        case *_:
+            raise NotImplementedError
+    query = f"""
+        SELECT
+            visit_count,
+            ({config.checkup_price} * visit_count) + drug_sale + procedure_profit AS revenue,
+            real_revenue,
+            drug_purchase,
+            drug_sale,
+            (drug_sale - drug_purchase) AS drug_profit,
+            procedure_profit
+        FROM (
+            SELECT
+                COUNT(DISTINCT vdp.vid) AS visit_count,
+                TOTAL(v.price) as real_revenue,
+                CAST(TOTAL(vdp.ldquantity * wh.purchase_price) AS INTEGER) AS drug_purchase,
+                CAST(TOTAL(vdp.ldquantity * wh.sale_price) AS INTEGER) AS drug_sale,
+                CAST(TOTAL(pr.price) AS INTEGER) AS procedure_profit
+            FROM (
+                SELECT
+                    v.id AS vid,
+                    v.price,
+                    ld.warehouse_id AS ldwarehouse_id,
+                    ld.quantity AS ldquantity,
+                    lp.procedure_id AS lpprocedure_id
+                FROM (
+                    SELECT id FROM {Visit.__tablename__} {visit_where_clause}
+                ) AS v
+                LEFT JOIN {LineDrug.__tablename__} AS ld
+                ON ld.visit_id = v.id
+                LEFT JOIN {LineProcedure.__tablename__} AS lp
+                ON lp.visit_id = v.id
+            ) as vdp
+            LEFT JOIN {Warehouse.__tablename__} AS wh
+            ON vdp.ldwarehouse_id = wh.id
+            LEFT JOIN {Procedure.__tablename__} AS pr
+            ON vdp.lpprocedure_id = pr.id
+        )
+    """
+    ret = connection.execute(query).fetchone()
+    assert ret is not None
+    return ret
+
+
+class FinanceReportDialog(wx.Dialog):
+    def __init__(self, parent:"mv.MainView",title:str):
+        super().__init__(parent,title=title)
+        self.mv = parent
+        res = self.report()
+        def w(s: str):
+            return (wx.StaticText(self, label=s), 0, wx.EXPAND | wx.ALL, 5)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.AddMany(
+            [
+                w(f"Số ca khám: {res['visit_count']}"),
+                w(
+                    f"Doanh thu (tiền công + thuốc + thủ thuật): {num_to_str_price(res['revenue'])}"
+                ),
+                w(f"Doanh thu thực tế: {num_to_str_price(res['real_revenue'])}"),
+                w(
+                    f"Tổng tiền thuốc (giá mua): {num_to_str_price(res['drug_purchase'])}"
+                ),
+                w(f"Tổng tiền thuốc (giá bán): {num_to_str_price(res['drug_sale'])}"),
+                w(f"Lợi nhuận từ thuốc: {num_to_str_price(res['profit_from_drug'])}"),
+                w(
+                    f"Lợi nhuận từ thủ thuật: {num_to_str_price(res['procedure_profit'])}"
+                ),
+            ]
+        )
+        self.SetSizerAndFit(sizer)
+    def report(self) -> sqlite3.Row:
+        ...
+class DayFinanceReportDialog(FinanceReportDialog):
     def __init__(self, parent: "mv.MainView", date: dt.date):
+        self.date = date
         super().__init__(parent, title=date.strftime("%d/%m/%Y"))
-        self.mv = parent
-        res = self.get_report(date)
-
-        def w(s: str):
-            return (wx.StaticText(self, label=s), 0, wx.EXPAND | wx.ALL, 5)
-
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.AddMany(
-            [
-                w(f"Số ca khám: {res['visit_count']}"),
-                w(f"Doanh thu: {num_to_str_price(res['revenue'])}"),
-                w(
-                    f"Tổng tiền thuốc (giá mua): {num_to_str_price(res['drug_purchase'])}"
-                ),
-                w(f"Tổng tiền thuốc (giá bán): {num_to_str_price(res['drug_sale'])}"),
-                w(f"Lợi nhuận từ thuốc: {num_to_str_price(res['profit_from_drug'])}"),
-                w(f"Lợi nhuận từ thủ thuật: {num_to_str_price(res['procedure'])}"),
-            ]
-        )
-        self.SetSizerAndFit(sizer)
-
-    def get_report(self, date: dt.date) -> sqlite3.Row:
-        """
-        Số ca khám
-        Doanh thu
-        Tổng tiền thuốc (giá mua)
-        Tổng tiền thuốc (giá bán)
-        Lợi nhuận từ thuốc
-        Lợi nhuận từ thủ thuật
-        """
-        query = f"""
-            SELECT
-                visit_count,
-                ({self.mv.config.checkup_price} * visit_count) + drug_sale + procedure AS revenue,
-                drug_purchase,
-                drug_sale,
-                (drug_sale - drug_purchase) AS profit_from_drug,
-                procedure
-            FROM (
-                SELECT
-                    COUNT(DISTINCT vdp.vid) AS visit_count,
-                    CAST(TOTAL(vdp.ldquantity * wh.purchase_price) AS INTEGER) AS drug_purchase,
-                    CAST(TOTAL(vdp.ldquantity * wh.sale_price) AS INTEGER) AS drug_sale,
-                    CAST(TOTAL(pr.price) AS INTEGER) AS procedure
-                FROM (
-                    SELECT
-                        v.id AS vid,
-                        ld.drug_id AS lddrug_id,
-                        ld.quantity AS ldquantity,
-                        lp.procedure_id AS lpprocedure_id
-                    FROM (
-                        SELECT id FROM {Visit.__tablename__}
-                        WHERE DATE(exam_datetime) = '{date.isoformat()}'
-                    ) AS v
-                    LEFT JOIN {LineDrug.__tablename__} AS ld
-                    ON ld.visit_id = v.id
-                    LEFT JOIN {LineProcedure.__tablename__} AS lp
-                    ON lp.visit_id = v.id
-                ) as vdp
-                LEFT JOIN {Warehouse.__tablename__} AS wh
-                ON vdp.lddrug_id = wh.id
-                LEFT JOIN {Procedure.__tablename__} AS pr
-                ON vdp.lpprocedure_id = pr.id
-            )
-        """
-        ret = self.mv.connection.execute(query).fetchone()
-        assert ret is not None
-        return ret
+    def report(self):
+        return finance_report(self.mv.connection, self.mv.config,date= self.date)
 
 
-class MonthReportDialog(wx.Dialog):
-    def __init__(self, parent, month: int, year: int):
+
+class MonthFinanceReportDialog(FinanceReportDialog):
+    def __init__(self, parent:"mv.MainView", month: int, year: int):
+        self.month = month
+        self.year = year
         super().__init__(parent, title=f"T{month}/{year}")
-        self.mv = parent
-        res = self.get_report(month, year)
 
-        def w(s: str):
-            return (wx.StaticText(self, label=s), 0, wx.EXPAND | wx.ALL, 5)
+    def report(self):
+        return finance_report(self.mv.connection, self.mv.config, month=self.month, year=self.year)
 
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.AddMany(
-            [
-                w(f"Số ca khám: {res['visit_count']}"),
-                w(f"Doanh thu: {num_to_str_price(res['revenue'])}"),
-                w(
-                    f"Tổng tiền thuốc (giá mua): {num_to_str_price(res['drug_purchase'])}"
-                ),
-                w(f"Tổng tiền thuốc (giá bán): {num_to_str_price(res['drug_sale'])}"),
-                w(f"Lợi nhuận từ thuốc: {num_to_str_price(res['profit_from_drug'])}"),
-                w(f"Lợi nhuận từ thủ thuật: {num_to_str_price(res['procedure'])}"),
-            ]
-        )
-        self.SetSizerAndFit(sizer)
-
-    def get_report(self, month: int, year: int) -> sqlite3.Row:
-        """
-        Số ca khám
-        Doanh thu
-        Tổng tiền thuốc (giá mua)
-        Tổng tiền thuốc (giá bán)
-        Lợi nhuận từ thuốc
-        Lợi nhuận từ thủ thuật
-        """
-        query = f"""
-            SELECT
-                visit_count,
-                ({self.mv.config.checkup_price} * visit_count) + drug_sale + procedure AS revenue,
-                drug_purchase,
-                drug_sale,
-                (drug_sale - drug_purchase) AS profit_from_drug,
-                procedure
-            FROM (
-                SELECT
-                    COUNT(DISTINCT vdp.vid) AS visit_count,
-                    CAST(TOTAL(vdp.ldquantity * wh.purchase_price) AS INTEGER) AS drug_purchase,
-                    CAST(TOTAL(vdp.ldquantity * wh.sale_price) AS INTEGER) AS drug_sale,
-                    CAST(TOTAL(pr.price) AS INTEGER) AS procedure
-                FROM (
-                    SELECT
-                        v.id AS vid,
-                        ld.drug_id AS lddrug_id,
-                        ld.quantity AS ldquantity,
-                        lp.procedure_id AS lpprocedure_id
-                    FROM (
-                        SELECT id FROM {Visit.__tablename__}
-                        WHERE (
-                            STRFTIME('%m', exam_datetime) = '{month:>02}' AND
-                            STRFTIME('%Y', exam_datetime) = '{year}'
-                        )
-                    ) AS v
-                    LEFT JOIN {LineDrug.__tablename__} AS ld
-                    ON ld.visit_id = v.id
-                    LEFT JOIN {LineProcedure.__tablename__} AS lp
-                    ON lp.visit_id = v.id
-                ) as vdp
-                LEFT JOIN {Warehouse.__tablename__} AS wh
-                ON vdp.lddrug_id = wh.id
-                LEFT JOIN {Procedure.__tablename__} AS pr
-                ON vdp.lpprocedure_id = pr.id
-            )
-        """
-        ret = self.mv.con.execute(query).fetchone()
-        assert ret is not None
-        return ret
 
 
 class MonthWarehouseReportDialog(wx.Dialog):
@@ -225,7 +188,7 @@ class MonthWarehouseReportDialog(wx.Dialog):
         ret = self.mv.con.execute(query).fetchall()
         return ret
 
-    def export(self, e):
+    def export(self, _):
         path = os.path.join(APP_DIR, "dungthuoctrongthang.txt")
         with open(path, mode="w", encoding="utf-8") as f:
             for row in self.res:

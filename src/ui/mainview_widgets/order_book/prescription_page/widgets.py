@@ -16,7 +16,7 @@ from misc import (
 from ui.generic_widgets import NumberTextCtrl, DoseTextCtrl
 import wx
 
-T = list[NewLineDrugListStateItem] | list[OldLineDrugListStateItem]
+T = list[NewLineDrugListStateItem] | list[OldLineDrugListStateItem] | list[NewLineDrugListStateItem | OldLineDrugListStateItem ]
 
 
 class DrugListCtrl(wx.ListCtrl):
@@ -50,7 +50,7 @@ class DrugListCtrl(wx.ListCtrl):
             item.quantity,
             wh.usage_unit,
             wh.sale_unit,
-            item.note,
+            item.usage_note,
         )
 
         self.Append(
@@ -73,7 +73,7 @@ class DrugListCtrl(wx.ListCtrl):
             item.quantity,
             wh.usage_unit,
             wh.sale_unit,
-            item.note,
+            item.usage_note,
         )
         self.SetItem(idx, 2, times)
         self.SetItem(idx, 3, dose)

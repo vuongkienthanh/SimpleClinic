@@ -14,8 +14,8 @@ from ui.dialogs import (
     WarehouseDialog,
     SampleDialog,
     ProcedureDialog,
-    DayReportDialog,
-    MonthReportDialog,
+    DayFinanceReportDialog,
+    MonthFinanceReportDialog,
     MonthWarehouseReportDialog,
 )
 from ui.dialogs.picker_dialog import MonthPickerDialog, DatePickerDialog
@@ -313,13 +313,13 @@ class MyMenuBar(wx.MenuBar):
         mv: "mainview.MainView" = self.GetFrame()
         datepickerdialog = DatePickerDialog(mv)
         if datepickerdialog.ShowModal() == wx.ID_OK:
-            DayReportDialog(mv, datepickerdialog.GetDate()).ShowModal()
+            DayFinanceReportDialog(mv, datepickerdialog.GetDate()).ShowModal()
 
     def onMonthReport(self, _):
         mv: "mainview.MainView" = self.GetFrame()
         monthpickerdialog = MonthPickerDialog(mv)
         if monthpickerdialog.ShowModal() == wx.ID_OK:
-            MonthReportDialog(
+            MonthFinanceReportDialog(
                 mv, monthpickerdialog.GetMonth(), monthpickerdialog.GetYear()
             ).ShowModal()
 

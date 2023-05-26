@@ -5,7 +5,7 @@ from .warehouse_dialog import WarehouseDialog
 from .sample_prescription_dialog import SampleDialog
 from .procedure_dialog import ProcedureDialog
 from .report_dialog import (
-    DayReportDialog,
-    MonthReportDialog,
+    DayFinanceReportDialog,
+    MonthFinanceReportDialog,
     MonthWarehouseReportDialog,
 )

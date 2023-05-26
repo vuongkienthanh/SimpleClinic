@@ -15,8 +15,12 @@ class Gender(enum.Enum):
         return ["Nam", "Nữ"][self.value]
 
     @classmethod
-    def from_s(cls, s: str):
-        return {"Nam": Gender.m, "Nữ": Gender.f}[s]
+    def from_s(cls, s: str) -> "Gender":
+        match s:
+            case "Nam": return Gender.m
+            case "Nữ": return Gender.f
+            case _:
+                raise IndexError("Invalid gender string")
 
 
 @dataclass
@@ -167,7 +171,7 @@ class LineDrug(BASE):
         "times",
         "quantity",
         "visit_id",
-        "note",
+        "usage_note",
     ]
 
     id: int
@@ -176,7 +180,7 @@ class LineDrug(BASE):
     times: int
     quantity: int
     visit_id: int
-    note: str | None = None
+    usage_note: str | None = None
 
 
 @dataclass(slots=True)
@@ -192,7 +196,7 @@ class Warehouse(BASE):
     - `sale_unit`: Đơn vị bán
     - `expire_date`: Ngày hết hạn
     - `made_by`: Xuất xứ
-    - `note`: Ghi chú
+    - `drug_note`: Ghi chú
     """
 
     __tablename__ = "warehouse"
@@ -207,7 +211,7 @@ class Warehouse(BASE):
         "sale_unit",
         "expire_date",
         "made_by",
-        "note",
+        "drug_note",
     ]
     id: int
     name: str
@@ -220,7 +224,7 @@ class Warehouse(BASE):
     sale_unit: str | None = None
     expire_date: dt.date | None = None
     made_by: str | None = None
-    note: str | None = None
+    drug_note: str | None = None
 
 
 @dataclass(slots=True)

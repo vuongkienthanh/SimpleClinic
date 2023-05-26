@@ -52,7 +52,7 @@ class AddDrugButton(wx.BitmapButton):
                 ld.times = int(page.times.Value)
                 ld.dose = page.dose.Value
                 ld.quantity = int(page.quantity.Value)
-                ld.note = note
+                ld.usage_note = note
                 idx: int = page.drug_list.GetFirstSelected()
                 page.drug_list.update_ui(idx, ld)
             state.warehouse = None
@@ -141,7 +141,7 @@ class UseSamplePrescriptionBtn(wx.Button):
                             self.mv.state.all_warehouse[lsp.warehouse_id].sale_unit,
                             self.mv.config,
                         ),
-                        note=None,
+                        usage_note=None,
                     )
                     self.parent.drug_list.append_ui(item)
                     self.mv.state.new_linedrug_list.append(item)

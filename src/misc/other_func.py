@@ -72,6 +72,7 @@ def times_dose_quantity_note_str(
     )
 
 
+@cache
 def calc_quantity(
     times: int, dose: str, days: int, sale_unit: str | None, config: Config
 ) -> int:
@@ -110,26 +111,24 @@ def str_to_int_price(price: str) -> int:
     return int(price.replace(".", ""))
 
 
-def vn_weekdays(d: int):
-    """
-    0 -> Thứ hai
-    1 -> Thứ ba
-    2 -> Thứ tư
-    3 -> Thứ năm
-    4 -> Thứ sáu
-    5 -> Thứ bảy
-    6 -> Chủ nhật
-    """
+def vn_weekdays(d: int) -> str:
     today = dt.date.today()
     target = today + dt.timedelta(days=d)
     wd = target.weekday()
-    vn = {
-        0: "Thứ hai",
-        1: "Thứ ba",
-        2: "Thứ tư",
-        3: "Thứ năm",
-        4: "Thứ sáu",
-        5: "Thứ bảy",
-        6: "Chủ nhật",
-    }
-    return f"=>{vn[wd]}"
+    match wd:
+        case 0:
+            return "Thứ hai"
+        case 1:
+            return "Thứ ba"
+        case 2:
+            return "Thứ tư"
+        case 3:
+            return "Thứ năm"
+        case 4:
+            return "Thứ sáu"
+        case 5:
+            return "Thứ bảy"
+        case 6:
+            return "Chủ nhật"
+        case _:
+            raise IndexError("wrong date")

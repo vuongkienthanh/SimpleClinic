@@ -1,6 +1,6 @@
 from state.seentoday_state import SeenTodayState
 from db import Patient, Patient, Queue
-from state.queue_state import QueueState
+from state.queue_state import QueueState, QueueStateItem
 from ui.generic_widgets import (
     DateTextCtrl,
     CalendarDatePicker,
@@ -10,6 +10,7 @@ from ui.generic_widgets import (
 )
 from misc import check_blank_to_none, check_none_to_blank
 from ui import mainview
+import datetime as dt
 import sqlite3
 import wx
 import wx.adv as adv
@@ -107,7 +108,7 @@ class BasePatientDialog(wx.Dialog):
         else:
             return True
 
-    def onOkBtn(self, e: wx.CommandEvent) -> None:
+    def onOkBtn(self, _) -> None:
         ...
 
     def onBirthdateText(self, e: wx.CommandEvent):
@@ -134,19 +135,24 @@ class NewPatientDialog(BasePatientDialog):
     def onOkBtn(self, e):
         if self.is_valid():
             try:
-                name: str = self.name.Value
-                lastrowid = self.mv.connection.insert(
+                name: str = self.name.Value.strip().upper()
+                gender = self.gender.GetGender()
+                birthdate = self.birthdate.GetDate()
+                address = check_blank_to_none(self.address.Value)
+                phone = check_blank_to_none(self.phone.Value)
+                past_history = check_blank_to_none(self.past_history.Value)
+                pid = self.mv.connection.insert(
                     Patient,
                     {
-                        "name": name.strip().upper(),
-                        "gender": self.gender.GetGender(),
-                        "birthdate": self.birthdate.GetDate(),
-                        "address": check_blank_to_none(self.address.Value),
-                        "phone": check_blank_to_none(self.phone.Value),
-                        "past_history": check_blank_to_none(self.past_history.Value),
+                        "name": name,
+                        "gender": gender,
+                        "birthdate": birthdate,
+                        "address": address,
+                        "phone": phone,
+                        "past_history": past_history,
                     },
                 )
-                assert lastrowid is not None
+                assert pid is not None
                 wx.MessageBox("Đã thêm bệnh nhân mới thành công", "Bệnh nhân mới")
                 try:
                     if (
@@ -158,9 +164,13 @@ class NewPatientDialog(BasePatientDialog):
                         ).ShowModal()
                         == wx.ID_OK
                     ):
-                        self.mv.connection.insert(Queue, {"patient_id": lastrowid})
+                        self.mv.connection.insert(Queue, {"patient_id": pid})
                         wx.MessageBox("Thêm vào danh sách chờ thành công", "OK")
-                        self.mv.state.queue = QueueState.fetch(self.mv.connection)
+                        item = QueueStateItem(
+                            pid, name, gender, birthdate, dt.datetime.now()
+                        )
+                        self.mv.state.queue.append(item)
+                        self.mv.patient_book.queuelistctrl.append_ui(item)
                 except sqlite3.IntegrityError as error:
                     wx.MessageBox(f"Đã có tên trong danh sách chờ.\n{error}", "Lỗi")
                 e.Skip()

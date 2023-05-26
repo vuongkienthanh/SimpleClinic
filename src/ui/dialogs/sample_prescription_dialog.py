@@ -82,12 +82,12 @@ class SampleList(wx.ListCtrl):
         self.mv = parent.mv
         self.AppendColumn("name", width=self.mv.config.header_width(0.2))
         self.DeleteAllItems()
-        for sp in self.parent.mv.state.all_sampleprescription:
-            self.append(sp)
+        for sp in self.parent.mv.state.all_sampleprescription.values():
+            self.append_ui(sp)
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onSelect)
         self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onDeselect)
 
-    def append(self, sp: SamplePrescription) -> None:
+    def append_ui(self, sp: SamplePrescription) -> None:
         self.Append((sp.name,))
 
     def onSelect(self, e: wx.ListEvent):
@@ -99,7 +99,7 @@ class SampleList(wx.ListCtrl):
         sp = self.parent.mv.state.all_sampleprescription[idx]
         self.parent.itemlist.build(sp.id)
 
-    def onDeselect(self, e: wx.ListEvent):
+    def onDeselect(self, _):
         self.parent.deletesamplebtn.Disable()
         self.parent.picker.Disable()
         self.parent.dose.Disable()
@@ -113,15 +113,15 @@ class AddSampleButton(wx.Button):
         self.parent = parent
         self.Bind(wx.EVT_BUTTON, self.onClick)
 
-    def onClick(self, e) -> None:
+    def onClick(self, _) -> None:
         s = wx.GetTextFromUser("Tên toa mẫu mới", "Thêm toa mẫu")
         if s != "":
             sp = {"name": s}
             lastrowid = self.parent.mv.connection.insert(SamplePrescription, sp)
             assert lastrowid is not None
             sp = SamplePrescription(id=lastrowid, name=s)
-            self.parent.mv.state.all_sampleprescription.append(sp)
-            self.parent.samplelist.append(sp)
+            self.parent.mv.state.all_sampleprescription[lastrowid] = sp
+            self.parent.samplelist.append_ui(sp)
 
 
 class DeleteSampleButton(wx.Button):
@@ -131,14 +131,14 @@ class DeleteSampleButton(wx.Button):
         self.Disable()
         self.Bind(wx.EVT_BUTTON, self.onClick)
 
-    def onClick(self, e) -> None:
+    def onClick(self, _) -> None:
         idx: int = self.parent.samplelist.GetFirstSelected()
         assert idx >= 0
         sp = self.parent.mv.state.all_sampleprescription[idx]
         try:
             rowcount = self.parent.mv.connection.delete(SamplePrescription, sp.id)
             assert rowcount is not None
-            self.parent.mv.state.all_sampleprescription.pop(idx)
+            del self.parent.mv.state.all_sampleprescription[idx]
             self.parent.samplelist.DeleteItem(idx)
             self.Disable()
         except Exception as error:
@@ -150,12 +150,12 @@ class Picker(wx.Choice):
         super().__init__(
             parent,
             choices=[
-                f"{wh.name}({wh.element})" for wh in parent.mv.state.all_warehouse
+                f"{wh.name}({wh.element})" for wh in parent.mv.state.all_warehouse.values()
             ],
             name=name,
         )
         self.Disable()
-        self.Bind(wx.EVT_CHOICE, lambda e: parent.adddrugbtn.check_state())
+        self.Bind(wx.EVT_CHOICE, lambda _: parent.adddrugbtn.check_state())
 
 
 class Dose(DoseTextCtrl):
@@ -163,7 +163,7 @@ class Dose(DoseTextCtrl):
         super().__init__(parent, name=name)
         self.SetHint("liều")
         self.Disable()
-        self.Bind(wx.EVT_TEXT, lambda e: parent.adddrugbtn.check_state())
+        self.Bind(wx.EVT_TEXT, lambda _: parent.adddrugbtn.check_state())
 
 
 class Times(NumberTextCtrl):
@@ -171,7 +171,7 @@ class Times(NumberTextCtrl):
         super().__init__(parent, name=name)
         self.SetHint("lần")
         self.Disable()
-        self.Bind(wx.EVT_TEXT, lambda e: parent.adddrugbtn.check_state())
+        self.Bind(wx.EVT_TEXT, lambda _: parent.adddrugbtn.check_state())
 
 
 class AddDrugButton(wx.Button):
@@ -191,7 +191,7 @@ class AddDrugButton(wx.Button):
         else:
             self.Disable()
 
-    def onClick(self, e: wx.CommandEvent):
+    def onClick(self, _):
         idx: int = self.parent.picker.GetCurrentSelection()
         wh = self.parent.mv.state.all_warehouse[idx]
         idx: int = self.parent.samplelist.GetFirstSelected()
@@ -234,7 +234,7 @@ class DeleteDrugButton(wx.Button):
         self.Disable()
         self.Bind(wx.EVT_BUTTON, self.onClick)
 
-    def onClick(self, e: wx.CommandEvent):
+    def onClick(self, _):
         idx: int = self.parent.itemlist.GetFirstSelected()
         lsp_id = self.parent.itemlist.pop(idx)
         self.parent.mv.connection.delete(LineSamplePrescription, lsp_id)
@@ -278,8 +278,8 @@ class ItemList(wx.ListCtrl):
         lsp_id = self._list_id.pop(idx)
         return lsp_id
 
-    def onSelect(self, e: wx.ListEvent):
+    def onSelect(self, _):
         self.parent.deletedrugbtn.Enable()
 
-    def onDeselect(self, e: wx.ListEvent):
+    def onDeselect(self, _):
         self.parent.deletedrugbtn.Disable()

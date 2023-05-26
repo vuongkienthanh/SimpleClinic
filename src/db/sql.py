@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS {Warehouse.__tablename__} (
     sale_price INTEGER NOT NULL,
     expire_date DATE,
     made_by TEXT,
-    note TEXT,
+    drug_note TEXT,
     CHECK (quantity >= 0),
     CHECK ((sale_price >= purchase_price) AND (purchase_price >= 0))
 );
@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS {LineDrug.__tablename__} (
     dose TEXT NOT NULL,
     quantity INTEGER NOT NULL,
     visit_id INTEGER NOT NULL,
-    note TEXT,
+    usage_note TEXT,
     FOREIGN KEY (visit_id) REFERENCES {Visit.__tablename__} (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
@@ -173,6 +173,9 @@ CREATE VIEW IF NOT EXISTS {Appointment.__tablename__}_view AS
     WHERE DATE(a.appointed_date, 'localtime') = DATE('now', 'localtime')
 ;
 
+"""
+
+create_trigger_sql = f"""
 CREATE TRIGGER IF NOT EXISTS last_open_date_update
 AFTER UPDATE OF last_open_date ON singleton 
 WHEN DATE(OLD.last_open_date, 'localtime') < DATE(NEW.last_open_date, 'localtime')

@@ -92,7 +92,7 @@ def sample_con():
             "recheck": 2,
             "patient_id": 6,
             "follow": "follow",
-            "vnote": "dynamic created",
+            "vnote": "fake",
         },
     )
     print("Fake data generated")

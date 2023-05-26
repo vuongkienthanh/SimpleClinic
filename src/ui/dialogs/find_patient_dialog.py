@@ -299,6 +299,7 @@ class FindPatientDialog(wx.Dialog):
             wx.MessageBox("Thêm vào danh sách chờ thành công", "OK")
             idx: int = self.lc.GetFirstSelected()
             assert idx != -1
+            self.lc.GetItemText(idx, 2)
             item = QueueStateItem(
                 pid,
                 self.lc.GetItemText(idx, 1),

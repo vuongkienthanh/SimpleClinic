@@ -161,7 +161,11 @@ class SaveBtn(wx.Button):
                             for item in state.new_lineprocedure_list
                         ),
                     )
-                    wx.MessageBox("Lưu lượt khám mới thành công", "Lưu lượt khám mới")
+                    wx.MessageBox(
+                        "Lưu lượt khám mới thành công",
+                        "Lưu lượt khám mới",
+                        style=wx.OK_DEFAULT | wx.ICON_NONE,
+                    )
                     if self.mv.config.ask_print:
                         if (
                             wx.MessageBox("In toa về?", "In toa", style=wx.YES | wx.NO)
@@ -257,7 +261,11 @@ class SaveBtn(wx.Button):
                             for item in state.new_lineprocedure_list
                         ),
                     )
-                wx.MessageBox("Cập nhật lượt khám thành công", "Cập nhật lượt khám")
+                wx.MessageBox(
+                    "Cập nhật lượt khám thành công",
+                    "Cập nhật lượt khám",
+                    style=wx.OK_DEFAULT | wx.ICON_NONE,
+                )
                 if self.mv.config.ask_print:
                     if (
                         wx.MessageBox("In toa về?", "In toa", style=wx.YES | wx.NO)

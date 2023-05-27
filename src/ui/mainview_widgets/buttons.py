@@ -89,8 +89,11 @@ class NewVisitBtn(wx.Button):
         self.Disable()
 
     def onClick(self, _):
-        idx: int = self.mv.visit_list.GetFirstSelected()
-        self.mv.visit_list.Select(idx, 0)
+        if self.mv.patient_book.Selection == 1:
+            self.mv.state.visit = None
+        else:
+            idx: int = self.mv.visit_list.GetFirstSelected()
+            self.mv.visit_list.Select(idx, 0)
 
 
 class SaveBtn(wx.Button):

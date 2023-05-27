@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS {Visit.__tablename__} (
     patient_id INTEGER NOT NULL,
     vnote TEXT,
     follow TEXT,
-    FOREIGN KEY (patient_id) REFERENCES {Patient.__tablename__} (id)
+    CONSTRAINT visit_ref_patient FOREIGN KEY (patient_id) REFERENCES {Patient.__tablename__} (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
     CONSTRAINT recheck_BE_0 CHECK (recheck >=0),
@@ -37,18 +37,19 @@ CREATE TABLE IF NOT EXISTS {Queue.__tablename__} (
     id INTEGER PRIMARY KEY,
     patient_id INTEGER UNIQUE NOT NULL,
     added_datetime TIMESTAMP DEFAULT (datetime('now', 'localtime')),
-    FOREIGN KEY (patient_id) REFERENCES {Patient.__tablename__} (id)
+    CONSTRAINT queue_ref_patient FOREIGN KEY (patient_id) REFERENCES {Patient.__tablename__} (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
 CREATE TABLE IF NOT EXISTS {SeenToday.__tablename__} (
     id INTEGER PRIMARY KEY,
-    patient_id INTEGER UNIQUE NOT NULL,
-    visit_id INTEGER UNIQUE NOT NULL,
-    FOREIGN KEY (patient_id) REFERENCES {Patient.__tablename__} (id)
+    patient_id INTEGER NOT NULL,
+    visit_id INTEGER NOT NULL,
+    CONSTRAINT patient_visit_unique_for_seentoday UNIQUE (patient_id, visit_id),
+    CONSTRAINT seentoday_ref_patient FOREIGN KEY (patient_id) REFERENCES {Patient.__tablename__} (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    FOREIGN KEY (visit_id) REFERENCES {Visit.__tablename__} (id)
+    CONSTRAINT seentoday_ref_visit FOREIGN KEY (visit_id) REFERENCES {Visit.__tablename__} (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
@@ -56,7 +57,7 @@ CREATE TABLE IF NOT EXISTS {Appointment.__tablename__} (
     id INTEGER PRIMARY KEY,
     patient_id INTEGER UNIQUE NOT NULL,
     appointed_date DATE NOT NULL,
-    FOREIGN KEY (patient_id) REFERENCES {Patient.__tablename__} (id)
+    CONSTRAINT appointment_ref_patient FOREIGN KEY (patient_id) REFERENCES {Patient.__tablename__} (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
@@ -87,10 +88,10 @@ CREATE TABLE IF NOT EXISTS {LineDrug.__tablename__} (
     quantity INTEGER NOT NULL,
     visit_id INTEGER NOT NULL,
     usage_note TEXT,
-    FOREIGN KEY (visit_id) REFERENCES {Visit.__tablename__} (id)
+    CONSTRAINT linedrug_ref_visit FOREIGN KEY (visit_id) REFERENCES {Visit.__tablename__} (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    FOREIGN KEY (warehouse_id) REFERENCES {Warehouse.__tablename__} (id)
+    CONSTRAINT linedrug_ref_warehouse FOREIGN KEY (warehouse_id) REFERENCES {Warehouse.__tablename__} (id)
         ON DELETE RESTRICT
         ON UPDATE NO ACTION,
     CONSTRAINT qt_ti_do_check CHECK (
@@ -109,10 +110,10 @@ CREATE TABLE IF NOT EXISTS {LineSamplePrescription.__tablename__} (
     sample_id INTEGER NOT NULL,
     times INTEGER NOT NULL,
     dose TEXT NOT NULL,
-    FOREIGN KEY (warehouse_id) REFERENCES {Warehouse.__tablename__} (id)
+    CONSTRAINT linesampleprescription_ref_warehouse FOREIGN KEY (warehouse_id) REFERENCES {Warehouse.__tablename__} (id)
         ON DELETE RESTRICT
         ON UPDATE NO ACTION,
-    FOREIGN KEY (sample_id) REFERENCES {SamplePrescription.__tablename__} (id)
+    CONSTRAINT linesampleprescription_ref_sample FOREIGN KEY (sample_id) REFERENCES {SamplePrescription.__tablename__} (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
     CONSTRAINT ti_do_check CHECK (times > 0 AND dose != ''),
@@ -128,10 +129,10 @@ CREATE TABLE IF NOT EXISTS {LineProcedure.__tablename__} (
     id INTEGER PRIMARY KEY,
     procedure_id INTEGER NOT NULL,
     visit_id INTEGER NOT NULL,
-    FOREIGN KEY (visit_id) REFERENCES {Visit.__tablename__} (id)
+    CONSTRAINT lineprocedure_ref_visit FOREIGN KEY (visit_id) REFERENCES {Visit.__tablename__} (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    FOREIGN KEY (procedure_id) REFERENCES {Procedure.__tablename__} (id)
+    CONSTRAINT lineprocedure_ref_procedure FOREIGN KEY (procedure_id) REFERENCES {Procedure.__tablename__} (id)
         ON DELETE RESTRICT
         ON UPDATE NO ACTION
 );
@@ -223,10 +224,15 @@ BEFORE INSERT ON {Visit.__tablename__}
 BEGIN
 DELETE FROM {Queue.__tablename__}
     WHERE patient_id = NEW.patient_id;
-INSERT INTO {SeenToday.__tablename__} ({SeenToday.commna_joined_field_names()})
-VALUES (NEW.patient_id, NEW.id);
 DELETE FROM {Appointment.__tablename__}
     WHERE patient_id = NEW.patient_id;
+END;
+
+CREATE TRIGGER IF NOT EXISTS visit_insert_after
+AFTER INSERT ON {Visit.__tablename__}
+BEGIN
+INSERT INTO {SeenToday.__tablename__} ({SeenToday.commna_joined_field_names()})
+    VALUES (NEW.patient_id, NEW.id);
 END;
 
 CREATE TRIGGER IF NOT EXISTS visit_insert_after_recheck
@@ -234,7 +240,8 @@ AFTER INSERT ON {Visit.__tablename__}
 WHEN NEW.recheck > 0
 BEGIN
 INSERT INTO {Appointment.__tablename__} ({Appointment.commna_joined_field_names()})
-VALUES (NEW.patient_id, DATE('now','localtime', '+'||CAST(NEW.recheck AS TEXT)||' days'));
+VALUES (NEW.patient_id, DATE('now','localtime', '+'||CAST(NEW.recheck AS TEXT)||' days'))
+ON CONFLICT (patient_id) DO UPDATE SET appointed_date=excluded.appointed_date;
 END;
 
 CREATE TRIGGER IF NOT EXISTS visit_update

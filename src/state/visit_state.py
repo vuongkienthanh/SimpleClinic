@@ -34,8 +34,7 @@ class VisitState:
         obj.to_delete_old_lineprocedure_list.clear()
         mv.savebtn.SetLabel("Cập nhật")
         mv.price.SetPrice(v.price)
-        if mv.patient_book.GetSelection() == 0:
-            mv.newvisitbtn.Enable()
+        mv.newvisitbtn.Enable()
         mv.order_book.prescriptionpage.reuse_druglist_btn.Enable()
         menubar: "menubar.MyMenuBar" = mv.MenuBar
         menubar.menuNewVisit.Enable()

@@ -131,12 +131,11 @@ class SeenTodayListCtrl(BasePatientListCtrl):
 
     def onDeselect(self, _):
         self.mv.state.patient = None
-        self.mv.state.visit = None
         self.SetFocus()
 
 
 class AppointmentListCtrl(BasePatientListCtrl):
-    "Set `state.patient` and `state.visit` when select item"
+    "Set `state.patient` when select item"
 
     def __init__(self, parent: PatientBook):
         super().__init__(parent)

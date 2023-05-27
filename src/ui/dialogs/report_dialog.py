@@ -51,19 +51,19 @@ def finance_report(
         FROM (
             SELECT
                 COUNT(DISTINCT vdp.vid) AS visit_count,
-                TOTAL(v.price) as real_revenue,
+                TOTAL(visit_price) as real_revenue,
                 CAST(TOTAL(vdp.ldquantity * wh.purchase_price) AS INTEGER) AS drug_purchase,
                 CAST(TOTAL(vdp.ldquantity * wh.sale_price) AS INTEGER) AS drug_sale,
                 CAST(TOTAL(pr.price) AS INTEGER) AS procedure_profit
             FROM (
                 SELECT
                     v.id AS vid,
-                    v.price,
+                    v.price AS visit_price,
                     ld.warehouse_id AS ldwarehouse_id,
                     ld.quantity AS ldquantity,
                     lp.procedure_id AS lpprocedure_id
                 FROM (
-                    SELECT id FROM {Visit.__tablename__} {visit_where_clause}
+                    SELECT id,price FROM {Visit.__tablename__} {visit_where_clause}
                 ) AS v
                 LEFT JOIN {LineDrug.__tablename__} AS ld
                 ON ld.visit_id = v.id
@@ -102,7 +102,7 @@ class FinanceReportDialog(wx.Dialog):
                     f"Tổng tiền thuốc (giá mua): {num_to_str_price(res['drug_purchase'])}"
                 ),
                 w(f"Tổng tiền thuốc (giá bán): {num_to_str_price(res['drug_sale'])}"),
-                w(f"Lợi nhuận từ thuốc: {num_to_str_price(res['profit_from_drug'])}"),
+                w(f"Lợi nhuận từ thuốc: {num_to_str_price(res['drug_profit'])}"),
                 w(
                     f"Lợi nhuận từ thủ thuật: {num_to_str_price(res['procedure_profit'])}"
                 ),

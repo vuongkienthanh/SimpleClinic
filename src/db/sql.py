@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS {SeenToday.__tablename__} (
 );
 CREATE TABLE IF NOT EXISTS {Appointment.__tablename__} (
     id INTEGER PRIMARY KEY,
-    patient_id INTEGER NOT NULL,
+    patient_id INTEGER UNIQUE NOT NULL,
     appointed_date DATE NOT NULL,
     FOREIGN KEY (patient_id) REFERENCES {Patient.__tablename__} (id)
         ON DELETE CASCADE
@@ -191,9 +191,9 @@ BEFORE UPDATE OF last_open_date ON singleton
 WHEN JULIANDAY(OLD.last_open_date) < JULIANDAY(NEW.last_open_date)
 BEGIN
 DELETE FROM {Queue.__tablename__};
-DELETE FROM {SeenToday.__tablename__}; 
+DELETE FROM {SeenToday.__tablename__};
 DELETE FROM {Appointment.__tablename__} 
-    WHERE JULIANDAY({Appointment.__tablename__}.appointed_date) < JULIANDAY(NEW.last_open_date);
+    WHERE JULIANDAY(appointed_date) < JULIANDAY(NEW.last_open_date);
 END;
 
 CREATE TRIGGER IF NOT EXISTS linedrug_insert 
@@ -223,18 +223,44 @@ BEFORE INSERT ON {Visit.__tablename__}
 BEGIN
 DELETE FROM {Queue.__tablename__}
     WHERE patient_id = NEW.patient_id;
-END;
-
-CREATE TRIGGER IF NOT EXISTS visit_insert_after
-AFTER INSERT ON {Visit.__tablename__}
-BEGIN
 INSERT INTO {SeenToday.__tablename__} ({SeenToday.commna_joined_field_names()})
 VALUES (NEW.patient_id, NEW.id);
+DELETE FROM {Appointment.__tablename__}
+    WHERE patient_id = NEW.patient_id;
+END;
+
+CREATE TRIGGER IF NOT EXISTS visit_insert_after_recheck
+AFTER INSERT ON {Visit.__tablename__}
+WHEN NEW.recheck > 0
+BEGIN
 INSERT INTO {Appointment.__tablename__} ({Appointment.commna_joined_field_names()})
 VALUES (NEW.patient_id, DATE('now','localtime', '+'||CAST(NEW.recheck AS TEXT)||' days'));
+END;
+
+CREATE TRIGGER IF NOT EXISTS visit_update
+BEFORE UPDATE OF recheck ON {Visit.__tablename__}
+WHEN NEW.recheck > 0 AND OLD.recheck > 0 AND NEW.recheck != OLD.recheck
+BEGIN
+UPDATE {Appointment.__tablename__} SET appointed_date=DATE(NEW.exam_datetime, 'localtime','+'||CAST(NEW.recheck AS TEXT)||' days')
+WHERE patient_id = OLD.patient_id;
+END;
+
+CREATE TRIGGER IF NOT EXISTS visit_update_before_recheck_BT_0
+BEFORE UPDATE OF recheck ON {Visit.__tablename__}
+WHEN NEW.recheck > 0 AND OLD.recheck = 0
+BEGIN
+INSERT INTO {Appointment.__tablename__} ({Appointment.commna_joined_field_names()})
+VALUES (NEW.patient_id, DATE('now','localtime', '+'||CAST(NEW.recheck AS TEXT)||' days'));
+END;
+
+CREATE TRIGGER IF NOT EXISTS visit_update_before_recheck_EQ_0
+BEFORE UPDATE OF recheck ON {Visit.__tablename__}
+WHEN NEW.recheck = 0 AND OLD.recheck > 0
+BEGIN
+DELETE FROM {Appointment.__tablename__} WHERE patient_id = OLD.patient_id;
 END;
 """
 
 finalized_sql = f"""
-INSERT OR IGNORE INTO singleton (id, last_open_date) VALUES ( 1, DATE('now', 'localtime', '-1 day'));
+INSERT OR IGNORE INTO singleton (id, last_open_date) VALUES ( 1, DATE('now', 'localtime'));
 """

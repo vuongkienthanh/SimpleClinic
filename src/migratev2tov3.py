@@ -38,6 +38,13 @@ new_con.executemany(
     VALUES (:id, :added_datetime, {Queue.qmark_style_placeholders()})""",
     old_con.execute("SELECT * FROM queuelist").fetchall(),
 )
+new_con.executescript(
+    f"""
+    INSERT INTO {SeenToday.__tablename__} 
+    (patient_id, visit_id) 
+    SELECT patient_id, id FROM visits 
+    WHERE DATE(exam_datetime) = DATE('now','localtime')"""
+)
 new_con.executemany(
     f"""
     INSERT INTO {Warehouse.__tablename__} 
@@ -93,8 +100,8 @@ new_con.executemany(
 new_con.executescript(
     f"""
     INSERT INTO {Appointment.__tablename__} (patient_id, appointed_date) 
-    SELECT patient_id, DATE(exam_datetime, 'localtime', '+'||CAST(recheck AS text)||' days')
-    FROM visits
+    SELECT patient_id, DATE(exam_datetime, 'localtime', '+'||CAST(recheck AS text)||' days') FROM visits WHERE true
+    ON CONFLICT (patient_id) DO UPDATE SET appointed_date=excluded.appointed_date
     """
 )
 new_con.commit()

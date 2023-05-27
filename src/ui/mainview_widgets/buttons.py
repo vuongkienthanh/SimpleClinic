@@ -212,7 +212,7 @@ class SaveBtn(wx.Button):
                     con.executemany(
                         f"""
                         UPDATE {LineDrug.__tablename__}
-                        SET (dose, times, quantity, note) = (?,?,?,?)
+                        SET (dose, times, quantity, usage_note) = (?,?,?,?)
                         WHERE id=?
                     """,
                         (

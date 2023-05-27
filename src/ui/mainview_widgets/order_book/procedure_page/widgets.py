@@ -1,14 +1,7 @@
 from ui import mainview
 from ui.mainview_widgets.order_book import order_book
-from state.lineprocedure_state import (
-    LineProcedureListStateItem,
-    NewLineProcedureListStateItem,
-    OldLineProcedureListStateItem,
-)
+from state.lineprocedure_state import LineProcedureListItem, LineProcedureList
 import wx
-
-
-T = list[NewLineProcedureListStateItem] | list[OldLineProcedureListStateItem]
 
 
 class ProcedureListCtrl(wx.ListCtrl):
@@ -16,16 +9,18 @@ class ProcedureListCtrl(wx.ListCtrl):
         super().__init__(parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
         self.mv: "mainview.MainView" = parent.mv
         self.AppendColumn("Tên thủ thuật", width=self.mv.config.header_width(0.2))
+        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onSelect)
+        self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onDeselect)
 
-    def build(self, _list: T):
+    def build(self, _list: LineProcedureList):
         for item in _list:
             self.append_ui(item)
 
-    def rebuild(self, _list: T):
+    def rebuild(self, _list: LineProcedureList):
         self.DeleteAllItems()
         self.build(_list)
 
-    def append_ui(self, item: LineProcedureListStateItem):
+    def append_ui(self, item: LineProcedureListItem):
         proc = self.mv.state.all_procedure[item.procedure_id]
         self.Append((proc.name,))
 
@@ -43,5 +38,5 @@ class ProcedureListCtrl(wx.ListCtrl):
                 idx - len(state.old_lineprocedure_list)
             ]
 
-    def OnDeselect(self, _) -> None:
+    def onDeselect(self, _) -> None:
         self.mv.state.lineprocedure = None

@@ -90,4 +90,11 @@ new_con.executemany(
         for ls in old_con.execute("SELECT * FROM linesampleprescription").fetchall()
     ),
 )
+new_con.executescript(
+    f"""
+    INSERT INTO {Appointment.__tablename__} (patient_id, appointed_date) 
+    SELECT patient_id, DATE(exam_datetime, 'localtime', '+'||CAST(recheck AS text)||' days')
+    FROM visits
+    """
+)
 new_con.commit()

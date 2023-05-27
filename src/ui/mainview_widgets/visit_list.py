@@ -1,6 +1,6 @@
 from ui import mainview as mv
 from db import Visit
-from state import visit_list_state
+from state.visit_list_state import VisitListStateItem
 import wx
 
 
@@ -16,15 +16,15 @@ class VisitListCtrl(wx.ListCtrl):
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onSelect)
         self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onDeselect)
 
-    def build(self, _list: list["visit_list_state.VisitListStateItem"]):
+    def build(self, _list: list[VisitListStateItem]):
         for item in _list:
             self.append_ui(item)
 
-    def rebuild(self, _list: list["visit_list_state.VisitListStateItem"]):
+    def rebuild(self, _list: list[VisitListStateItem]):
         self.DeleteAllItems()
         self.build(_list)
 
-    def append_ui(self, item: "visit_list_state.VisitListStateItem"):
+    def append_ui(self, item: VisitListStateItem):
         self.Append(
             [
                 item.visit_id,
@@ -34,9 +34,8 @@ class VisitListCtrl(wx.ListCtrl):
         )
 
     def onSelect(self, e: wx.ListEvent):
-        item = self.mv.state.visit_list[e.Index]
-        vid = item.vid
-        v = self.mv.connection.select(Visit, vid)
+        item: VisitListStateItem = self.mv.state.visit_list[e.Index]
+        v = self.mv.connection.select(Visit, item.visit_id)
         assert v is not None
         self.mv.state.visit = v
         self.SetFocus()

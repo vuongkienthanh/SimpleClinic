@@ -1,3 +1,4 @@
+from state.appointment_state import AppointmentStateItem
 from ui import mainview
 from ui.dialogs import EditPatientDialog
 from state.queue_state import QueueStateItem
@@ -5,8 +6,8 @@ from state.seentoday_state import SeenTodayStateItem
 from db import Patient, Visit
 import wx
 
-StateList = list[QueueStateItem] | list[SeenTodayStateItem]
-StateItem = QueueStateItem | SeenTodayStateItem
+StateList = list[QueueStateItem] | list[SeenTodayStateItem] | list[AppointmentStateItem]
+StateItem = QueueStateItem | SeenTodayStateItem | AppointmentStateItem
 
 
 class PatientBook(wx.Notebook):
@@ -15,8 +16,10 @@ class PatientBook(wx.Notebook):
         self.mv = parent
         self.queuelistctrl = QueuePatientListCtrl(self)
         self.seentodaylistctrl = SeenTodayListCtrl(self)
+        self.appointmentlistctrl = AppointmentListCtrl(self)
         self.AddPage(page=self.queuelistctrl, text="Danh sách chờ khám", select=True)
         self.AddPage(page=self.seentodaylistctrl, text="Danh sách đã khám hôm nay")
+        self.AddPage(page=self.appointmentlistctrl, text="Danh sách tái khám")
         self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGING, self.onChanging)
 
     def onChanging(self, e: wx.BookCtrlEvent):
@@ -129,4 +132,34 @@ class SeenTodayListCtrl(BasePatientListCtrl):
     def onDeselect(self, _):
         self.mv.state.patient = None
         self.mv.state.visit = None
+        self.SetFocus()
+
+
+class AppointmentListCtrl(BasePatientListCtrl):
+    "Set `state.patient` and `state.visit` when select item"
+
+    def __init__(self, parent: PatientBook):
+        super().__init__(parent)
+
+    def append_ui(self, item: AppointmentStateItem):
+        self.Append(
+            [
+                item.patient_id,
+                item.name,
+                str(item.gender),
+                item.birthdate.strftime("%d/%m/%Y"),
+            ]
+        )
+
+    def onSelect(self, e: wx.ListEvent):
+        idx: int = e.Index
+        target = self.mv.state.appointment[idx]
+        pid: int = target.patient_id
+        p = self.mv.connection.select(Patient, pid)
+        assert p is not None
+        self.mv.state.patient = p
+        self.SetFocus()
+
+    def onDeselect(self, _):
+        self.mv.state.patient = None
         self.SetFocus()

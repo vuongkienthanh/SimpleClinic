@@ -113,7 +113,7 @@ class SeenToday(BASE):
 class Appointment(BASE):
     """Danh sách hẹn tái khám"""
 
-    __tablename__ = "appointments"
+    __tablename__ = "appointment"
     __match_args__ = ["patient_id", "appointed_date"]
     id: int
     patient_id: int
@@ -160,7 +160,7 @@ class Visit(BASE):
 @dataclass(slots=True)
 class LineDrug(BASE):
     """Thuốc trong toa
-    - `drug_id`: Mã thuốc
+    - `warehouse_id`: Mã thuốc
     - `dose`: Liều một cữ
     - `times`: Số cữ
     - `quantity`: Số lượng

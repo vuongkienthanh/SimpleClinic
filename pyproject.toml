@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "SimpleClinic"
-version = "2.4"
+version = "3.0"
 description = "Phần mềm phòng khám Simple Clinic"
 license = "MIT"
 authors = ["vuongkienthanh <thanhstardust@outlook.com>"]

@@ -16,17 +16,20 @@ class NewLineProcedureListStateItem:
     procedure_id: int
 
 
-LineProcedureListStateItem = (
-    OldLineProcedureListStateItem | NewLineProcedureListStateItem
+LineProcedureListItem = OldLineProcedureListStateItem | NewLineProcedureListStateItem
+LineProcedureList = (
+    list[NewLineProcedureListStateItem]
+    | list[OldLineProcedureListStateItem]
+    | list[LineProcedureListItem]
 )
 
 
 class LineProcedureState:
-    def __get__(self, obj: "main_state.State", _) -> LineProcedureListStateItem | None:
+    def __get__(self, obj: "main_state.State", _) -> LineProcedureListItem | None:
         return obj._lineprocedure
 
     def __set__(
-        self, obj: "main_state.State", value: LineProcedureListStateItem | None
+        self, obj: "main_state.State", value: LineProcedureListItem | None
     ) -> None:
         obj._lineprocedure = value
         match value:
@@ -35,7 +38,7 @@ class LineProcedureState:
             case item:
                 self.onSet(obj, item)
 
-    def onSet(self, obj: "main_state.State", item: LineProcedureListStateItem):
+    def onSet(self, obj: "main_state.State", item: LineProcedureListItem):
         page = obj.mv.order_book.procedurepage
         page.procedure_picker.SetSelectionProcedureID(item.procedure_id)
         page.SetFocus()

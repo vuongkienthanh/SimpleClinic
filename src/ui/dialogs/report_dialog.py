@@ -195,7 +195,7 @@ class MonthWarehouseReportDialog(wx.Dialog):
             ) AS v
             ON ld.visit_id = v.id
             LEFT JOIN {Warehouse.__tablename__} AS wh
-            ON ld.drug_id = wh.id
+            ON ld.warehouse_id = wh.id
             GROUP BY wh.name
         """
         ret = self.mv.con.execute(query).fetchall()

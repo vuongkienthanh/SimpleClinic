@@ -203,7 +203,7 @@ class AddDrugButton(wx.Button):
         dose_str: str = self.parent.dose.GetValue()
         dose = dose_str.strip()
         lsp = {
-            "drug_id": wh.id,
+            "warehouse_id": wh.id,
             "sample_id": sp.id,
             "times": times,
             "dose": dose,
@@ -264,7 +264,7 @@ class ItemList(wx.ListCtrl):
                 WHERE sample_id = {sp_id}
             ) AS lsp
             JOIN {Warehouse.__tablename__} as wh
-            ON wh.id = lsp.drug_id
+            ON wh.id = lsp.warehouse_id
         """
         ).fetchall():
             self.append(lsp)

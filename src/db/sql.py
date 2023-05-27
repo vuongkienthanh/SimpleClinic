@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS {SeenToday.__tablename__} (
 );
 CREATE TABLE IF NOT EXISTS {Appointment.__tablename__} (
     id INTEGER PRIMARY KEY,
-    patient_id INTEGER UNIQUE NOT NULL,
+    patient_id INTEGER NOT NULL,
     appointed_date DATE NOT NULL,
     FOREIGN KEY (patient_id) REFERENCES {Patient.__tablename__} (id)
         ON DELETE CASCADE
@@ -187,13 +187,13 @@ CREATE VIEW IF NOT EXISTS {Appointment.__tablename__}_view AS
 
 create_trigger_sql = f"""
 CREATE TRIGGER IF NOT EXISTS last_open_date_update
-AFTER UPDATE OF last_open_date ON singleton 
-WHEN DATE(OLD.last_open_date, 'localtime') < DATE(NEW.last_open_date, 'localtime')
+BEFORE UPDATE OF last_open_date ON singleton 
+WHEN JULIANDAY(OLD.last_open_date) < JULIANDAY(NEW.last_open_date)
 BEGIN
 DELETE FROM {Queue.__tablename__};
 DELETE FROM {SeenToday.__tablename__}; 
 DELETE FROM {Appointment.__tablename__} 
-    WHERE DATE({Appointment.__tablename__}.appointed_date, 'localtime') < DATE('now','localtime');
+    WHERE JULIANDAY({Appointment.__tablename__}.appointed_date) < JULIANDAY(NEW.last_open_date);
 END;
 
 CREATE TRIGGER IF NOT EXISTS linedrug_insert 
@@ -230,9 +230,11 @@ AFTER INSERT ON {Visit.__tablename__}
 BEGIN
 INSERT INTO {SeenToday.__tablename__} ({SeenToday.commna_joined_field_names()})
 VALUES (NEW.patient_id, NEW.id);
+INSERT INTO {Appointment.__tablename__} ({Appointment.commna_joined_field_names()})
+VALUES (NEW.patient_id, DATE('now','localtime', '+'||CAST(NEW.recheck AS TEXT)||' days'));
 END;
 """
 
 finalized_sql = f"""
-INSERT OR IGNORE INTO singleton (id, last_open_date) VALUES ( 1, DATE('now', 'localtime'));
+INSERT OR IGNORE INTO singleton (id, last_open_date) VALUES ( 1, DATE('now', 'localtime', '-1 day'));
 """

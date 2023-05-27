@@ -23,16 +23,19 @@ class OldLineDrugListStateItem:
     usage_note: str | None
 
 
-LineDrugListStateItem = OldLineDrugListStateItem | NewLineDrugListStateItem
+LineDrugListItem = OldLineDrugListStateItem | NewLineDrugListStateItem
+LineDrugList = (
+    list[NewLineDrugListStateItem]
+    | list[OldLineDrugListStateItem]
+    | list[NewLineDrugListStateItem | OldLineDrugListStateItem]
+)
 
 
 class LineDrugState:
-    def __get__(self, obj: "main_state.State", _) -> LineDrugListStateItem | None:
+    def __get__(self, obj: "main_state.State", _) -> LineDrugListItem | None:
         return obj._linedrug
 
-    def __set__(
-        self, obj: "main_state.State", value: LineDrugListStateItem | None
-    ) -> None:
+    def __set__(self, obj: "main_state.State", value: LineDrugListItem | None) -> None:
         obj._linedrug = value
         match value:
             case None:
@@ -40,7 +43,7 @@ class LineDrugState:
             case item:
                 self.onSet(obj, item)
 
-    def onSet(self, obj: "main_state.State", item: LineDrugListStateItem) -> None:
+    def onSet(self, obj: "main_state.State", item: LineDrugListItem) -> None:
         mv = obj.mv
         page = mv.order_book.prescriptionpage
         obj.warehouse = obj.all_warehouse[item.warehouse_id]
@@ -89,14 +92,14 @@ class OldLineDrugListState:
     def fetch(v: Visit, connection: Connection):
         query = f"""
             SELECT 
-                ld.id, ld.drug_id as warehouse_id, 
+                ld.id, ld.warehouse_id,
                 ld.times, ld.dose,
                 ld.quantity, ld.usage_note
             FROM (SELECT * FROM {LineDrug.__tablename__}
                   WHERE visit_id = {v.id}
             ) AS ld
             JOIN {Warehouse.__tablename__} AS wh
-            ON wh.id = ld.drug_id
+            ON wh.id = ld.warehouse_id
         """
         rows = connection.execute(query).fetchall()
         return [OldLineDrugListStateItem(*row) for row in rows]

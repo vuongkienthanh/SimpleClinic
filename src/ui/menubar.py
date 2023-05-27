@@ -100,7 +100,7 @@ class MyMenuBar(wx.MenuBar):
         menuOpenConfigFolder: wx.MenuItem = settingMenu.Append(
             wx.ID_ANY, "Mở folder cài đặt + dữ liệu"
         )
-        menuVacuum: wx.MenuItem = settingMenu.Append(
+        menuReduceDatabaseSize: wx.MenuItem = settingMenu.Append(
             wx.ID_ANY, "Thu nhỏ kích thước dữ liệu"
         )
         menuBackup: wx.MenuItem = settingMenu.Append(wx.ID_ANY, "Sao lưu dữ liệu")
@@ -135,7 +135,7 @@ class MyMenuBar(wx.MenuBar):
         self.Bind(wx.EVT_MENU, self.onMonthWarehouseReport, menuMonthWarehouseReport)
         self.Bind(wx.EVT_MENU, self.onSetup, menuSetupConfig)
         self.Bind(wx.EVT_MENU, self.onOpenConfigFolder, menuOpenConfigFolder)
-        self.Bind(wx.EVT_MENU, self.onVacuum, menuVacuum)
+        self.Bind(wx.EVT_MENU, self.onReduceDatabaseSize, menuReduceDatabaseSize)
         self.Bind(wx.EVT_MENU, self.onBackup, menuBackup)
         self.Bind(wx.EVT_MENU, self.onResetConfig, menuResetConfig)
 
@@ -197,7 +197,9 @@ class MyMenuBar(wx.MenuBar):
             assert v is not None
             try:
                 mv.connection.delete(Visit, v.id)
-                wx.MessageBox("Xóa thành công", "OK")
+                wx.MessageBox(
+                    "Xóa thành công", "OK", style=wx.OK_DEFAULT | wx.ICON_NONE
+                )
                 visit_list_idx: int = mv.visit_list.GetFirstSelected()
                 assert visit_list_idx != -1, "visit_list not selected, cant delete"
                 mv.visit_list.DeleteItem(visit_list_idx)
@@ -224,7 +226,9 @@ class MyMenuBar(wx.MenuBar):
                     con.execute(
                         f"DELETE FROM {Queue.__tablename__} WHERE patient_id = {p.id}"
                     )
-                    wx.MessageBox("Xóa thành công", "OK")
+                    wx.MessageBox(
+                        "Xóa thành công", "OK", style=wx.OK_DEFAULT | wx.ICON_NONE
+                    )
                     mv.state.refresh()
             except Exception as error:
                 wx.MessageBox("Lỗi không xóa được\n" + str(error), "Lỗi")
@@ -343,12 +347,19 @@ class MyMenuBar(wx.MenuBar):
         elif sys.platform == "darwin":
             subprocess.run(["start", APP_DIR])
 
-    def onVacuum(self, _):
+    def onReduceDatabaseSize(self, _):
         mv: "mainview.MainView" = self.GetFrame()
-        pre, post = mv.connection.vacuum()
+        connection = mv.connection
+        pre = os.path.getsize(connection.path) >> 10
+        connection.execute(f"UPDATE {Visit.__tablename__} SET follow=NULL")
+        connection.execute(f"UPDATE {LineDrug.__tablename__} SET usage_note=NULL")
+        connection.commit()
+        connection.execute("VACUUM")
+        post = os.path.getsize(connection.path) >> 10
         wx.MessageBox(
-            f"Kích thước trước khi thu gọn: {pre} bytes\nKích thước sau khi thu gọn: {post} bytes",
+            f"Kích thước trước khi thu gọn: {pre} KB\nKích thước sau khi thu gọn: {post} KB",
             "Thu gọn dữ liệu",
+            style=wx.OK_DEFAULT | wx.ICON_NONE,
         )
 
     def onBackup(self, _):
@@ -359,7 +370,11 @@ class MyMenuBar(wx.MenuBar):
         )
         if Path(MY_DATABASE_PATH).exists():
             shutil.copyfile(MY_DATABASE_PATH, bak)
-            wx.MessageBox(f"Sao lưu thành công tại {bak}", "Sao lưu dữ liệu")
+            wx.MessageBox(
+                f"Sao lưu thành công tại {bak}",
+                "Sao lưu dữ liệu",
+                style=wx.OK_DEFAULT | wx.ICON_NONE,
+            )
         else:
             wx.MessageBox("Sao lưu không thành công", "Sao lưu dữ liệu")
 
@@ -371,6 +386,7 @@ class MyMenuBar(wx.MenuBar):
             wx.MessageBox(
                 f"Khôi phục cài đặt gốc thành công\nConfig cũ lưu tại {bak}",
                 "Khôi phục cài đặt gốc",
+                style=wx.OK_DEFAULT | wx.ICON_NONE,
             )
         except Exception as error:
             wx.MessageBox(f"Lỗi {error}", "Khôi phục cài đặt gốc")

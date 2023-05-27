@@ -69,6 +69,7 @@ class Connection:
 
     def update_last_open_date(self) -> dt.date | None:
         self.execute("UPDATE singleton SET last_open_date = ?", (dt.date.today(),))
+        self.commit()
 
     def insert(self, t: type[T], base: dict) -> int:
         with self:
@@ -112,9 +113,3 @@ class Connection:
             """,
                 base.qmark_style_sql_params(),
             ).rowcount
-
-    def vacuum(self):
-        pre = os.path.getsize(self.path)
-        self.execute("VACUUM")
-        post = os.path.getsize(self.path)
-        return pre, post

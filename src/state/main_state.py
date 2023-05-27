@@ -8,18 +8,19 @@ from .linedrug_state import (
     OldLineDrugListStateItem,
     NewLineDrugListState,
     NewLineDrugListStateItem,
-    LineDrugListStateItem,
+    LineDrugListItem,
 )
 from .lineprocedure_state import (
     OldLineProcedureListState,
     OldLineProcedureListStateItem,
     NewLineProcedureListState,
     NewLineProcedureListStateItem,
-    LineProcedureListStateItem,
+    LineProcedureListItem,
     LineProcedureState,
 )
 from .queue_state import QueueState, QueueStateItem
 from .seentoday_state import SeenTodayState, SeenTodayStateItem
+from .appointment_state import AppointmentState, AppointmentStateItem
 from db import *
 from ui import mainview
 
@@ -41,6 +42,8 @@ class State:
     new_lineprocedure_list = NewLineProcedureListState()
 
     queue = QueueState()
+    seentoday = SeenTodayState()
+    appointment = AppointmentState()
 
     def __init__(self, mv: "mainview.MainView") -> None:
         self.mv = mv
@@ -52,18 +55,19 @@ class State:
         self._warehouse: Warehouse | None = None
         self._visit_list: list[VisitListStateItem] = []
 
-        self._linedrug: LineDrugListStateItem | None = None
+        self._linedrug: LineDrugListItem | None = None
         self._old_linedrug_list: list[OldLineDrugListStateItem] = []
         self._new_linedrug_list: list[NewLineDrugListStateItem] = []
         self.to_delete_old_linedrug_list: list[OldLineDrugListStateItem] = []
 
-        self._lineprocedure: LineProcedureListStateItem | None = None
+        self._lineprocedure: LineProcedureListItem | None = None
         self._old_lineprocedure_list: list[OldLineProcedureListStateItem] = []
         self._new_lineprocedure_list: list[NewLineProcedureListStateItem] = []
         self.to_delete_old_lineprocedure_list: list[OldLineProcedureListStateItem] = []
 
         self._queue: list[QueueStateItem] = []
         self._seentoday: list[SeenTodayStateItem] = []
+        self._appointment: list[AppointmentStateItem] = []
 
         self.all_warehouse: dict[int, Warehouse] = self.mv.connection.selectall(
             Warehouse
@@ -93,6 +97,7 @@ class State:
 
         self.queue = QueueState.fetch(self.mv.connection)
         self.seentoday = SeenTodayState.fetch(self.mv.connection)
+        self.appointment = AppointmentState.fetch(self.mv.connection)
 
         self.all_warehouse = self.mv.connection.selectall(Warehouse)
         self.all_sampleprescription = self.mv.connection.selectall(SamplePrescription)

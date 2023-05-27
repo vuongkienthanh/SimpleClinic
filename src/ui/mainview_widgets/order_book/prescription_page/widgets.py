@@ -16,7 +16,11 @@ from misc import (
 from ui.generic_widgets import NumberTextCtrl, DoseTextCtrl
 import wx
 
-T = list[NewLineDrugListStateItem] | list[OldLineDrugListStateItem] | list[NewLineDrugListStateItem | OldLineDrugListStateItem ]
+T = (
+    list[NewLineDrugListStateItem]
+    | list[OldLineDrugListStateItem]
+    | list[NewLineDrugListStateItem | OldLineDrugListStateItem]
+)
 
 
 class DrugListCtrl(wx.ListCtrl):

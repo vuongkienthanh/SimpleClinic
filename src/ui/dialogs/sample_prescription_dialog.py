@@ -150,7 +150,8 @@ class Picker(wx.Choice):
         super().__init__(
             parent,
             choices=[
-                f"{wh.name}({wh.element})" for wh in parent.mv.state.all_warehouse.values()
+                f"{wh.name}({wh.element})"
+                for wh in parent.mv.state.all_warehouse.values()
             ],
             name=name,
         )

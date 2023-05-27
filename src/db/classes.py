@@ -17,8 +17,10 @@ class Gender(enum.Enum):
     @classmethod
     def from_s(cls, s: str) -> "Gender":
         match s:
-            case "Nam": return Gender.m
-            case "Nữ": return Gender.f
+            case "Nam":
+                return Gender.m
+            case "Nữ":
+                return Gender.f
             case _:
                 raise IndexError("Invalid gender string")
 

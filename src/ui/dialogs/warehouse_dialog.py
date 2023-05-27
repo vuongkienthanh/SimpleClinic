@@ -112,7 +112,7 @@ class WarehouseDialog(wx.Dialog):
         self.lc.DeleteAllItems()
 
     def filtered_build(self, s: str = ""):
-        "build UI warehouse list from state "
+        "build UI warehouse list from state"
         self.clear()
         if s == "":
             for wh in self.mv.state.all_warehouse.values():

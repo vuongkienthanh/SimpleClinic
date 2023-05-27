@@ -10,7 +10,14 @@ import os
 import subprocess
 
 
-def finance_report(connection:Connection, config: Config, *, date: dt.date | None = None, month:int | None = None, year:int|None =None) -> sqlite3.Row:
+def finance_report(
+    connection: Connection,
+    config: Config,
+    *,
+    date: dt.date | None = None,
+    month: int | None = None,
+    year: int | None = None,
+) -> sqlite3.Row:
     """
     Số ca khám
     Doanh thu từ thuốc và tiền công
@@ -21,7 +28,7 @@ def finance_report(connection:Connection, config: Config, *, date: dt.date | Non
     Lợi nhuận từ thủ thuật
     """
     match date, month, year:
-        case dt.date(), None, None :
+        case dt.date(), None, None:
             visit_where_clause = f"""WHERE DATE(exam_datetime) = '{date.isoformat()}'"""
         case None, int(), int():
             visit_where_clause = f"""
@@ -30,7 +37,7 @@ def finance_report(connection:Connection, config: Config, *, date: dt.date | Non
                     STRFTIME('%Y', exam_datetime) = '{year}'
                 )
             """
-        case *_:
+        case _:
             raise NotImplementedError
     query = f"""
         SELECT
@@ -75,12 +82,14 @@ def finance_report(connection:Connection, config: Config, *, date: dt.date | Non
 
 
 class FinanceReportDialog(wx.Dialog):
-    def __init__(self, parent:"mv.MainView",title:str):
-        super().__init__(parent,title=title)
+    def __init__(self, parent: "mv.MainView", title: str):
+        super().__init__(parent, title=title)
         self.mv = parent
         res = self.report()
+
         def w(s: str):
             return (wx.StaticText(self, label=s), 0, wx.EXPAND | wx.ALL, 5)
+
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.AddMany(
             [
@@ -100,26 +109,30 @@ class FinanceReportDialog(wx.Dialog):
             ]
         )
         self.SetSizerAndFit(sizer)
+
     def report(self) -> sqlite3.Row:
         ...
+
+
 class DayFinanceReportDialog(FinanceReportDialog):
     def __init__(self, parent: "mv.MainView", date: dt.date):
         self.date = date
         super().__init__(parent, title=date.strftime("%d/%m/%Y"))
-    def report(self):
-        return finance_report(self.mv.connection, self.mv.config,date= self.date)
 
+    def report(self):
+        return finance_report(self.mv.connection, self.mv.config, date=self.date)
 
 
 class MonthFinanceReportDialog(FinanceReportDialog):
-    def __init__(self, parent:"mv.MainView", month: int, year: int):
+    def __init__(self, parent: "mv.MainView", month: int, year: int):
         self.month = month
         self.year = year
         super().__init__(parent, title=f"T{month}/{year}")
 
     def report(self):
-        return finance_report(self.mv.connection, self.mv.config, month=self.month, year=self.year)
-
+        return finance_report(
+            self.mv.connection, self.mv.config, month=self.month, year=self.year
+        )
 
 
 class MonthWarehouseReportDialog(wx.Dialog):

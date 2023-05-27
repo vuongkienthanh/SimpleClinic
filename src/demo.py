@@ -74,8 +74,8 @@ def sample_con():
         CSVReader(SamplePrescription, f("sampleprescription.csv")),
         CSVReader(LineSamplePrescription, f("linesampleprescription.csv")),
     ]:
-        with con.sqlcon as sqlcon:
-            sqlcon.executemany(
+        with con:
+            con.executemany(
                 f"""
                 INSERT INTO {reader.t.__tablename__} ({','.join(reader.fields)})
                 VALUES ({','.join(['?']* len(reader.fields))})

@@ -212,7 +212,13 @@ class SaveBtn(wx.Button):
                         WHERE id=?
                     """,
                         (
-                            (item.dose, item.times, item.quantity, item.usage_note, item.id)
+                            (
+                                item.dose,
+                                item.times,
+                                item.quantity,
+                                item.usage_note,
+                                item.id,
+                            )
                             for item in state.old_linedrug_list
                         ),
                     )

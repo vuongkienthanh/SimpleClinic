@@ -1,5 +1,5 @@
-from db.classes import *
-from db.sql import create_table_sql
+from db.classes import Gender, BASE
+from db.sql import *
 import os.path
 import sqlite3
 from decimal import Decimal
@@ -8,14 +8,6 @@ import datetime as dt
 
 class Connection:
     def __init__(self, path: str):
-        self.path = path
-        self.sqlcon = self._get_db_connection(path)
-
-    def close(self):
-        self.sqlcon.execute("PRAGMA optimize")
-        self.sqlcon.close()
-
-    def register_custom_type(self):
         def custom_type_decimal():
             def adapt(decimal: Decimal) -> str:
                 return str(decimal)
@@ -38,33 +30,49 @@ class Connection:
 
         custom_type_decimal()
         custom_type_gender()
+        self.sqlcon = sqlite3.connect(path, detect_types=sqlite3.PARSE_DECLTYPES)
+        self.sqlcon.row_factory = sqlite3.Row
+        self.path = path
+        self.sqlcon.execute("PRAGMA foreign_keys=ON")
 
-    def _get_db_connection(self, path: str) -> sqlite3.Connection:
-        self.register_custom_type()
-        con = sqlite3.connect(path, detect_types=sqlite3.PARSE_DECLTYPES)
-        con.row_factory = sqlite3.Row
-        con.execute("PRAGMA foreign_keys=ON")
-        return con
+    def execute(self, *arg, **kwarg):
+        return self.sqlcon.execute(*arg, **kwarg)
 
-    def make_db(self):
-        self.sqlcon.executescript(create_table_sql)
+    def executemany(self, *arg, **kwarg):
+        return self.sqlcon.executemany(*arg, **kwarg)
+
+    def executescript(self, *arg, **kwarg):
+        return self.sqlcon.executescript(*arg, **kwarg)
+
+    def commit(self):
+        return self.sqlcon.commit()
+
+    def rollback(self):
+        return self.sqlcon.rollback()
 
     def __enter__(self):
         return self.sqlcon.__enter__()
 
-    def __exit__(self, exc_type, exc_value, exc_traceback):
-        return self.sqlcon.__exit__(exc_type, exc_value, exc_traceback)
+    def __exit__(self, *arg, **kwarg):
+        return self.sqlcon.__exit__(*arg, **kwarg)
 
-    def execute(self, sql, *parameters):
-        return self.sqlcon.execute(sql, *parameters)
+    def close(self):
+        self.execute("PRAGMA optimize")
+        self.sqlcon.close()
+
+    def make_db(self):
+        self.executescript(create_table_sql)
+        self.executescript(create_index_sql)
+        self.executescript(create_view_sql)
+        self.executescript(create_trigger_sql)
+        self.executescript(finalized_sql)
 
     def update_last_open_date(self) -> dt.date | None:
-        with self.sqlcon as con:
-            con.execute("UPDATE singleton SET last_open_date = ?", (dt.date.today(),))
+        self.execute("UPDATE singleton SET last_open_date = ?", (dt.date.today(),))
 
-    def insert(self, t: type[T], base: dict) -> int | None:
-        with self.sqlcon as con:
-            cur = con.execute(
+    def insert(self, t: type[T], base: dict) -> int:
+        with self:
+            cur = self.execute(
                 f"""
                 INSERT INTO {t.__tablename__} ({t.commna_joined_field_names()})
                 VALUES ({t.named_style_placeholders()})
@@ -88,15 +96,15 @@ class Connection:
         return {row["id"]: t.parse(row) for row in rows}
 
     def delete(self, t: type[BASE], id: int) -> int | None:
-        with self.sqlcon as con:
-            return con.execute(
+        with self:
+            return self.execute(
                 f"DELETE FROM {t.__tablename__} WHERE id = {id}"
             ).rowcount
 
     def update(self, base: BASE) -> int | None:
         t = type(base)
-        with self.sqlcon as con:
-            return con.execute(
+        with self:
+            return self.execute(
                 f"""
                 UPDATE {t.__tablename__} SET ({t.commna_joined_field_names()})
                 = ({t.qmark_style_placeholders()})

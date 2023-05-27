@@ -29,7 +29,9 @@ CREATE TABLE IF NOT EXISTS {Visit.__tablename__} (
     FOREIGN KEY (patient_id) REFERENCES {Patient.__tablename__} (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    CHECK (recheck >=0 AND days >= 0 AND weight >=0 )
+    CONSTRAINT recheck_BE_0 CHECK (recheck >=0),
+    CONSTRAINT days_BE_0 CHECK (days >= 0),
+    CONSTRAINT weight_BT_0 CHECK (weight > 0) 
 );
 CREATE TABLE IF NOT EXISTS {Queue.__tablename__} (
     id INTEGER PRIMARY KEY,
@@ -71,8 +73,11 @@ CREATE TABLE IF NOT EXISTS {Warehouse.__tablename__} (
     expire_date DATE,
     made_by TEXT,
     drug_note TEXT,
-    CHECK (quantity >= 0),
-    CHECK ((sale_price >= purchase_price) AND (purchase_price >= 0))
+    CONSTRAINT quantity_BE_0 CHECK (quantity >= 0),
+    CONSTRAINT price_check CHECK (
+        sale_price >= purchase_price AND 
+        purchase_price >= 0
+        )
 );
 CREATE TABLE IF NOT EXISTS {LineDrug.__tablename__} (
     id INTEGER PRIMARY KEY,
@@ -88,7 +93,11 @@ CREATE TABLE IF NOT EXISTS {LineDrug.__tablename__} (
     FOREIGN KEY (warehouse_id) REFERENCES {Warehouse.__tablename__} (id)
         ON DELETE RESTRICT
         ON UPDATE NO ACTION,
-    CHECK ( quantity > 0 AND times > 0 AND dose != '')
+    CONSTRAINT qt_ti_do_check CHECK (
+        quantity > 0 AND 
+        times > 0 AND 
+        dose != ''
+        )
 );
 CREATE TABLE IF NOT EXISTS {SamplePrescription.__tablename__} (
     id INTEGER PRIMARY KEY,
@@ -106,14 +115,14 @@ CREATE TABLE IF NOT EXISTS {LineSamplePrescription.__tablename__} (
     FOREIGN KEY (sample_id) REFERENCES {SamplePrescription.__tablename__} (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    CHECK (times > 0 AND dose != ''),
-    UNIQUE (warehouse_id, sample_id)
+    CONSTRAINT ti_do_check CHECK (times > 0 AND dose != ''),
+    CONSTRAINT unique_wh_sp UNIQUE (warehouse_id, sample_id)
 );
 CREATE TABLE IF NOT EXISTS {Procedure.__tablename__} (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     price INTEGER NOT NULL,
-    CHECK (price >= 0)
+    CONSTRAINT price_BE_0 CHECK (price >= 0)
 );
 CREATE TABLE IF NOT EXISTS {LineProcedure.__tablename__} (
     id INTEGER PRIMARY KEY,
@@ -126,14 +135,16 @@ CREATE TABLE IF NOT EXISTS {LineProcedure.__tablename__} (
         ON DELETE RESTRICT
         ON UPDATE NO ACTION
 );
+"""
 
-
+create_index_sql = f"""
 CREATE INDEX IF NOT EXISTS patient_name ON {Patient.__tablename__} (name);
 CREATE INDEX IF NOT EXISTS procedure_name ON {Procedure.__tablename__} (name);
 CREATE INDEX IF NOT EXISTS drug_name ON {Warehouse.__tablename__} (name);
 CREATE INDEX IF NOT EXISTS drug_element ON {Warehouse.__tablename__} (element);
+"""
 
-
+create_view_sql = f"""
 CREATE VIEW IF NOT EXISTS {Queue.__tablename__}_view AS
     SELECT
         p.id AS pid,
@@ -172,7 +183,6 @@ CREATE VIEW IF NOT EXISTS {Appointment.__tablename__}_view AS
     ON a.patient_id = p.id
     WHERE DATE(a.appointed_date, 'localtime') = DATE('now', 'localtime')
 ;
-
 """
 
 create_trigger_sql = f"""
@@ -221,7 +231,8 @@ BEGIN
 INSERT INTO {SeenToday.__tablename__} ({SeenToday.commna_joined_field_names()})
 VALUES (NEW.patient_id, NEW.id);
 END;
+"""
 
+finalized_sql = f"""
 INSERT OR IGNORE INTO singleton (id, last_open_date) VALUES ( 1, DATE('now', 'localtime'));
-
 """

@@ -20,7 +20,7 @@
   },
   "ask_print": false,
   "print_price": true,
-  "number_of_drugs_in_one_page": 8,
+  "max_number_of_drugs_in_one_page": 8,
   "display_recent_visit_count": -1,
   "print_scale": 1,
   "preview_scale": 1,

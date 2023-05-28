@@ -28,7 +28,7 @@ class PrintOut(wx.Printout):
         "Relative to `num_of_ld`"
         x, y = divmod(
             self.mv.order_book.prescriptionpage.drug_list.ItemCount,
-            self.mv.config.number_of_drugs_in_one_page,
+            self.mv.config.max_number_of_drugs_in_one_page,
         )
         if page <= (x + bool(y)):
             return True
@@ -44,12 +44,12 @@ class PrintOut(wx.Printout):
         else:
             x, y = divmod(
                 self.mv.order_book.prescriptionpage.drug_list.ItemCount,
-                self.mv.config.number_of_drugs_in_one_page,
+                self.mv.config.max_number_of_drugs_in_one_page,
             )
         return (1, x + bool(y), 1, x + bool(y))
 
     def OnPrintPage(self, page):
-        num_of_ld = self.mv.config.number_of_drugs_in_one_page
+        num_of_ld = self.mv.config.max_number_of_drugs_in_one_page
         drug_list = self.mv.order_book.prescriptionpage.drug_list
         state = self.mv.state
         p = state.patient
@@ -178,7 +178,7 @@ class PrintOut(wx.Printout):
             with wx.DCFontChanger(dc, heading):
                 dc.DrawText(f"Trang {i}/2", atx(0.7), aty(0.72))
 
-        def draw_content(first=True):
+        def draw_content(first_page=True):
             row_y = round(dcy * 0.055)
             y = aty(0.28)
 
@@ -186,16 +186,16 @@ class PrintOut(wx.Printout):
                 return y + row_y * i
 
             i = 0
-            if first:
+            if first_page:
                 _list = [
                     {
                         "name": drug_list.GetItemText(i, 1),
                         "quantity": drug_list.GetItemText(i, 4),
                         "note": drug_list.GetItemText(i, 4),
                     }
-                    for i in range(num_of_ld)
+                    for i in range(min(num_of_ld, drug_list.ItemCount))
                 ]
-                added = 0
+                added_idx_number = 0
             else:
                 _list = [
                     {
@@ -203,12 +203,12 @@ class PrintOut(wx.Printout):
                         "quantity": drug_list.GetItemText(i, 4),
                         "note": drug_list.GetItemText(i, 4),
                     }
-                    for i in range(num_of_ld, len(drug_list.ItemCount))
+                    for i in range(num_of_ld, drug_list.ItemCount)
                 ]
-                added = num_of_ld
+                added_idx_number = num_of_ld
             for dl in _list:
                 with wx.DCFontChanger(dc, list_num):
-                    dc.DrawText(f"{i+1+added}/", atx(0.06), row(i))
+                    dc.DrawText(f"{i+1+added_idx_number}/", atx(0.06), row(i))
                 with wx.DCFontChanger(dc, drug_name):
                     dc.DrawText(dl["name"], atx(0.12), row(i))
                     dc.DrawText(dl["quantity"], atx(0.7), row(i))
@@ -219,7 +219,7 @@ class PrintOut(wx.Printout):
         if page == 1:
             draw_top()
             if drug_list.ItemCount != 0:
-                draw_content(first=True)
+                draw_content(first_page=True)
             draw_bottom()
             if self.HasPage(2):
                 draw_page_count(1)
@@ -227,7 +227,7 @@ class PrintOut(wx.Printout):
 
         elif page == 2:
             draw_top()
-            draw_content(first=False)
+            draw_content(first_page=False)
             draw_page_count(2)
             draw_bottom()
             return True

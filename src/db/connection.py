@@ -1,6 +1,5 @@
 from db.classes import Gender, BASE
 from db.sql import *
-import os.path
 import sqlite3
 from decimal import Decimal
 import datetime as dt

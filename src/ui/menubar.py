@@ -264,19 +264,19 @@ class MyMenuBar(wx.MenuBar):
             )
             diagnosis = f"Chẩn đoán: {mv.diagnosis.GetValue()}"
             dl = "\n".join(
-                "{}/ {} {} {}".format(
-                    i + 1,
-                    drug_list.GetItemText(i, 1),
-                    drug_list.GetItemText(i, 4),
-                    drug_list.GetItemText(i, 5),
-                )
-                for i in range(drug_list.ItemCount)
+                [
+                    "{}/ {} {} {}".format(
+                        i + 1,
+                        drug_list.GetItemText(i, 1),
+                        drug_list.GetItemText(i, 4),
+                        drug_list.GetItemText(i, 5),
+                    )
+                    for i in range(drug_list.ItemCount)
+                ]
             )
             pl = "\n".join(
-                "{}".format(
-                    procedure_list.GetItemText(i)
-                    for i in range(procedure_list.ItemCount)
-                )
+                "{}".format(procedure_list.GetItemText(i))
+                for i in range(procedure_list.ItemCount)
             )
             if dl != "":
                 dl = "\n".join([f"Thuốc {mv.days.GetValue()} ngày:", dl])
@@ -297,7 +297,7 @@ class MyMenuBar(wx.MenuBar):
                     follow,
                     price,
                 )
-            )
+            ).replace("\n\n", "\n")
             cb.SetData(wx.TextDataObject(t))
             cb.Close()
 

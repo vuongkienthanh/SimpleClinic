@@ -56,7 +56,7 @@ class SetupDialog(wx.Dialog):
         lc.Append(("",))
         self.num_of_ld = wx.SpinCtrl(
             self.scroll,
-            initial=self.mv.config.number_of_drugs_in_one_page,
+            initial=self.mv.config.max_number_of_drugs_in_one_page,
             name="Số lượng thuốc trong một toa\n)Tối đa: 8)",
             min=4,
             max=8,
@@ -299,7 +299,7 @@ class SetupDialog(wx.Dialog):
                 for idx in range(lc.ItemCount)
                 if lc.GetItemText(idx).strip() != ""
             ]
-            self.mv.config.number_of_drugs_in_one_page = self.num_of_ld.GetValue()
+            self.mv.config.max_number_of_drugs_in_one_page = self.num_of_ld.GetValue()
             self.mv.config.display_recent_visit_count = self.visit_count.GetValue()
             self.mv.config.maximize_at_start = self.maximize_at_start.Value
 

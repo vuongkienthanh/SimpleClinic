@@ -1,4 +1,4 @@
-id,name,element,quantity,usage_unit,usage,sale_unit,purchase_price,sale_price,expire_date,made_by,note
+id,name,element,quantity,usage_unit,usage,sale_unit,purchase_price,sale_price,expire_date,made_by,drug_note
 1,Acyclovir 400,Acyclovir,50,viên,uống,,1,1000,,,aaaa
 2,Acyclovir 200,Acyclovir,50,viên,uống,,2,2000,,,bbb
 3,Nyst,Nystatin  25 000 UI,100,gói,uống,,3,3000,,,ccc

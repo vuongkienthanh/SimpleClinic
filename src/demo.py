@@ -70,7 +70,7 @@ def sample_con():
         CSVReader(Visit, f("visits.csv")),
         CSVReader(LineDrug, f("linedrugs.csv")),
         CSVReader(LineProcedure, f("lineprocedure.csv")),
-        CSVReader(Queue, f("queuelist.csv")),
+        CSVReader(Queue, f("queue.csv")),
         CSVReader(SamplePrescription, f("sampleprescription.csv")),
         CSVReader(LineSamplePrescription, f("linesampleprescription.csv")),
     ]:
@@ -90,6 +90,7 @@ def sample_con():
             "weight": decimal.Decimal(10),
             "days": 2,
             "recheck": 2,
+            "price":1000000,
             "patient_id": 6,
             "follow": "follow",
             "vnote": "fake",

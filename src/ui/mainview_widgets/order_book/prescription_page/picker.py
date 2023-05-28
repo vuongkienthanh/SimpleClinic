@@ -151,7 +151,7 @@ class DrugPicker(wx.ComboCtrl):
             e.Skip()
 
     def onText(self, e: wx.CommandEvent):
-        if self.GetValue() == "":
+        if self.Value == "":
             self.mv.state.warehouse = None
             self.mv.state.linedrug = None
         else:

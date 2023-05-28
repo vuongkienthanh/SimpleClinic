@@ -160,13 +160,13 @@ class PrintOut(wx.Printout):
 
             with wx.DCFontChanger(dc, heading):
                 if self.mv.config.print_price:
-                    t = f"Tổng cộng: {self.mv.price.GetValue()}"
+                    t = f"Tổng cộng: {self.mv.price.Value}"
                     if self.mv.order_book.procedurepage.procedure_list.ItemCount > 0:
                         t += " (đã gồm tiền thủ thuật)"
                     dc.DrawText(t, atx(0.06), row(0))
-                if self.mv.recheck.GetValue() != 0:
+                if self.mv.recheck.Value != 0:
                     dc.DrawText(
-                        f"Tái khám sau {self.mv.recheck.GetValue()} ngày",
+                        f"Tái khám sau {self.mv.recheck.Value} ngày",
                         atx(0.06),
                         row(1),
                     )

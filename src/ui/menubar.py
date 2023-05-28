@@ -258,11 +258,11 @@ class MyMenuBar(wx.MenuBar):
         if cb.Open():
             intro = "{date}\n{name}_{gender}_{bd}".format(
                 date=dt.datetime.now().strftime("%d/%m/%Y, %H:%M"),
-                name=f"Tên: {mv.name.GetValue()}",
-                gender=f"Giới tính: {mv.gender.GetValue()}",
-                bd=f"Ngày sinh: {mv.birthdate.GetValue()}",
+                name=f"Tên: {mv.name.Value}",
+                gender=f"Giới tính: {mv.gender.Value}",
+                bd=f"Ngày sinh: {mv.birthdate.Value}",
             )
-            diagnosis = f"Chẩn đoán: {mv.diagnosis.GetValue()}"
+            diagnosis = f"Chẩn đoán: {mv.diagnosis.Value}"
             dl = "\n".join(
                 [
                     "{}/ {} {} {}".format(
@@ -279,7 +279,7 @@ class MyMenuBar(wx.MenuBar):
                 for i in range(procedure_list.ItemCount)
             )
             if dl != "":
-                dl = "\n".join([f"Thuốc {mv.days.GetValue()} ngày:", dl])
+                dl = "\n".join([f"Thuốc {mv.days.Value} ngày:", dl])
             else:
                 dl = "Không thuốc"
             if pl != "":

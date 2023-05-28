@@ -177,7 +177,7 @@ class WarehouseDialog(wx.Dialog):
                 self.mv.state.old_linedrug_list + self.mv.state.new_linedrug_list
             )
             self.mv.price.FetchPrice()
-            wx.MessageBox(f"Xoá thuốc thành công\n{rowcount}", "Xóa")
+            wx.MessageBox(f"Xoá thuốc thành công", "Xóa")
         except Exception as error:
             wx.MessageBox(f"Lỗi không xóa được\n{error}", "Lỗi")
 
@@ -201,7 +201,7 @@ class BaseDialog(wx.Dialog):
         self.sale_unit = wx.TextCtrl(self, name="Đơn vị bán")
         self.expire_date = CalendarDatePicker(self, name="Hạn sử dụng")
         self.made_by = wx.TextCtrl(self, name="Xuất xứ")
-        self.note = wx.TextCtrl(self, style=wx.TE_MULTILINE, name="Ghi chú")
+        self.drug_note = wx.TextCtrl(self, style=wx.TE_MULTILINE, name="Ghi chú")
         self.cancelbtn = wx.Button(self, id=wx.ID_CANCEL)
         self.okbtn = wx.Button(self, id=wx.ID_OK)
 
@@ -245,7 +245,7 @@ class BaseDialog(wx.Dialog):
                 *widget(self.sale_unit),
                 *widget(self.expire_date),
                 *widget(self.made_by),
-                *widget(self.note),
+                *widget(self.drug_note),
             ]
         )
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -273,8 +273,8 @@ class BaseDialog(wx.Dialog):
     def is_valid(self) -> bool:
         "valid when all fields in mandatory are filled"
         for widget in self.mandatory:
-            val: str = widget.GetValue()
-            name: str = widget.GetName()
+            val: str = widget.Value
+            name: str = widget.Name
             if val.strip() == "":
                 wx.MessageBox(f"Chưa nhập đủ thông tin\n{name}", self.title)
                 return False
@@ -283,9 +283,9 @@ class BaseDialog(wx.Dialog):
 
     def get_sale_unit(self) -> str | None:
         "return sale_unit or usage_unit if none"
-        sale_unit: str = self.sale_unit.GetValue()
+        sale_unit: str = self.sale_unit.Value
         sale_unit = sale_unit.strip()
-        usage_unit: str = self.usage_unit.GetValue()
+        usage_unit: str = self.usage_unit.Value
         usage_unit = usage_unit.strip()
 
         if (sale_unit == "") or (sale_unit == usage_unit):
@@ -312,7 +312,7 @@ class NewDialog(BaseDialog):
                 "sale_unit": self.get_sale_unit(),
                 "expire_date": self.expire_date.checked_GetDate(),
                 "made_by": check_blank_to_none(self.made_by.Value),
-                "note": check_blank_to_none(self.note.Value),
+                "drug_note": check_blank_to_none(self.drug_note.Value),
             }
             try:
                 lastrowid = self.mv.connection.insert(Warehouse, wh)
@@ -348,7 +348,7 @@ class EditDialog(BaseDialog):
         if wh.expire_date is not None:
             self.expire_date.SetDate(wh.expire_date)
         self.made_by.ChangeValue(check_none_to_blank(wh.made_by))
-        self.note.ChangeValue(check_none_to_blank(wh.drug_note))
+        self.drug_note.ChangeValue(check_none_to_blank(wh.drug_note))
 
     def onOkBtn(self, e):
         if self.is_valid():
@@ -362,7 +362,7 @@ class EditDialog(BaseDialog):
             self.wh.sale_unit = self.get_sale_unit()
             self.wh.expire_date = self.expire_date.checked_GetDate()
             self.wh.made_by = check_blank_to_none(self.made_by.Value)
-            self.wh.drug_note = check_blank_to_none(self.note.Value)
+            self.wh.drug_note = check_blank_to_none(self.drug_note.Value)
             try:
                 self.mv.connection.update(self.wh)
                 wx.MessageBox("Cập nhật thành công", "Cập nhật")

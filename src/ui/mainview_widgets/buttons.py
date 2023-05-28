@@ -188,7 +188,7 @@ class SaveBtn(wx.Button):
         if self.mv.check_diag_wt_filled():
             p = state.patient
             assert p is not None
-            past_history = check_blank_to_none(self.mv.past_history.GetValue())
+            past_history = check_blank_to_none(self.mv.past_history.Value)
             v = state.visit
             assert v is not None
             v.diagnosis = mv.diagnosis.Value.strip()

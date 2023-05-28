@@ -90,7 +90,7 @@ def sample_con():
             "weight": decimal.Decimal(10),
             "days": 2,
             "recheck": 2,
-            "price":1000000,
+            "price": 1000000,
             "patient_id": 6,
             "follow": "follow",
             "vnote": "fake",

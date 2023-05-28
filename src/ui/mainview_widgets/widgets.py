@@ -88,7 +88,7 @@ class Follow(wx.ComboBox):
 
     def expand_when_print(self) -> str:
         "expand `key` -> `key: value` in config"
-        k = self.GetValue().strip()
+        k = self.Value.strip()
         if k in self.mv.config.follow_choices.keys():
             return f"{k}: {self.mv.config.follow_choices[k]}"
         else:

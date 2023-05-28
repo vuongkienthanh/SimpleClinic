@@ -60,7 +60,7 @@ class MonthPickerDialog(wx.Dialog):
         self.SetSizerAndFit(sizer)
 
     def GetMonth(self) -> int:
-        return self.month.GetValue()
+        return self.month.Value
 
     def GetYear(self) -> int:
-        return int(self.year.GetValue())
+        return int(self.year.Value)

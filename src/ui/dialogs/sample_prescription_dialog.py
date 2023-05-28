@@ -185,8 +185,8 @@ class AddDrugButton(wx.Button):
     def check_state(self):
         if (
             self.parent.picker.GetSelection() != wx.NOT_FOUND
-            and self.parent.dose.GetValue() != ""
-            and self.parent.times.GetValue() != ""
+            and self.parent.dose.Value != ""
+            and self.parent.times.Value != ""
         ):
             self.Enable()
         else:
@@ -198,9 +198,9 @@ class AddDrugButton(wx.Button):
         idx: int = self.parent.samplelist.GetFirstSelected()
         sp = self.parent.mv.state.all_sampleprescription[idx]
 
-        times_str: str = self.parent.times.GetValue()
+        times_str: str = self.parent.times.Value
         times = int(times_str.strip())
-        dose_str: str = self.parent.dose.GetValue()
+        dose_str: str = self.parent.dose.Value
         dose = dose_str.strip()
         lsp = {
             "warehouse_id": wh.id,

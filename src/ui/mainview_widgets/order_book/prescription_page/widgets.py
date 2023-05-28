@@ -138,9 +138,9 @@ class Quantity(NumberTextCtrl):
         self.Bind(wx.EVT_CHAR, self.onChar)
 
     def FetchQuantity(self):
-        times = int(self.parent.times.GetValue())
-        dose = self.parent.dose.GetValue()
-        days = self.mv.days.GetValue()
+        times = int(self.parent.times.Value)
+        dose = self.parent.dose.Value
+        days = self.mv.days.Value
         wh = self.mv.state.warehouse
         assert wh is not None
         res = calc_quantity(times, dose, days, wh.sale_unit, self.mv.config)
@@ -181,8 +181,8 @@ class Note(wx.TextCtrl):
         self.ChangeValue(
             note_str(
                 wh.usage,
-                self.parent.times.GetValue(),
-                self.parent.dose.GetValue(),
+                self.parent.times.Value,
+                self.parent.dose.Value,
                 wh.usage_unit,
                 None,
             )

@@ -218,7 +218,7 @@ class MainView(wx.Frame):
         e.Skip()
 
     def check_diag_wt_filled(self) -> bool:
-        diagnosis: str = self.diagnosis.GetValue()
+        diagnosis: str = self.diagnosis.Value
         weight = self.weight.GetWeight()
         if diagnosis.strip() == "":
             wx.MessageBox("Chưa nhập chẩn đoán", "Lỗi")

@@ -26,7 +26,7 @@ class WeightCtrl(wx.SpinCtrlDouble):
         self.Disable()
 
     def GetWeight(self) -> Decimal:
-        return Decimal(self.GetValue())
+        return Decimal(self.Value)
 
     def SetWeight(self, value: Decimal | int):
         super().SetValue(str(value))
@@ -81,7 +81,7 @@ class DateTextCtrl(wx.TextCtrl):
         self.Bind(wx.EVT_CHAR, self.onChar)
 
     def onChar(self, e: wx.KeyEvent):
-        s: str = self.GetValue()
+        s: str = self.Value
         kc: int = e.KeyCode
         if kc in k_special:
             e.Skip()
@@ -93,7 +93,7 @@ class DateTextCtrl(wx.TextCtrl):
                 e.Skip()
 
     def GetDate(self) -> dt.date:
-        val: str = self.GetValue()
+        val: str = self.Value
         return dt.datetime.strptime(val, self.format).date()
 
     def SetDate(self, date: dt.date):
@@ -102,7 +102,7 @@ class DateTextCtrl(wx.TextCtrl):
     def is_valid(self) -> bool:
         """Check if text value follows format"""
         try:
-            val: str = self.GetValue()
+            val: str = self.Value
             dt.datetime.strptime(val, self.format)
             return True
         except ValueError:

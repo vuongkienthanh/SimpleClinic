@@ -26,3 +26,8 @@ class ProcedurePicker(wx.Choice):
 
     def SetSelectionProcedureID(self, pr_id: int):
         self.SetSelection(self._pr_to_choice[pr_id])
+
+    def rebuild(self):
+        self.Clear()
+        for pr in self.mv.state.all_procedure.values():
+            self.Append(f"{pr.name} ({num_to_str_price(pr.price)})")

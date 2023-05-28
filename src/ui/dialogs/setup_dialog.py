@@ -292,15 +292,15 @@ class SetupDialog(wx.Dialog):
             self.mv.config.ask_print = self.ask_print.Value
             self.mv.config.print_price = self.print_price.Value
             self.mv.config.checkup_price = int(self.checkup_price.Value)
-            self.mv.config.default_days_for_prescription = self.days.GetValue()
-            self.mv.config.minimum_drug_quantity_alert = self.alert.GetValue()
+            self.mv.config.default_days_for_prescription = self.days.Value
+            self.mv.config.minimum_drug_quantity_alert = self.alert.Value
             self.mv.config.single_sale_units = [
                 lc.GetItemText(idx).strip()
                 for idx in range(lc.ItemCount)
                 if lc.GetItemText(idx).strip() != ""
             ]
-            self.mv.config.max_number_of_drugs_in_one_page = self.num_of_ld.GetValue()
-            self.mv.config.display_recent_visit_count = self.visit_count.GetValue()
+            self.mv.config.max_number_of_drugs_in_one_page = self.num_of_ld.Value
+            self.mv.config.display_recent_visit_count = self.visit_count.Value
             self.mv.config.maximize_at_start = self.maximize_at_start.Value
 
             def set_color(name: str, widget: wx.ColourPickerCtrl):

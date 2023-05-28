@@ -64,7 +64,9 @@ class Config:
             follow_choices=config_json["follow_choices"],
             ask_print=config_json["ask_print"],
             print_price=config_json["print_price"],
-            max_number_of_drugs_in_one_page=config_json["max_number_of_drugs_in_one_page"],
+            max_number_of_drugs_in_one_page=config_json[
+                "max_number_of_drugs_in_one_page"
+            ],
             display_recent_visit_count=config_json["display_recent_visit_count"],
             print_scale=config_json["print_scale"],
             preview_scale=config_json["preview_scale"],

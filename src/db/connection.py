@@ -3,6 +3,7 @@ from db.sql import *
 import sqlite3
 from decimal import Decimal
 import datetime as dt
+from typing import overload
 
 
 class Connection:
@@ -95,11 +96,31 @@ class Connection:
         rows = self.execute(f"SELECT * FROM {t.__tablename__}").fetchall()
         return {row["id"]: t.parse(row) for row in rows}
 
-    def delete(self, t: type[BASE], id: int) -> int | None:
-        with self:
-            return self.execute(
-                f"DELETE FROM {t.__tablename__} WHERE id = {id}"
-            ).rowcount
+    @overload
+    def delete(self, target: BASE) -> int | None:
+        ...
+
+    @overload
+    def delete(self, target: type[BASE], id: int) -> int | None:
+        ...
+
+    def delete(
+        self,
+        target,
+        id: int | None = None,
+    ) -> int | None:
+        match target,id:
+            case s, None if isinstance(s, BASE) :
+                with self:
+                    return self.execute(
+                        f"DELETE FROM {target.__tablename__} WHERE id = {target.id}"
+                    ).rowcount
+            case s,int() if issubclass(s, BASE):
+                with self:
+                    return self.execute(
+                        f"DELETE FROM {target.__tablename__} WHERE id = {id}"
+                    ).rowcount
+
 
     def update(self, base: BASE) -> int | None:
         t = type(base)

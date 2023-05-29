@@ -8,14 +8,14 @@ from .linedrug_state import (
     OldLineDrugListStateItem,
     NewLineDrugListState,
     NewLineDrugListStateItem,
-    LineDrugListItem,
+    LineDrugListStateItem,
 )
 from .lineprocedure_state import (
     OldLineProcedureListState,
     OldLineProcedureListStateItem,
     NewLineProcedureListState,
     NewLineProcedureListStateItem,
-    LineProcedureListItem,
+    LineProcedureListStateItem,
     LineProcedureState,
 )
 from .queue_state import QueueState, QueueStateItem
@@ -55,12 +55,12 @@ class State:
         self._warehouse: Warehouse | None = None
         self._visit_list: list[VisitListStateItem] = []
 
-        self._linedrug: LineDrugListItem | None = None
+        self._linedrug: LineDrugListStateItem | None = None
         self._old_linedrug_list: list[OldLineDrugListStateItem] = []
         self._new_linedrug_list: list[NewLineDrugListStateItem] = []
         self.to_delete_old_linedrug_list: list[OldLineDrugListStateItem] = []
 
-        self._lineprocedure: LineProcedureListItem | None = None
+        self._lineprocedure: LineProcedureListStateItem | None = None
         self._old_lineprocedure_list: list[OldLineProcedureListStateItem] = []
         self._new_lineprocedure_list: list[NewLineProcedureListStateItem] = []
         self.to_delete_old_lineprocedure_list: list[OldLineProcedureListStateItem] = []

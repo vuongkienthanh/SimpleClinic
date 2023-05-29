@@ -134,14 +134,14 @@ class NewPatientDialog(BasePatientDialog):
 
     def onOkBtn(self, e):
         if self.is_valid():
+            name: str = self.name.Value.strip().upper()
+            gender = self.gender.GetGender()
+            birthdate = self.birthdate.GetDate()
+            address = check_blank_to_none(self.address.Value)
+            phone = check_blank_to_none(self.phone.Value)
+            past_history = check_blank_to_none(self.past_history.Value)
             try:
-                name: str = self.name.Value.strip().upper()
-                gender = self.gender.GetGender()
-                birthdate = self.birthdate.GetDate()
-                address = check_blank_to_none(self.address.Value)
-                phone = check_blank_to_none(self.phone.Value)
-                past_history = check_blank_to_none(self.past_history.Value)
-                pid = self.mv.connection.insert(
+                new_patient_id = self.mv.connection.insert(
                     Patient,
                     {
                         "name": name,
@@ -152,27 +152,27 @@ class NewPatientDialog(BasePatientDialog):
                         "past_history": past_history,
                     },
                 )
-                assert pid is not None
-                wx.MessageBox("Đã thêm bệnh nhân mới thành công", "Bệnh nhân mới")
-                try:
-                    if (
-                        wx.MessageDialog(
-                            self,
-                            message="Thêm bệnh nhân mới vào danh sách chờ khám?",
-                            caption="Danh sách chờ khám",
-                            style=wx.OK_DEFAULT | wx.CANCEL,
-                        ).ShowModal()
-                        == wx.ID_OK
-                    ):
-                        self.mv.connection.insert(Queue, {"patient_id": pid})
-                        wx.MessageBox("Thêm vào danh sách chờ thành công", "OK")
+                assert new_patient_id is not None
+                if (
+                    wx.MessageDialog(
+                        self,
+                        message="Thêm bệnh nhân mới vào danh sách chờ khám?",
+                        caption="Danh sách chờ khám",
+                        style=wx.OK_DEFAULT | wx.CANCEL,
+                    ).ShowModal()
+                    == wx.ID_OK
+                ):
+                    try:
+                        self.mv.connection.insert(Queue, {"patient_id": new_patient_id})
                         item = QueueStateItem(
-                            pid, name, gender, birthdate, dt.datetime.now()
+                            new_patient_id, name, gender, birthdate, dt.datetime.now()
                         )
                         self.mv.state.queue.append(item)
                         self.mv.patient_book.queuelistctrl.append_ui(item)
-                except sqlite3.IntegrityError as error:
-                    wx.MessageBox(f"Đã có tên trong danh sách chờ.\n{error}", "Lỗi")
+                    except Exception as error:
+                        wx.MessageBox(
+                            f"Lỗi không thêm vào danh sách chờ được.\n{error}", "Lỗi"
+                        )
                 e.Skip()
             except Exception as error:
                 wx.MessageBox(f"Lỗi không thêm bệnh nhân mới được\n{error}", "Lỗi")
@@ -183,26 +183,23 @@ class EditPatientDialog(BasePatientDialog):
         super().__init__(parent, title="Cập nhật thông tin bệnh nhân")
         self.mv = parent
         self.patient = self.get_patient()
-        self.build(self.patient)
+        self.name.ChangeValue(self.patient.name)
+        self.gender.SetGender(self.patient.gender)
+        self.birthdate.SetDate(self.patient.birthdate)
+        self.age.SetBirthdate(self.patient.birthdate)
+        self.birthdate_text.SetDate(self.patient.birthdate)
+        self.address.ChangeValue(check_none_to_blank(self.patient.address))
+        self.phone.ChangeValue(check_none_to_blank(self.patient.phone))
+        self.past_history.ChangeValue(check_none_to_blank(self.patient.past_history))
 
     def get_patient(self) -> Patient:
         p = self.mv.state.patient
         assert p is not None
         return p
 
-    def build(self, p: Patient):
-        self.name.ChangeValue(p.name)
-        self.gender.SetGender(p.gender)
-        self.birthdate.SetDate(p.birthdate)
-        self.age.SetBirthdate(p.birthdate)
-        self.birthdate_text.SetDate(p.birthdate)
-        self.address.ChangeValue(check_none_to_blank(p.address))
-        self.phone.ChangeValue(check_none_to_blank(p.phone))
-        self.past_history.ChangeValue(check_none_to_blank(p.past_history))
-
     def onOkBtn(self, e):
         if self.is_valid():
-            p = Patient(
+            updated_patient = Patient(
                 id=self.patient.id,
                 name=self.name.Value.strip().upper(),
                 gender=self.gender.GetGender(),
@@ -212,8 +209,7 @@ class EditPatientDialog(BasePatientDialog):
                 past_history=check_blank_to_none(self.past_history.Value),
             )
             try:
-                self.mv.connection.update(p)
-                wx.MessageBox("Cập nhật thành công", "OK")
+                self.mv.connection.update(updated_patient)
                 page: wx.ListCtrl = self.mv.patient_book.GetCurrentPage()
                 idx: int = page.GetFirstSelected()
                 self.mv.state.queue = QueueState.fetch(self.mv.connection)

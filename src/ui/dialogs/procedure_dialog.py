@@ -14,7 +14,7 @@ class ProcedureDialog(wx.Dialog):
         )
         self.mv = parent
 
-        self.procedurelist = ProcedureListCtrl(self)
+        self.procedurelistctrl = ProcedureListCtrl(self)
         self.addbtn = AddBtn(self)
         self.updatebtn = UpdateBtn(self)
         self.deletebtn = DeleteBtn(self)
@@ -33,7 +33,7 @@ class ProcedureDialog(wx.Dialog):
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.AddMany(
             [
-                (self.procedurelist, 1, wx.EXPAND | wx.ALL, 5),
+                (self.procedurelistctrl, 1, wx.EXPAND | wx.ALL, 5),
                 (btn_sizer, 0, wx.EXPAND | wx.ALL, 5),
             ]
         )
@@ -41,12 +41,14 @@ class ProcedureDialog(wx.Dialog):
         self.Bind(wx.EVT_CLOSE, self.onClose)
         self.Bind(wx.EVT_BUTTON, self.onClose, okbtn)
         for pr in self.mv.state.all_procedure.values():
-            self.procedurelist.append_ui(pr)
+            self.procedurelistctrl.append_ui(pr)
 
     def onClose(self, e):
         self.mv.order_book.procedurepage.procedure_picker.rebuild()
-        if self.mv.state.visit is None:
-            self.mv.order_book.procedurepage.procedure_list.DeleteAllItems()
+        self.mv.state.new_lineprocedure_list = []
+        self.mv.order_book.procedurepage.procedure_list.rebuild(
+            self.mv.state.old_lineprocedure_list
+        )
         self.mv.price.FetchPrice()
         e.Skip()
 
@@ -115,17 +117,15 @@ class DeleteBtn(wx.Button):
         self.Disable()
 
     def onClick(self, _):
-        idx: int = self.parent.procedurelist.GetFirstSelected()
+        idx: int = self.parent.procedurelistctrl.GetFirstSelected()
         assert idx >= 0
         pr = self.mv.state.all_procedure[
-            int(self.parent.procedurelist.GetItemText(idx, 0))
+            int(self.parent.procedurelistctrl.GetItemText(idx, 0))
         ]
         try:
             self.mv.connection.delete(pr)
             del self.mv.state.all_procedure[pr.id]
-            self.parent.procedurelist.pop_ui(
-                self.parent.procedurelist.GetFirstSelected()
-            )
+            self.parent.procedurelistctrl.pop_ui(idx)
         except Exception as error:
             wx.MessageBox(f"Không xoá được\n{error}", "Lỗi")
 
@@ -178,11 +178,13 @@ class AddDialog(BaseDialog):
         name = self.name.Value.strip()
         price = int(self.price.Value.strip())
         try:
-            pr_id = self.mv.connection.insert(Procedure, {"name": name, "price": price})
-            assert pr_id is not None
-            new_pr = Procedure(pr_id, name, price)
-            self.parent.procedurelist.append_ui(new_pr)
-            self.mv.state.all_procedure[pr_id] = new_pr
+            new_pr_id = self.mv.connection.insert(
+                Procedure, {"name": name, "price": price}
+            )
+            assert new_pr_id is not None
+            new_pr = Procedure(new_pr_id, name, price)
+            self.parent.procedurelistctrl.append_ui(new_pr)
+            self.mv.state.all_procedure[new_pr_id] = new_pr
             e.Skip()
         except Exception as error:
             wx.MessageBox(f"Không thêm mới được\n{error}", "Lỗi")
@@ -190,23 +192,22 @@ class AddDialog(BaseDialog):
 
 class UpdateDialog(BaseDialog):
     def __init__(self, parent: ProcedureDialog):
-        super().__init__(parent, title="Thêm thủ thuật mới")
-        self.idx = self.parent.procedurelist.GetFirstSelected()
+        super().__init__(parent, title="Cập nhật thủ thuật")
+        self.idx = self.parent.procedurelistctrl.GetFirstSelected()
         assert self.idx >= 0
         self.pr = self.mv.state.all_procedure[
-            int(self.parent.procedurelist.GetItemText(self.idx, 0))
+            int(self.parent.procedurelistctrl.GetItemText(self.idx, 0))
         ]
         self.name.ChangeValue(self.pr.name)
         self.price.ChangeValue(str(self.pr.price))
 
     def onClick(self, e):
-        name = self.name.Value.strip()
-        price = int(self.price.Value.strip())
+        pr = {"name": self.name.Value.strip(), "price": int(self.price.Value.strip())}
         try:
-            self.mv.connection.update(Procedure(self.pr.id, name, price))
-            self.pr.name = name
-            self.pr.price = price
-            self.parent.procedurelist.update_ui(self.idx, self.pr)
+            self.mv.connection.update(Procedure(self.pr.id, **pr))
+            for field in self.pr.fields():
+                setattr(self.pr, field, pr[field])
+            self.parent.procedurelistctrl.update_ui(self.idx, self.pr)
             e.Skip()
         except Exception as error:
             wx.MessageBox(f"Không cập nhật được\n{error}", "Lỗi")

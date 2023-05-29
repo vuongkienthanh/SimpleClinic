@@ -1,5 +1,5 @@
 from ui import mainview as mv
-from state.linedrug_state import LineDrugListItem, LineDrugList
+from state.linedrug_state import LineDrugListStateItem, LineDrugListState
 from ui.mainview_widgets.order_book import order_book
 from misc import (
     calc_quantity,
@@ -27,15 +27,15 @@ class DrugListCtrl(wx.ListCtrl):
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onSelect)
         self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onDeselect)
 
-    def build(self, _list: LineDrugList):
+    def build(self, _list: LineDrugListState):
         for item in _list:
             self.append_ui(item)
 
-    def rebuild(self, _list: LineDrugList):
+    def rebuild(self, _list: LineDrugListState):
         self.DeleteAllItems()
         self.build(_list)
 
-    def append_ui(self, item: LineDrugListItem):
+    def append_ui(self, item: LineDrugListStateItem):
         wh = self.mv.state.all_warehouse[item.warehouse_id]
         times, dose, quantity, note = times_dose_quantity_note_str(
             wh.usage,
@@ -58,7 +58,7 @@ class DrugListCtrl(wx.ListCtrl):
             ]
         )
 
-    def update_ui(self, idx: int, item: LineDrugListItem):
+    def update_ui(self, idx: int, item: LineDrugListStateItem):
         wh = self.mv.state.all_warehouse[item.warehouse_id]
         times, dose, quantity, note = times_dose_quantity_note_str(
             wh.usage,

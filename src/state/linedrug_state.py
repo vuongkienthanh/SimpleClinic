@@ -23,8 +23,8 @@ class OldLineDrugListStateItem:
     usage_note: str | None
 
 
-LineDrugListItem = OldLineDrugListStateItem | NewLineDrugListStateItem
-LineDrugList = (
+LineDrugListStateItem = OldLineDrugListStateItem | NewLineDrugListStateItem
+LineDrugListState = (
     list[NewLineDrugListStateItem]
     | list[OldLineDrugListStateItem]
     | list[NewLineDrugListStateItem | OldLineDrugListStateItem]
@@ -32,10 +32,12 @@ LineDrugList = (
 
 
 class LineDrugState:
-    def __get__(self, obj: "main_state.State", _) -> LineDrugListItem | None:
+    def __get__(self, obj: "main_state.State", _) -> LineDrugListStateItem | None:
         return obj._linedrug
 
-    def __set__(self, obj: "main_state.State", value: LineDrugListItem | None) -> None:
+    def __set__(
+        self, obj: "main_state.State", value: LineDrugListStateItem | None
+    ) -> None:
         obj._linedrug = value
         match value:
             case None:
@@ -43,7 +45,7 @@ class LineDrugState:
             case item:
                 self.onSet(obj, item)
 
-    def onSet(self, obj: "main_state.State", item: LineDrugListItem) -> None:
+    def onSet(self, obj: "main_state.State", item: LineDrugListStateItem) -> None:
         mv = obj.mv
         page = mv.order_book.prescriptionpage
         obj.warehouse = obj.all_warehouse[item.warehouse_id]

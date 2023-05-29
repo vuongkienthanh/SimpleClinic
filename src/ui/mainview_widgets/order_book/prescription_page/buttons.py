@@ -3,6 +3,7 @@ from db import LineSamplePrescription
 from misc import plus_bm, minus_bm, calc_quantity, note_str
 from ui.dialogs.sample_prescription_dialog import SampleDialog
 from state.linedrug_state import (
+    LineDrugListStateItem,
     NewLineDrugListStateItem,
     OldLineDrugListStateItem,
 )
@@ -45,10 +46,7 @@ class AddDrugButton(wx.BitmapButton):
                 )
                 state.new_linedrug_list.append(new_ld)
                 page.drug_list.append_ui(new_ld)
-            elif (
-                type(ld) is NewLineDrugListStateItem
-                or type(ld) is OldLineDrugListStateItem
-            ):
+            elif isinstance(ld, LineDrugListStateItem):
                 ld.times = int(page.times.Value)
                 ld.dose = page.dose.Value
                 ld.quantity = int(page.quantity.Value)
@@ -110,24 +108,20 @@ class UseSamplePrescriptionBtn(wx.Button):
     def onClick(self, _):
         dlg = SampleDialog(self.mv)
         if dlg.ShowModal() == wx.ID_OK:
-            idx: int = dlg.samplelist.GetFirstSelected()
+            idx: int = dlg.samplelistctrl.GetFirstSelected()
+            sp_id: int = int(dlg.samplelistctrl.GetItemText(idx))
             if idx != -1:
                 self.parent.drug_list.DeleteAllItems()
+                self.mv.state.to_delete_old_linedrug_list.extend(
+                    self.mv.state.old_linedrug_list.copy()
+                )
+                self.mv.state.old_linedrug_list.clear()
                 self.mv.state.new_linedrug_list.clear()
-                sp = self.mv.state.all_sampleprescription[idx]
+                sp = self.mv.state.all_sampleprescription[sp_id]
                 for lsp in (
                     LineSamplePrescription(*row)
                     for row in self.mv.connection.execute(
-                        f"""
-                    SELECT 
-                        lsp.id,
-                        lsp.warehouse_id,
-                        lsp.times,
-                        lsp.dose
-                    FROM {LineSamplePrescription.__tablename__} 
-                    WHERE
-                        lsp.sample_id = {sp.id}
-                    """
+                        f"SELECT * FROM {LineSamplePrescription.__tablename__} WHERE sample_id = {sp.id}"
                     ).fetchall()
                 ):
                     item = NewLineDrugListStateItem(

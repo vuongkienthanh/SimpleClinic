@@ -71,14 +71,14 @@ class Connection:
         self.execute("UPDATE singleton SET last_open_date = ?", (dt.date.today(),))
         self.commit()
 
-    def insert(self, t: type[T], base: dict) -> int:
+    def insert(self, t: type[T], base_without_id_dict: dict) -> int:
         with self:
             cur = self.execute(
                 f"""
                 INSERT INTO {t.__tablename__} ({t.commna_joined_field_names()})
                 VALUES ({t.named_style_placeholders()})
             """,
-                base,
+                base_without_id_dict,
             )
             assert cur.lastrowid is not None
             return cur.lastrowid
@@ -109,18 +109,17 @@ class Connection:
         target,
         id: int | None = None,
     ) -> int | None:
-        match target,id:
-            case s, None if isinstance(s, BASE) :
+        match target, id:
+            case s, None if isinstance(s, BASE):
                 with self:
                     return self.execute(
                         f"DELETE FROM {target.__tablename__} WHERE id = {target.id}"
                     ).rowcount
-            case s,int() if issubclass(s, BASE):
+            case s, int() if issubclass(s, BASE):
                 with self:
                     return self.execute(
                         f"DELETE FROM {target.__tablename__} WHERE id = {id}"
                     ).rowcount
-
 
     def update(self, base: BASE) -> int | None:
         t = type(base)

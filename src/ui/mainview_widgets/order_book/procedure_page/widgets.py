@@ -1,6 +1,6 @@
 from ui import mainview
 from ui.mainview_widgets.order_book import order_book
-from state.lineprocedure_state import LineProcedureListItem, LineProcedureList
+from state.lineprocedure_state import LineProcedureListStateItem, LineProcedureListState
 import wx
 
 
@@ -12,15 +12,15 @@ class ProcedureListCtrl(wx.ListCtrl):
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onSelect)
         self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onDeselect)
 
-    def build(self, _list: LineProcedureList):
+    def build(self, _list: LineProcedureListState):
         for item in _list:
             self.append_ui(item)
 
-    def rebuild(self, _list: LineProcedureList):
+    def rebuild(self, _list: LineProcedureListState):
         self.DeleteAllItems()
         self.build(_list)
 
-    def append_ui(self, item: LineProcedureListItem):
+    def append_ui(self, item: LineProcedureListStateItem):
         proc = self.mv.state.all_procedure[item.procedure_id]
         self.Append((proc.name,))
 

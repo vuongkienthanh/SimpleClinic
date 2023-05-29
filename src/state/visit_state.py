@@ -84,4 +84,3 @@ class VisitState:
         menubar.menuCopyVisitInfo.Enable(False)
         obj.warehouse = None
         obj.linedrug = None
-        obj.lineprocedure = None

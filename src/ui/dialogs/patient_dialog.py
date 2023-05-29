@@ -153,6 +153,7 @@ class NewPatientDialog(BasePatientDialog):
                     },
                 )
                 assert new_patient_id is not None
+                wx.MessageBox("Đã thêm bệnh nhân mới", "Bệnh nhân", style=wx.ICON_NONE)
                 if (
                     wx.MessageDialog(
                         self,
@@ -164,6 +165,7 @@ class NewPatientDialog(BasePatientDialog):
                 ):
                     try:
                         self.mv.connection.insert(Queue, {"patient_id": new_patient_id})
+                        wx.MessageBox("Đã thêm vao danh sách chờ", "Danh sách chờ", style=wx.ICON_NONE)
                         item = QueueStateItem(
                             new_patient_id, name, gender, birthdate, dt.datetime.now()
                         )

@@ -248,8 +248,8 @@ CREATE TRIGGER IF NOT EXISTS visit_update
 BEFORE UPDATE OF recheck ON {Visit.__tablename__}
 WHEN NEW.recheck > 0 AND OLD.recheck > 0 AND NEW.recheck != OLD.recheck
 BEGIN
-UPDATE {Appointment.__tablename__} SET appointed_date=DATE(NEW.exam_datetime, 'localtime','+'||CAST(NEW.recheck AS TEXT)||' days')
-WHERE patient_id = OLD.patient_id;
+UPDATE {Appointment.__tablename__} SET appointed_date=DATE(NEW.exam_datetime, '+'||CAST(NEW.recheck AS TEXT)||' days')
+    WHERE patient_id = OLD.patient_id;
 END;
 
 CREATE TRIGGER IF NOT EXISTS visit_update_before_recheck_BT_0

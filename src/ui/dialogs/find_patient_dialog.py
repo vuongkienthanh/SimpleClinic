@@ -296,7 +296,7 @@ class FindPatientDialog(wx.Dialog):
         try:
             qid = self.mv.connection.insert(Queue, {"patient_id": pid})
             assert qid is not None
-            wx.MessageBox("Thêm vào danh sách chờ thành công", "OK")
+            wx.MessageBox("Thêm vào danh sách chờ thành công", "OK", style=wx.ICON_NONE)
             idx: int = self.lc.GetFirstSelected()
             assert idx != -1
             self.lc.GetItemText(idx, 2)
@@ -334,7 +334,7 @@ class FindPatientDialog(wx.Dialog):
             assert pid is not None
             try:
                 self.mv.connection.delete(Patient, pid)
-                wx.MessageBox("Xóa thành công", "OK")
+                wx.MessageBox("Xóa thành công", "OK", style=wx.ICON_NONE)
                 self.mv.state.refresh()
                 self.clear()
             except sqlite3.Error as error:

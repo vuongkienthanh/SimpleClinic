@@ -256,7 +256,7 @@ class MyMenuBar(wx.MenuBar):
         procedure_list = mv.order_book.procedurepage.procedure_list
 
         if cb.Open():
-            intro = "{date}\n{name}_{gender}_{bd}".format(
+            intro = "{date}\n{name} ({gender}_{bd})".format(
                 date=dt.datetime.now().strftime("%d/%m/%Y, %H:%M"),
                 name=f"Tên: {mv.name.Value}",
                 gender=f"Giới tính: {mv.gender.Value}",

@@ -94,9 +94,10 @@ class DrugPopup(wx.ComboPopup):
             self.curitem = index
 
     def OnLeftDown(self, _):
-        self.Dismiss()
         cc: DrugPicker = self.ComboCtrl
-        self.mv.state.warehouse = self._list[self.curitem]
+        curitem = self.curitem
+        self.Dismiss()
+        self.mv.state.warehouse = self._list[curitem]
         cc.parent.times.SetFocus()
 
     def onChar(self, e: wx.KeyEvent):
@@ -129,9 +130,9 @@ class DrugPopup(wx.ComboPopup):
             self.OnLeftDown(None)
 
     def KeyESC(self):
-        self.Dismiss()
         self.mv.state.warehouse = None
         self.mv.state.linedrug = None
+        self.Dismiss()
 
 
 class DrugPicker(wx.ComboCtrl):

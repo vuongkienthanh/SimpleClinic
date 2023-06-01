@@ -95,6 +95,16 @@ class ReuseDrugListButton(wx.Button):
         self.mv.state.visit = None
         self.mv.weight.SetWeight(weight)
         self.parent.drug_list.rebuild(_list)
+        for old_linedrug in _list:
+            self.mv.state.new_linedrug_list.append(
+                NewLineDrugListStateItem(
+                    warehouse_id=old_linedrug.warehouse_id,
+                    times=old_linedrug.times,
+                    dose=old_linedrug.dose,
+                    quantity=old_linedrug.quantity,
+                    usage_note=old_linedrug.usage_note,
+                )
+            )
         self.mv.updatequantitybtn.update_quantity()
 
 

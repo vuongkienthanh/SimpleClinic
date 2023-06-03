@@ -3,6 +3,15 @@ from pathlib import Path
 from db import Connection, create_table_sql
 from db.classes import *
 
+ans = input(
+    "This will delete the new database in .SimpleClinic, confirm migration[y/N]"
+)
+match ans:
+    case "y" | "Y":
+        pass
+    case _:
+        print('exit')
+        exit()
 
 old_db_path = os.path.join(Path.home(), ".pmpktn", "my_database.db")
 new_db_path = os.path.join(Path.home(), ".SimpleClinic", "my_database.db")
@@ -104,4 +113,7 @@ new_con.executescript(
     ON CONFLICT (patient_id) DO UPDATE SET appointed_date=excluded.appointed_date
     """
 )
+old_con.commit()
 new_con.commit()
+old_con.sqlcon.close()
+new_con.sqlcon.close()

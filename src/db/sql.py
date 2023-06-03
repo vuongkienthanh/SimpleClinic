@@ -2,11 +2,11 @@ from .classes import *
 
 
 create_table_sql = f"""\
-CREATE TABLE IF NOT EXISTS singleton (
+CREATE TABLE singleton (
     id INTEGER PRIMARY KEY,
     last_open_date DATE
 );
-CREATE TABLE IF NOT EXISTS {Patient.__tablename__} (
+CREATE TABLE {Patient.__tablename__} (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     gender GENDER NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS {Patient.__tablename__} (
     phone TEXT,
     past_history TEXT
 );
-CREATE TABLE IF NOT EXISTS {Visit.__tablename__} (
+CREATE TABLE {Visit.__tablename__} (
     id INTEGER PRIMARY KEY,
     exam_datetime TIMESTAMP DEFAULT (datetime('now', 'localtime')),
     diagnosis TEXT NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS {Visit.__tablename__} (
     CONSTRAINT days_BE_0 CHECK (days >= 0),
     CONSTRAINT weight_BT_0 CHECK (weight > 0) 
 );
-CREATE TABLE IF NOT EXISTS {Queue.__tablename__} (
+CREATE TABLE {Queue.__tablename__} (
     id INTEGER PRIMARY KEY,
     patient_id INTEGER UNIQUE NOT NULL,
     added_datetime TIMESTAMP DEFAULT (datetime('now', 'localtime')),
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS {Queue.__tablename__} (
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
-CREATE TABLE IF NOT EXISTS {SeenToday.__tablename__} (
+CREATE TABLE {SeenToday.__tablename__} (
     id INTEGER PRIMARY KEY,
     patient_id INTEGER NOT NULL,
     visit_id INTEGER NOT NULL,
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS {SeenToday.__tablename__} (
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
-CREATE TABLE IF NOT EXISTS {Appointment.__tablename__} (
+CREATE TABLE {Appointment.__tablename__} (
     id INTEGER PRIMARY KEY,
     patient_id INTEGER UNIQUE NOT NULL,
     appointed_date DATE NOT NULL,
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS {Appointment.__tablename__} (
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
-CREATE TABLE IF NOT EXISTS {Warehouse.__tablename__} (
+CREATE TABLE {Warehouse.__tablename__} (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     element TEXT NOT NULL,
@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS {Warehouse.__tablename__} (
         purchase_price >= 0
         )
 );
-CREATE TABLE IF NOT EXISTS {LineDrug.__tablename__} (
+CREATE TABLE {LineDrug.__tablename__} (
     id INTEGER PRIMARY KEY,
     warehouse_id INTEGER NOT NULL,
     times INTEGER NOT NULL,
@@ -100,11 +100,11 @@ CREATE TABLE IF NOT EXISTS {LineDrug.__tablename__} (
         dose != ''
         )
 );
-CREATE TABLE IF NOT EXISTS {SamplePrescription.__tablename__} (
+CREATE TABLE {SamplePrescription.__tablename__} (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL
 );
-CREATE TABLE IF NOT EXISTS {LineSamplePrescription.__tablename__} (
+CREATE TABLE {LineSamplePrescription.__tablename__} (
     id INTEGER PRIMARY KEY,
     warehouse_id INTEGER NOT NULL,
     sample_id INTEGER NOT NULL,
@@ -119,13 +119,13 @@ CREATE TABLE IF NOT EXISTS {LineSamplePrescription.__tablename__} (
     CONSTRAINT ti_do_check CHECK (times > 0 AND dose != ''),
     CONSTRAINT unique_wh_sp UNIQUE (warehouse_id, sample_id)
 );
-CREATE TABLE IF NOT EXISTS {Procedure.__tablename__} (
+CREATE TABLE {Procedure.__tablename__} (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     price INTEGER NOT NULL,
     CONSTRAINT price_BE_0 CHECK (price >= 0)
 );
-CREATE TABLE IF NOT EXISTS {LineProcedure.__tablename__} (
+CREATE TABLE {LineProcedure.__tablename__} (
     id INTEGER PRIMARY KEY,
     procedure_id INTEGER NOT NULL,
     visit_id INTEGER NOT NULL,
@@ -139,14 +139,14 @@ CREATE TABLE IF NOT EXISTS {LineProcedure.__tablename__} (
 """
 
 create_index_sql = f"""
-CREATE INDEX IF NOT EXISTS patient_name ON {Patient.__tablename__} (name);
-CREATE INDEX IF NOT EXISTS procedure_name ON {Procedure.__tablename__} (name);
-CREATE INDEX IF NOT EXISTS drug_name ON {Warehouse.__tablename__} (name);
-CREATE INDEX IF NOT EXISTS drug_element ON {Warehouse.__tablename__} (element);
+CREATE INDEX patient_name ON {Patient.__tablename__} (name);
+CREATE INDEX procedure_name ON {Procedure.__tablename__} (name);
+CREATE INDEX drug_name ON {Warehouse.__tablename__} (name);
+CREATE INDEX drug_element ON {Warehouse.__tablename__} (element);
 """
 
 create_view_sql = f"""
-CREATE VIEW IF NOT EXISTS {Queue.__tablename__}_view AS
+CREATE VIEW {Queue.__tablename__}_view AS
     SELECT
         p.id AS pid,
         p.name,
@@ -158,7 +158,7 @@ CREATE VIEW IF NOT EXISTS {Queue.__tablename__}_view AS
     ON q.patient_id = p.id
     ORDER BY q.added_datetime ASC
 ;
-CREATE VIEW IF NOT EXISTS {SeenToday.__tablename__}_view AS
+CREATE VIEW {SeenToday.__tablename__}_view AS
     SELECT
         p.id AS pid,
         p.name,
@@ -173,7 +173,7 @@ CREATE VIEW IF NOT EXISTS {SeenToday.__tablename__}_view AS
     ON st.visit_id = v.id
     ORDER BY v.exam_datetime DESC
 ;
-CREATE VIEW IF NOT EXISTS {Appointment.__tablename__}_view AS
+CREATE VIEW {Appointment.__tablename__}_view AS
     SELECT
         p.id AS pid,
         p.name,
@@ -187,7 +187,7 @@ CREATE VIEW IF NOT EXISTS {Appointment.__tablename__}_view AS
 """
 
 create_trigger_sql = f"""
-CREATE TRIGGER IF NOT EXISTS last_open_date_update
+CREATE TRIGGER last_open_date_update
 BEFORE UPDATE OF last_open_date ON singleton 
 WHEN JULIANDAY(OLD.last_open_date) < JULIANDAY(NEW.last_open_date)
 BEGIN
@@ -197,21 +197,21 @@ DELETE FROM {Appointment.__tablename__}
     WHERE JULIANDAY(appointed_date) < JULIANDAY(NEW.last_open_date);
 END;
 
-CREATE TRIGGER IF NOT EXISTS linedrug_insert 
+CREATE TRIGGER linedrug_insert 
 BEFORE INSERT ON {LineDrug.__tablename__}
 BEGIN
 UPDATE {Warehouse.__tablename__} SET quantity = quantity - NEW.quantity
     WHERE id = NEW.warehouse_id;
 END;
 
-CREATE TRIGGER IF NOT EXISTS linedrug_delete
+CREATE TRIGGER linedrug_delete
 BEFORE DELETE ON {LineDrug.__tablename__}
 BEGIN
 UPDATE {Warehouse.__tablename__} SET quantity = quantity + OLD.quantity
     WHERE id = OLD.warehouse_id;
 END;
 
-CREATE TRIGGER IF NOT EXISTS linedrug_update
+CREATE TRIGGER linedrug_update
 BEFORE UPDATE ON {LineDrug.__tablename__}
 WHEN NEW.warehouse_id = OLD.warehouse_id
 BEGIN
@@ -219,7 +219,7 @@ UPDATE {Warehouse.__tablename__} SET quantity = quantity + OLD.quantity - NEW.qu
     WHERE id = OLD.warehouse_id;
 END;
 
-CREATE TRIGGER IF NOT EXISTS visit_insert_before
+CREATE TRIGGER visit_insert_before
 BEFORE INSERT ON {Visit.__tablename__}
 BEGIN
 DELETE FROM {Queue.__tablename__}
@@ -228,14 +228,14 @@ DELETE FROM {Appointment.__tablename__}
     WHERE patient_id = NEW.patient_id;
 END;
 
-CREATE TRIGGER IF NOT EXISTS visit_insert_after
+CREATE TRIGGER visit_insert_after
 AFTER INSERT ON {Visit.__tablename__}
 BEGIN
 INSERT INTO {SeenToday.__tablename__} ({SeenToday.commna_joined_field_names()})
     VALUES (NEW.patient_id, NEW.id);
 END;
 
-CREATE TRIGGER IF NOT EXISTS visit_insert_after_recheck
+CREATE TRIGGER visit_insert_after_recheck
 AFTER INSERT ON {Visit.__tablename__}
 WHEN NEW.recheck > 0
 BEGIN
@@ -244,7 +244,7 @@ VALUES (NEW.patient_id, DATE('now','localtime', '+'||CAST(NEW.recheck AS TEXT)||
 ON CONFLICT (patient_id) DO UPDATE SET appointed_date=excluded.appointed_date;
 END;
 
-CREATE TRIGGER IF NOT EXISTS visit_update
+CREATE TRIGGER visit_update
 BEFORE UPDATE OF recheck ON {Visit.__tablename__}
 WHEN NEW.recheck > 0 AND OLD.recheck > 0 AND NEW.recheck != OLD.recheck
 BEGIN
@@ -252,7 +252,7 @@ UPDATE {Appointment.__tablename__} SET appointed_date=DATE(NEW.exam_datetime, '+
     WHERE patient_id = OLD.patient_id;
 END;
 
-CREATE TRIGGER IF NOT EXISTS visit_update_before_recheck_BT_0
+CREATE TRIGGER visit_update_before_recheck_BT_0
 BEFORE UPDATE OF recheck ON {Visit.__tablename__}
 WHEN NEW.recheck > 0 AND OLD.recheck = 0
 BEGIN
@@ -260,7 +260,7 @@ INSERT INTO {Appointment.__tablename__} ({Appointment.commna_joined_field_names(
 VALUES (NEW.patient_id, DATE('now','localtime', '+'||CAST(NEW.recheck AS TEXT)||' days'));
 END;
 
-CREATE TRIGGER IF NOT EXISTS visit_update_before_recheck_EQ_0
+CREATE TRIGGER visit_update_before_recheck_EQ_0
 BEFORE UPDATE OF recheck ON {Visit.__tablename__}
 WHEN NEW.recheck = 0 AND OLD.recheck > 0
 BEGIN

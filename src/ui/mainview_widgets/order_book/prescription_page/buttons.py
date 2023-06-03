@@ -5,7 +5,6 @@ from ui.dialogs.sample_prescription_dialog import SampleDialog
 from state.linedrug_state import (
     LineDrugListStateItem,
     NewLineDrugListStateItem,
-    OldLineDrugListStateItem,
 )
 import wx
 

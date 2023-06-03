@@ -94,6 +94,9 @@ class DrugPopup(wx.ComboPopup):
             self.curitem = index
 
     def OnLeftDown(self, _):
+        self.select_drug()
+
+    def select_drug(self):
         cc: DrugPicker = self.ComboCtrl
         curitem = self.curitem
         self.Dismiss()
@@ -127,7 +130,7 @@ class DrugPopup(wx.ComboPopup):
 
     def KeyReturn(self):
         if self.lc.ItemCount > 0:
-            self.OnLeftDown(None)
+            self.select_drug()
 
     def KeyESC(self):
         self.mv.state.warehouse = None

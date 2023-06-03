@@ -103,8 +103,9 @@ class SampleListCtrl(wx.ListCtrl):
         self.parent.times.Enable()
         idx: int = e.GetIndex()
         sp_id = int(self.GetItemText(idx, 0))
-        sp = self.mv.state.all_sampleprescription[sp_id]
-        self.parent.sampleitemlistctrl.build(sp.id)
+        self.parent.sampleitemlistctrl.build(
+            self.parent.sampleitemlistctrl.fetch_list(sp_id)
+        )
 
     def onDeselect(self, _):
         self.parent.deletesamplebtn.Disable()
@@ -307,8 +308,8 @@ class SampleItemListCtrl(wx.ListCtrl):
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onSelect)
         self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onDeselect)
 
-    def build(self, sp_id: int):
-        for lsp in self.parent.mv.connection.execute(
+    def fetch_list(self, sp_id: int):
+        return self.parent.mv.connection.execute(
             f"""
             SELECT lsp.id, wh.name, wh.element, lsp.times, lsp.dose
             FROM (
@@ -318,7 +319,10 @@ class SampleItemListCtrl(wx.ListCtrl):
             JOIN {Warehouse.__tablename__} as wh
             ON wh.id = lsp.warehouse_id
         """
-        ).fetchall():
+        ).fetchall()
+
+    def build(self, _list: list[Mapping[str, Any]]):
+        for lsp in _list:
             self.append_ui(lsp)
 
     def append_ui(self, lsp: Mapping[str, Any]):

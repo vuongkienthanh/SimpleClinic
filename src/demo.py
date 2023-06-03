@@ -69,7 +69,7 @@ def sample_con():
         CSVReader(Patient, f("patients.csv")),
         CSVReader(Visit, f("visits.csv")),
         CSVReader(LineDrug, f("linedrugs.csv")),
-        CSVReader(LineProcedure, f("lineprocedure.csv")),
+        CSVReader(LineProcedure, f("lineprocedures.csv")),
         CSVReader(Queue, f("queue.csv")),
         CSVReader(SamplePrescription, f("sampleprescription.csv")),
         CSVReader(LineSamplePrescription, f("linesampleprescription.csv")),

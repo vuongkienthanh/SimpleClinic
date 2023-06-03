@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from db import Connection, create_table_sql
+from db import *
 from db.classes import *
 
 ans = input(
@@ -113,6 +113,10 @@ new_con.executescript(
     ON CONFLICT (patient_id) DO UPDATE SET appointed_date=excluded.appointed_date
     """
 )
+new_con.executescript(create_view_sql)
+new_con.executescript(create_index_sql)
+new_con.executescript(create_trigger_sql)
+new_con.executescript(finalized_sql)
 old_con.commit()
 new_con.commit()
 old_con.sqlcon.close()

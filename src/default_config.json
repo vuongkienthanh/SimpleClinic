@@ -5,7 +5,6 @@
   "clinic_phone_number": "0909.222.111",
   "checkup_price": 50000,
   "default_days_for_prescription": 2,
-  "minimum_drug_quantity_alert": 20,
   "single_sale_units": [
     "chai",
     "lọ",
@@ -13,13 +12,19 @@
     "tube",
     "tuýp"
   ],
-  "follow_choices": {
+  "follow_choices_dict": {
     "Dấu hiệu chung": "Khám lại khi trẻ có những dấu hiệu sau: co giật, ngủ li bì hay vật vã, bứt rứt, thở mệt, nôn ói nhiều, sốt cao liên tục, tiêu máu",
     "Dấu hiệu nặng TCM": "Sốt cao ≥39 độ C hay sốt liên tục trên 2 ngày - Giật mình, chới với, hốt hoảng bất thường - Ngủ gà, li bì hay bứt rứt - Run giật tay chân bất thường - Yếu tay chân, ngồi không vững, đi đứng loạng choạng - Thở bất thường: không đều, thở nhanh - Nuốt sặc, thay đổi giọng nói",
     "Dấu hiệu nặng SXH": "Lừ đừ, bứt rứt - Lạnh tay chân khi trẻ đã hết sốt (thường vào ngày thứ 4, thứ 5 của bệnh) - Đau bụng - Ói nhiều - Chảy máu bất thường: Chảy máu răng, máu mũi, đi cầu phân đen, ói ra máu"
   },
+  "follow_choices_list":[
+    "Uống nhiều nước",
+    "Ăn nhiều rau củ",
+    "Tập đi vệ sinh"
+  ],
   "ask_print": false,
   "print_price": true,
+  "minimum_drug_quantity_alert": 20,
   "max_number_of_drugs_in_one_page": 8,
   "display_recent_visit_count": -1,
   "print_scale": 1,
@@ -32,12 +37,17 @@
       219,
       186
     ],
-    "patient_queuelist": [
+    "queue": [
       255,
       255,
       255
     ],
-    "patient_seenlist": [
+    "seentoday": [
+      255,
+      255,
+      255
+    ],
+    "appointment": [
       255,
       255,
       255
@@ -88,11 +98,6 @@
       255
     ],
     "drug_list": [
-      255,
-      255,
-      255
-    ],
-    "procedure_list": [
       255,
       255,
       255
@@ -153,6 +158,11 @@
       255
     ],
     "procedure_picker": [
+      255,
+      255,
+      255
+    ],
+    "procedure_list": [
       255,
       255,
       255

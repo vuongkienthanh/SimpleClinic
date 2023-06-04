@@ -112,16 +112,17 @@ class MainView(wx.Frame):
                 (self.weight, "weight"),
                 (self.follow, "follow"),
                 (self.visit_list, "visit_list"),
-                (self.patient_book.queuelistctrl, "patient_queuelist"),
-                (self.patient_book.seentodaylistctrl, "patient_seenlist"),
+                (self.patient_book.queuelistctrl, "queue"),
+                (self.patient_book.seentodaylistctrl, "seentoday"),
+                (self.patient_book.appointmentlistctrl, "appointment"),
                 (self.order_book.prescriptionpage.drug_list, "drug_list"),
                 (self.order_book.prescriptionpage.drug_picker, "drug_picker"),
                 (self.order_book.prescriptionpage.times, "drug_times"),
                 (self.order_book.prescriptionpage.dose, "drug_dose"),
                 (self.order_book.prescriptionpage.quantity, "drug_quantity"),
                 (self.order_book.prescriptionpage.note, "drug_note"),
-                # (self.order_book.procedurepage.procedure_picker, "procedure_picker"),
-                # (self.order_book.procedurepage.procedure_list, "procedure_list"),
+                (self.order_book.procedurepage.procedure_picker, "procedure_picker"),
+                (self.order_book.procedurepage.procedure_list, "procedure_list"),
             ]
         )
 

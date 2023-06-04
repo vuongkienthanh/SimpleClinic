@@ -20,12 +20,10 @@ from ui.dialogs import (
 )
 from ui.dialogs.picker_dialog import MonthPickerDialog, DatePickerDialog
 from misc.printer import printdata, PrintOut
-import subprocess
 import wx
 import shutil
 import os.path
 from pathlib import Path
-import sys
 import os
 import sqlite3
 import datetime as dt
@@ -96,7 +94,7 @@ class MyMenuBar(wx.MenuBar):
 
         settingMenu = wx.Menu()
 
-        menuSetupConfig: wx.MenuItem = settingMenu.Append(wx.ID_ANY, "Cài đặt hệ thống")
+        menuSetupConfig: wx.MenuItem = settingMenu.Append(wx.ID_ANY, "Cài đặt")
         menuOpenConfigFolder: wx.MenuItem = settingMenu.Append(
             wx.ID_ANY, "Mở folder cài đặt + dữ liệu"
         )
@@ -111,7 +109,7 @@ class MyMenuBar(wx.MenuBar):
         self.Append(homeMenu, "&Home")
         self.Append(editMenu, "&Khám bệnh")
         self.Append(manageMenu, "&Quản lý")
-        self.Append(settingMenu, "&Cài đặt")
+        self.Append(settingMenu, "&Hệ thống")
 
         self.Bind(wx.EVT_MENU, self.onRefresh, id=wx.ID_REFRESH)
         self.Bind(wx.EVT_MENU, self.onAbout, id=wx.ID_ABOUT)
@@ -340,12 +338,7 @@ class MyMenuBar(wx.MenuBar):
         SetupDialog(mv).ShowModal()
 
     def onOpenConfigFolder(self, _):
-        if sys.platform == "win32":
-            os.startfile(APP_DIR)
-        elif sys.platform == "linux":
-            subprocess.run(["xdg-open", APP_DIR])
-        elif sys.platform == "darwin":
-            subprocess.run(["start", APP_DIR])
+        wx.LaunchDefaultApplication(APP_DIR)
 
     def onReduceDatabaseSize(self, _):
         mv: "mainview.MainView" = self.GetFrame()

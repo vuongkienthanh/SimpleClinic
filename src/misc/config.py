@@ -22,7 +22,8 @@ class Config:
     default_days_for_prescription: int
     minimum_drug_quantity_alert: int
     single_sale_units: list[str]
-    follow_choices: dict[str, str]
+    follow_choices_dict: dict[str, str]
+    follow_choices_list: list[str]
     ask_print: bool
     print_price: bool
     max_number_of_drugs_in_one_page: int
@@ -61,7 +62,8 @@ class Config:
             default_days_for_prescription=config_json["default_days_for_prescription"],
             minimum_drug_quantity_alert=config_json["minimum_drug_quantity_alert"],
             single_sale_units=config_json["single_sale_units"],
-            follow_choices=config_json["follow_choices"],
+            follow_choices_dict=config_json["follow_choices_dict"],
+            follow_choices_list=config_json["follow_choices_list"],
             ask_print=config_json["ask_print"],
             print_price=config_json["print_price"],
             max_number_of_drugs_in_one_page=config_json[

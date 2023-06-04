@@ -138,6 +138,7 @@ with open(old_config_path, "r", encoding="utf-8") as old_f, open(
 new_config_json |= old_config_json
 del new_config_json["initial_price"]
 del new_config_json["number_of_drugs_in_one_page"]
+del new_config_json["follow_choices"]
 
 with open(new_config_path, "w", encoding="utf-8") as f:
     json.dump(new_config_json, f, ensure_ascii=False, indent=4)

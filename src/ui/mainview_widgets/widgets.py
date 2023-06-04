@@ -76,14 +76,18 @@ class PriceCtrl(wx.TextCtrl):
 
 class Follow(wx.ComboBox):
     """A Combobox which is able to:
-    - use only the `key` in `follow_choices`
+    - use only the `key` in `follow_choices_dict` and `follow_choices_list`
     """
 
     def __init__(self, mv: "mv.MainView", **kwargs):
         super().__init__(
             mv,
             style=wx.CB_DROPDOWN,
-            choices=list(mv.config.follow_choices.keys()),
+            choices=list(
+                chain(
+                    mv.config.follow_choices_dict.keys(), mv.config.follow_choices_list
+                )
+            ),
             **kwargs,
         )
         self.mv = mv
@@ -92,8 +96,8 @@ class Follow(wx.ComboBox):
     def expand_when_print(self) -> str:
         "expand `key` -> `key: value` in config"
         k = self.Value.strip()
-        if k in self.mv.config.follow_choices.keys():
-            return f"{k}: {self.mv.config.follow_choices[k]}"
+        if k in self.mv.config.follow_choices_dict.keys():
+            return f"{k}: {self.mv.config.follow_choices_dict[k]}"
         else:
             return k
 

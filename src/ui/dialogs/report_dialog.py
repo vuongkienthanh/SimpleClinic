@@ -5,9 +5,7 @@ from misc import num_to_str_price, Config
 import wx
 import datetime as dt
 import sqlite3
-import sys
 import os
-import subprocess
 
 
 def finance_report(
@@ -211,9 +209,4 @@ class MonthWarehouseReportDialog(wx.Dialog):
                 sale_unit = row["sale_unit"] or row["usage_unit"]
                 s = f"{name:<30}: {quantity:>3} {sale_unit}\n"
                 f.write(s)
-        if sys.platform == "win32":
-            os.startfile(path)
-        elif sys.platform == "linux":
-            subprocess.run(["xdg-open", path])
-        elif sys.platform == "darwin":
-            subprocess.run(["start", path])
+        wx.LaunchDefaultApplication(path)

@@ -78,15 +78,16 @@ class InfoPage(BasePage):
         self.SetSizer(entry_sizer)
 
 
-class FollowChoicePage(BasePage):
+class FollowChoicePage(wx.Panel):
     def __init__(self, parent: wx.Notebook):
         super().__init__(parent)
+        mv :"mainview.MainView" = parent.Parent.mv 
         self.grid = wx.grid.Grid(self)
-        self.grid.CreateGrid(10, 2)
+        self.grid.CreateGrid(8, 2)
         self.grid.SetColLabelValue(0, "Lời dặn dò")
         self.grid.SetColLabelValue(1, "Mở rộng khi in")
-        self.grid.SetColSize(0, self.mv.config.header_width(0.1))
-        self.grid.SetColSize(1, self.mv.config.header_width(0.3))
+        self.grid.SetColSize(0, mv.config.header_width(0.1))
+        self.grid.SetColSize(1, mv.config.header_width(0.3))
         self.grid.HideRowLabels()
         addbtn = wx.BitmapButton(self, bitmap=wx.Bitmap(plus_bm))
         deletebtn = wx.BitmapButton(self, bitmap=wx.Bitmap(minus_bm))
@@ -108,8 +109,8 @@ class FollowChoicePage(BasePage):
         self.SetSizer(sizer)
         for idx, item in enumerate(
             chain(
-                self.mv.config.follow_choices_dict.keys(),
-                self.mv.config.follow_choices_list,
+                mv.config.follow_choices_dict.keys(),
+                mv.config.follow_choices_list,
             )
         ):
             try:
@@ -117,7 +118,7 @@ class FollowChoicePage(BasePage):
             except:
                 self.grid.AppendRows()
                 self.grid.SetCellValue(idx, 0, item)
-        for idx, item in enumerate(self.mv.config.follow_choices_dict.values()):
+        for idx, item in enumerate(mv.config.follow_choices_dict.values()):
             try:
                 self.grid.SetCellValue(idx, 1, item)
             except:

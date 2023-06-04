@@ -136,6 +136,9 @@ with open(old_config_path, "r", encoding="utf-8") as old_f, open(
     new_config_json = json.load(new_f)
 
 new_config_json |= old_config_json
+new_config_json['checkup_price'] = new_config_json['initial_price']
+new_config_json['max_number_of_drugs_in_one_page'] = new_config_json['number_of_drugs_in_one_page']
+new_config_json['follow_choices_dict'] = new_config_json['follow_choices']
 del new_config_json["initial_price"]
 del new_config_json["number_of_drugs_in_one_page"]
 del new_config_json["follow_choices"]

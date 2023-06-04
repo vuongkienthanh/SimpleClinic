@@ -1,5 +1,5 @@
-import db.db_func as dbf
-from paths import *
+import db
+from misc import SRC_DIR, MY_DATABASE_PATH
 import os.path
 import wx
 import os
@@ -7,9 +7,9 @@ import sys
 
 
 class App(wx.App):
-    def __init__(self, con: dbf.Connection):
+    def __init__(self, con: db.Connection):
         super().__init__()
-        from core.mainview import MainView
+        from ui.mainview import MainView
 
         mv = MainView(con)
         self.SetTopWindow(mv)
@@ -29,7 +29,12 @@ def platform_settings():
 
 
 if __name__ == "__main__":
-    con = dbf.Connection(MY_DATABASE_PATH)
-    con.make_db()
-    platform_settings()
-    App(con)
+    connection = db.Connection(MY_DATABASE_PATH)
+    try:
+        connection.update_last_open_date()
+    except Exception as e:
+        connection.make_db()
+        connection.update_last_open_date()
+    finally:
+        platform_settings()
+        App(connection)

@@ -3,7 +3,7 @@
   "doctor_name": "Bs xxxx yyyyy zzzz aaa",
   "clinic_address": "Qui laboriosam corporis non quasi maiores velit culpa",
   "clinic_phone_number": "0909.222.111",
-  "initial_price": 50000,
+  "checkup_price": 50000,
   "default_days_for_prescription": 2,
   "minimum_drug_quantity_alert": 20,
   "single_sale_units": [
@@ -20,7 +20,7 @@
   },
   "ask_print": false,
   "print_price": true,
-  "number_of_drugs_in_one_page": 8,
+  "max_number_of_drugs_in_one_page": 8,
   "display_recent_visit_count": -1,
   "print_scale": 1,
   "preview_scale": 1,

@@ -1,6 +1,5 @@
-from db.db_func import Connection
-from db.db_class import *
-from paths import SAMPLE_DIR
+from db import *
+from misc import SAMPLE_DIR
 from main import App, platform_settings
 
 import os
@@ -70,15 +69,15 @@ def sample_con():
         CSVReader(Patient, f("patients.csv")),
         CSVReader(Visit, f("visits.csv")),
         CSVReader(LineDrug, f("linedrugs.csv")),
-        CSVReader(LineProcedure, f("lineprocedure.csv")),
-        CSVReader(QueueList, f("queuelist.csv")),
+        CSVReader(LineProcedure, f("lineprocedures.csv")),
+        CSVReader(Queue, f("queue.csv")),
         CSVReader(SamplePrescription, f("sampleprescription.csv")),
         CSVReader(LineSamplePrescription, f("linesampleprescription.csv")),
     ]:
-        with con.sqlcon as sqlcon:
-            sqlcon.executemany(
+        with con:
+            con.executemany(
                 f"""
-                INSERT INTO {reader.t.table_name} ({','.join(reader.fields)})
+                INSERT INTO {reader.t.__tablename__} ({','.join(reader.fields)})
                 VALUES ({','.join(['?']* len(reader.fields))})
             """,
                 (tuple(getattr(row, attr) for attr in reader.fields) for row in reader),
@@ -91,9 +90,10 @@ def sample_con():
             "weight": decimal.Decimal(10),
             "days": 2,
             "recheck": 2,
+            "price": 1000000,
             "patient_id": 6,
             "follow": "follow",
-            "vnote": "dynamic created",
+            "vnote": "fake",
         },
     )
     print("Fake data generated")
@@ -101,6 +101,6 @@ def sample_con():
 
 
 if __name__ == "__main__":
-    con = sample_con()
+    connection = sample_con()
     platform_settings()
-    App(con)
+    App(connection)

@@ -5,6 +5,7 @@ from ui import mainview as mv
 from misc.printer import PrintOut, printdata
 import dataclasses
 import wx
+from itertools import chain
 
 
 class GetWeightBtn(wx.BitmapButton):
@@ -63,7 +64,9 @@ class UpdateQuantityBtn(wx.BitmapButton):
         """Update quantity in DrugList, also update price"""
         state = self.mv.state
         drug_list = self.mv.order_book.prescriptionpage.drug_list
-        for idx, item in enumerate(state.old_linedrug_list + state.new_linedrug_list):
+        for idx, item in enumerate(
+            chain(state.old_linedrug_list, state.new_linedrug_list)
+        ):
             wh = state.all_warehouse[item.warehouse_id]
             item.quantity = calc_quantity(
                 times=item.times,

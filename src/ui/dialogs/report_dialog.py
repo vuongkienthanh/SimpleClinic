@@ -28,8 +28,8 @@ def finance_report(
     Lợi nhuận từ thủ thuật
     """
     match date, month, year:
-        case dt.date(), None, None:
-            visit_where_clause = f"""WHERE DATE(exam_datetime) = '{date.isoformat()}'"""
+        case dt.date() as d, None, None:
+            visit_where_clause = f"""WHERE DATE(exam_datetime) = '{d.isoformat()}'"""
         case None, int(), int():
             visit_where_clause = f"""
                 WHERE (
@@ -137,7 +137,7 @@ class MonthFinanceReportDialog(FinanceReportDialog):
 
 
 class MonthWarehouseReportDialog(wx.Dialog):
-    def __init__(self, parent:"mv.MainView", month: int, year: int):
+    def __init__(self, parent: "mv.MainView", month: int, year: int):
         super().__init__(parent, title=f"T{month}/{year}")
         self.mv = parent
         self.res = self.get_report(month, year)

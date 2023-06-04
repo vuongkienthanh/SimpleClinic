@@ -1,5 +1,6 @@
 from ui import mainview as mv
 from misc import vn_weekdays, num_to_str_price, str_to_int_price
+from itertools import chain
 import wx
 
 
@@ -53,11 +54,13 @@ class PriceCtrl(wx.TextCtrl):
         price: int = self.mv.config.checkup_price
         price += sum(
             state.all_warehouse[item.warehouse_id].sale_price * item.quantity
-            for item in state.old_linedrug_list + state.new_linedrug_list
+            for item in chain(state.old_linedrug_list, state.new_linedrug_list)
         )
         price += sum(
             state.all_procedure[item.procedure_id].price
-            for item in state.old_lineprocedure_list + state.new_lineprocedure_list
+            for item in chain(
+                state.old_lineprocedure_list, state.new_lineprocedure_list
+            )
         )
         self.ChangeValue(num_to_str_price(price))
 

@@ -96,15 +96,16 @@ def calc_quantity(
 
 def num_to_str_price(price: int) -> str:
     s = str(price)
-    res = ""
+    res = []
     for char, cyc in zip(s[::-1], cycle(range(3))):
-        res += char
+        res.append(char)
         if cyc == 2:
-            res += "."
+            res.append(".")
     else:
         if res[-1] == ".":
-            res = res[:-1]
-    return res[::-1]
+            res.pop()
+    res.reverse()
+    return "".join(res)
 
 
 def str_to_int_price(price: str) -> int:

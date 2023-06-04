@@ -294,7 +294,7 @@ class DeleteDrugButton(wx.Button):
 
 
 class SampleItemListCtrl(wx.ListCtrl):
-    def __init__(self, parent: SampleDialog,name:str):
+    def __init__(self, parent: SampleDialog, name: str):
         super().__init__(parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL, name=name)
         self.parent = parent
         self.mv = parent.mv

@@ -2,15 +2,17 @@ import os
 from pathlib import Path
 from db import *
 from db.classes import *
+from misc import DEFAULT_CONFIG_PATH
+import json
 
 ans = input(
-    "This will delete the new database in .SimpleClinic, confirm migration[y/N]"
+    "This will delete the new database and config in .SimpleClinic, confirm migration[y/N]"
 )
 match ans:
     case "y" | "Y":
         pass
     case _:
-        print('exit')
+        print("exit")
         exit()
 
 old_db_path = os.path.join(Path.home(), ".pmpktn", "my_database.db")
@@ -121,3 +123,21 @@ old_con.commit()
 new_con.commit()
 old_con.sqlcon.close()
 new_con.sqlcon.close()
+
+old_config_path = os.path.join(Path.home(), ".pmpktn", "config.json")
+new_config_path = os.path.join(Path.home(), ".SimpleClinic", "config.json")
+if os.path.exists(new_config_path):
+    os.remove(new_config_path)
+
+with open(old_config_path, "r", encoding="utf-8") as old_f, open(
+    DEFAULT_CONFIG_PATH, "r", encoding="utf-8"
+) as new_f:
+    old_config_json = json.load(old_f)
+    new_config_json = json.load(new_f)
+
+new_config_json |= old_config_json
+del new_config_json["initial_price"]
+del new_config_json["number_of_drugs_in_one_page"]
+
+with open(new_config_path, "w", encoding="utf-8") as f:
+    json.dump(new_config_json, f, ensure_ascii=False, indent=4)

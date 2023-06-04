@@ -13,11 +13,11 @@ class SampleDialog(wx.Dialog):
             style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.MAXIMIZE_BOX,
         )
         self.mv = mv
-        self.samplelistctrl = SampleListCtrl(self)
+        self.samplelistctrl = SampleListCtrl(self, name="Danh sách toa mẫu")
         self.addsamplebtn = AddSampleButton(self)
         self.updatesamplebtn = UpdateSampleButton(self)
         self.deletesamplebtn = DeleteSampleButton(self)
-        self.sampleitemlistctrl = SampleItemListCtrl(self)
+        self.sampleitemlistctrl = SampleItemListCtrl(self, name="Nội dung")
         self.picker = Picker(self, name="Thuốc")
         self.times = Times(self, name="Số cữ")
         self.dose = Dose(self, name="Liều")
@@ -75,10 +75,8 @@ class SampleDialog(wx.Dialog):
 
 
 class SampleListCtrl(wx.ListCtrl):
-    def __init__(self, parent: SampleDialog):
-        super().__init__(
-            parent, style=wx.LC_SINGLE_SEL | wx.LC_REPORT, name="Danh sách toa mẫu"
-        )
+    def __init__(self, parent: SampleDialog, name: str):
+        super().__init__(parent, style=wx.LC_SINGLE_SEL | wx.LC_REPORT, name=name)
         self.parent = parent
         self.mv = parent.mv
         self.AppendColumn("Mã", width=self.mv.config.header_width(0.05))
@@ -296,8 +294,8 @@ class DeleteDrugButton(wx.Button):
 
 
 class SampleItemListCtrl(wx.ListCtrl):
-    def __init__(self, parent: SampleDialog):
-        super().__init__(parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL, name="Nội dung")
+    def __init__(self, parent: SampleDialog,name:str):
+        super().__init__(parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL, name=name)
         self.parent = parent
         self.mv = parent.mv
         self.AppendColumn("Mã", width=self.mv.config.header_width(0.05))

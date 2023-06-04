@@ -30,6 +30,11 @@ def platform_settings():
 
 if __name__ == "__main__":
     connection = db.Connection(MY_DATABASE_PATH)
-    connection.update_last_open_date()
-    platform_settings()
-    App(connection)
+    try:
+        connection.update_last_open_date()
+    except Exception as e:
+        connection.make_db()
+        connection.update_last_open_date()
+    finally:
+        platform_settings()
+        App(connection)

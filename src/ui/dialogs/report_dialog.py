@@ -41,27 +41,27 @@ def finance_report(
             raise NotImplementedError
     query = f"""
         SELECT
-            visit_count,
-            ({config.checkup_price} * visit_count) + drug_sale + procedure_profit AS revenue,
-            real_revenue,
-            drug_purchase,
-            drug_sale,
-            (drug_sale - drug_purchase) AS drug_profit,
-            procedure_profit
+            COUNT(DISTINCT vid) as visit_count,
+            SUM({config.checkup_price} + drug_sale_per_visit + procedure_profit_per_visit) AS revenue,
+            SUM(vprice) AS real_revenue,
+            SUM(drug_purchase_per_visit) AS drug_purchase,
+            SUM(drug_sale_per_visit) AS drug_sale,
+            SUM(drug_sale_per_visit - drug_purchase_per_visit) AS drug_profit,
+            SUM(procedure_profit_per_visit) AS procedure_profit
         FROM (
             SELECT
-                COUNT(DISTINCT vdp.vid) AS visit_count,
-                TOTAL(visit_price) as real_revenue,
-                CAST(TOTAL(vdp.ldquantity * wh.purchase_price) AS INTEGER) AS drug_purchase,
-                CAST(TOTAL(vdp.ldquantity * wh.sale_price) AS INTEGER) AS drug_sale,
-                CAST(TOTAL(pr.price) AS INTEGER) AS procedure_profit
+                vid,
+                vprice,
+                CAST(TOTAL(v2.quantity * wh.purchase_price) AS INTEGER) AS drug_purchase_per_visit,
+                CAST(TOTAL(v2.quantity * wh.sale_price) AS INTEGER) AS drug_sale_per_visit,
+                CAST(TOTAL(pr.price) AS INTEGER) AS procedure_profit_per_visit
             FROM (
                 SELECT
                     v.id AS vid,
-                    v.price AS visit_price,
-                    ld.warehouse_id AS ldwarehouse_id,
-                    ld.quantity AS ldquantity,
-                    lp.procedure_id AS lpprocedure_id
+                    v.price AS vprice,
+                    ld.warehouse_id,
+                    ld.quantity,
+                    lp.procedure_id
                 FROM (
                     SELECT id,price FROM {Visit.__tablename__} {visit_where_clause}
                 ) AS v
@@ -69,11 +69,12 @@ def finance_report(
                 ON ld.visit_id = v.id
                 LEFT JOIN {LineProcedure.__tablename__} AS lp
                 ON lp.visit_id = v.id
-            ) as vdp
+            ) as v2
             LEFT JOIN {Warehouse.__tablename__} AS wh
-            ON vdp.ldwarehouse_id = wh.id
+            ON v2.warehouse_id = wh.id
             LEFT JOIN {Procedure.__tablename__} AS pr
-            ON vdp.lpprocedure_id = pr.id
+            ON v2.procedure_id = pr.id
+            GROUP BY vid
         )
     """
     ret = connection.execute(query).fetchone()
@@ -97,7 +98,7 @@ class FinanceReportDialog(wx.Dialog):
                 w(
                     f"Doanh thu (tiền công + thuốc + thủ thuật): {num_to_str_price(res['revenue'])}"
                 ),
-                w(f"Doanh thu thực tế: {num_to_str_price(res['real_revenue'])}"),
+                w(f"Doanh thu (theo giá thu): {num_to_str_price(res['real_revenue'])}"),
                 w(
                     f"Tổng tiền thuốc (giá mua): {num_to_str_price(res['drug_purchase'])}"
                 ),
@@ -136,7 +137,7 @@ class MonthFinanceReportDialog(FinanceReportDialog):
 
 
 class MonthWarehouseReportDialog(wx.Dialog):
-    def __init__(self, parent, month: int, year: int):
+    def __init__(self, parent:"mv.MainView", month: int, year: int):
         super().__init__(parent, title=f"T{month}/{year}")
         self.mv = parent
         self.res = self.get_report(month, year)
@@ -186,7 +187,7 @@ class MonthWarehouseReportDialog(wx.Dialog):
                 wh.sale_unit AS sale_unit,
                 wh.usage_unit AS usage_unit
             FROM {LineDrug.__tablename__} AS ld
-            LEFT JOIN (
+            JOIN (
                 SELECT id FROM {Visit.__tablename__}
                 WHERE (
                     STRFTIME('%m', exam_datetime) = '{month:>02}' AND
@@ -196,9 +197,9 @@ class MonthWarehouseReportDialog(wx.Dialog):
             ON ld.visit_id = v.id
             LEFT JOIN {Warehouse.__tablename__} AS wh
             ON ld.warehouse_id = wh.id
-            GROUP BY wh.name
+            GROUP BY ld.warehouse_id
         """
-        ret = self.mv.con.execute(query).fetchall()
+        ret = self.mv.connection.execute(query).fetchall()
         return ret
 
     def export(self, _):

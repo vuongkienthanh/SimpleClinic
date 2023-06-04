@@ -195,6 +195,7 @@ class SaveBtn(wx.Button):
             v.weight = mv.weight.GetWeight()
             v.days = mv.days.Value
             v.recheck = mv.recheck.Value
+            v.price = mv.price.GetPrice()
             v.vnote = check_blank_to_none(self.mv.vnote.Value)
             v.follow = check_blank_to_none(self.mv.follow.Value)
 

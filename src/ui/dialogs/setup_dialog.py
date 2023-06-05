@@ -81,7 +81,7 @@ class InfoPage(BasePage):
 class FollowChoicePage(wx.Panel):
     def __init__(self, parent: wx.Notebook):
         super().__init__(parent)
-        mv :"mainview.MainView" = parent.Parent.mv 
+        mv: "mainview.MainView" = parent.Parent.mv
         self.grid = wx.grid.Grid(self)
         self.grid.CreateGrid(8, 2)
         self.grid.SetColLabelValue(0, "Lời dặn dò")

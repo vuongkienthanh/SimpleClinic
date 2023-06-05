@@ -191,7 +191,7 @@ class PrintOut(wx.Printout):
                     {
                         "name": drug_list.GetItemText(i, 1),
                         "quantity": drug_list.GetItemText(i, 4),
-                        "note": drug_list.GetItemText(i, 4),
+                        "note": drug_list.GetItemText(i, 5),
                     }
                     for i in range(min(num_of_ld, drug_list.ItemCount))
                 ]
@@ -201,7 +201,7 @@ class PrintOut(wx.Printout):
                     {
                         "name": drug_list.GetItemText(i, 1),
                         "quantity": drug_list.GetItemText(i, 4),
-                        "note": drug_list.GetItemText(i, 4),
+                        "note": drug_list.GetItemText(i, 5),
                     }
                     for i in range(num_of_ld, drug_list.ItemCount)
                 ]

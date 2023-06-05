@@ -111,7 +111,7 @@ new_con.executemany(
 new_con.executescript(
     f"""
     INSERT INTO {Appointment.__tablename__} (patient_id, appointed_date) 
-    SELECT patient_id, DATE(exam_datetime, 'localtime', '+'||CAST(recheck AS text)||' days') FROM visits WHERE true
+    SELECT patient_id, DATE(exam_datetime, '+'||CAST(recheck AS text)||' days') FROM visits WHERE true
     ON CONFLICT (patient_id) DO UPDATE SET appointed_date=excluded.appointed_date
     """
 )

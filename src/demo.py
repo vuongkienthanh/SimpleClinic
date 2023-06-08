@@ -1,11 +1,11 @@
-from db import *
-from misc import SAMPLE_DIR
-from main import App, platform_settings
-
-import os
 import csv
 import datetime as dt
 import decimal
+import os
+
+from db import *
+from main import App, platform_settings
+from misc import SAMPLE_DIR
 
 
 class CSVReader(csv.DictReader):

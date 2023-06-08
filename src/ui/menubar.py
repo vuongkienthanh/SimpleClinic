@@ -1,32 +1,29 @@
-from misc import (
-    APP_DIR,
-    MY_DATABASE_PATH,
-    DEFAULT_CONFIG_PATH,
-    CONFIG_PATH,
-)
+import datetime as dt
+import os
+import os.path
+import shutil
+import sqlite3
+from pathlib import Path
+
+import wx
+
 from db import *
+from misc import APP_DIR, CONFIG_PATH, DEFAULT_CONFIG_PATH, MY_DATABASE_PATH
+from misc.printer import PrintOut, printdata
 from ui import mainview
 from ui.dialogs import (
-    FindPatientDialog,
-    EditPatientDialog,
-    NewPatientDialog,
-    SetupDialog,
-    WarehouseDialog,
-    SampleDialog,
-    ProcedureDialog,
     DayFinanceReportDialog,
+    EditPatientDialog,
+    FindPatientDialog,
     MonthFinanceReportDialog,
     MonthWarehouseReportDialog,
+    NewPatientDialog,
+    ProcedureDialog,
+    SampleDialog,
+    SetupDialog,
+    WarehouseDialog,
 )
-from ui.dialogs.picker_dialog import MonthPickerDialog, DatePickerDialog
-from misc.printer import printdata, PrintOut
-import wx
-import shutil
-import os.path
-from pathlib import Path
-import os
-import sqlite3
-import datetime as dt
+from ui.generics.picker_dialog import DatePickerDialog, MonthPickerDialog
 
 
 class MyMenuBar(wx.MenuBar):

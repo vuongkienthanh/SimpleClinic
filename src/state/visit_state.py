@@ -1,10 +1,12 @@
+import wx
+
 from db import Visit
-from . import main_state
+from misc import check_none_to_blank, vn_weekdays
 from ui import menubar
-from misc import vn_weekdays, check_none_to_blank
+
+from . import main_state
 from .linedrug_state import OldLineDrugListState
 from .lineprocedure_state import OldLineProcedureListState
-import wx
 
 
 class VisitState:

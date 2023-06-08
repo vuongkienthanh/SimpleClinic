@@ -1,6 +1,5 @@
 from .classes import *
 
-
 create_table_sql = f"""\
 CREATE TABLE singleton (
     id INTEGER PRIMARY KEY,

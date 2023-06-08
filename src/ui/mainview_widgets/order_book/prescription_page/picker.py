@@ -1,7 +1,8 @@
-from db import Warehouse
-from ui.mainview_widgets.order_book import order_book
 import wx
+
+from db import Warehouse
 from ui import mainview
+from ui.mainview_widgets.order_book import order_book
 
 
 class DrugPopup(wx.ComboPopup):

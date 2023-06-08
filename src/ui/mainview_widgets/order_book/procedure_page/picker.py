@@ -1,6 +1,8 @@
-from . import page
-from misc import num_to_str_price
 import wx
+
+from misc import num_to_str_price
+
+from . import page
 
 
 class ProcedurePicker(wx.Choice):

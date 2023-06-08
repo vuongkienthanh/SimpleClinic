@@ -1,9 +1,10 @@
-from db.classes import Gender, BASE
-from db.sql import *
+import datetime as dt
 import sqlite3
 from decimal import Decimal
-import datetime as dt
 from typing import overload
+
+from db.classes import BASE, Gender
+from db.sql import *
 
 
 class Connection:

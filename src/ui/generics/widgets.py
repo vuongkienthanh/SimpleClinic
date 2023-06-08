@@ -1,10 +1,11 @@
-from misc import k_number, k_special, k_tab, k_decimal, k_hash, k_slash
-from misc import bd_to_vn_age
-from db import Gender
-import wx
-import wx.adv
 import datetime as dt
 from decimal import Decimal
+
+import wx
+import wx.adv
+
+from db import Gender
+from misc import bd_to_vn_age, k_decimal, k_hash, k_number, k_slash, k_special, k_tab
 
 
 class GenderChoice(wx.Choice):
@@ -102,8 +103,7 @@ class DateTextCtrl(wx.TextCtrl):
     def is_valid(self) -> bool:
         """Check if text value follows format"""
         try:
-            val: str = self.Value
-            dt.datetime.strptime(val, self.format)
+            dt.datetime.strptime(self.Value, self.format)
             return True
         except ValueError:
             return False

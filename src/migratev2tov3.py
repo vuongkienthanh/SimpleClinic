@@ -1,9 +1,10 @@
+import json
 import os
 from pathlib import Path
+
 from db import *
 from db.classes import *
 from misc import DEFAULT_CONFIG_PATH
-import json
 
 ans = input(
     "This will delete the new database and config in .SimpleClinic, confirm migration[y/N]"

@@ -1,12 +1,10 @@
-from ui.mainview_widgets.order_book import order_book
-from db import LineSamplePrescription
-from misc import plus_bm, minus_bm, calc_quantity, note_str
-from ui.dialogs.sample_prescription_dialog import SampleDialog
-from state.linedrug_state import (
-    LineDrugListStateItem,
-    NewLineDrugListStateItem,
-)
 import wx
+
+from db import LineSamplePrescription
+from misc import calc_quantity, minus_bm, note_str, plus_bm
+from state.linedrug_state import LineDrugListStateItem, NewLineDrugListStateItem
+from ui.dialogs.sample_prescription_dialog import SampleDialog
+from ui.mainview_widgets.order_book import order_book
 
 
 class AddDrugButton(wx.BitmapButton):

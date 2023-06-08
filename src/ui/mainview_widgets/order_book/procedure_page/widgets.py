@@ -1,7 +1,8 @@
+import wx
+
+from state.lineprocedure_state import LineProcedureListState, LineProcedureListStateItem
 from ui import mainview
 from ui.mainview_widgets.order_book import order_book
-from state.lineprocedure_state import LineProcedureListStateItem, LineProcedureListState
-import wx
 
 
 class ProcedureListCtrl(wx.ListCtrl):

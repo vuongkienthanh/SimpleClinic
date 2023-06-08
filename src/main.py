@@ -1,9 +1,11 @@
-import db
-from misc import SRC_DIR, MY_DATABASE_PATH
-import os.path
-import wx
 import os
+import os.path
 import sys
+
+import wx
+
+import db
+from misc import MY_DATABASE_PATH, SRC_DIR
 
 
 class App(wx.App):

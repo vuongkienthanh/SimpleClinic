@@ -1,8 +1,10 @@
-from dataclasses import dataclass
 import datetime as dt
-from . import main_state
-from db import Connection, Visit, Patient
+from dataclasses import dataclass
+
+from db import Connection, Patient, Visit
 from misc import Config
+
+from . import main_state
 
 
 @dataclass(slots=True, match_args=False)

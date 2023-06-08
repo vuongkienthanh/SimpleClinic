@@ -1,9 +1,10 @@
-from misc import bd_to_vn_age
-from ui import mainview
-import textwrap as tw
 import datetime as dt
+import textwrap as tw
+
 import wx
 
+from misc import bd_to_vn_age
+from ui import mainview
 
 printdata = wx.PrintData()
 printdata.Bin = wx.PRINTBIN_DEFAULT

@@ -1,28 +1,29 @@
+import wx
+
 import db
 from misc import Config, vn_weekdays
 from state import State
-from ui.generic_widgets import (
-    ReadonlyVNAgeCtrl,
-    PhoneTextCtrl,
+from ui.generics.widgets import (
     DateTextCtrl,
+    PhoneTextCtrl,
+    ReadonlyVNAgeCtrl,
     WeightCtrl,
 )
 from ui.mainview_widgets import (
-    GetWeightBtn,
     DaysCtrl,
-    UpdateQuantityBtn,
-    RecheckCtrl,
-    NoRecheckBtn,
-    PriceCtrl,
     Follow,
+    GetWeightBtn,
     NewVisitBtn,
-    SaveBtn,
-    PatientBook,
-    VisitListCtrl,
+    NoRecheckBtn,
     OrderBook,
+    PatientBook,
+    PriceCtrl,
+    RecheckCtrl,
+    SaveBtn,
+    UpdateQuantityBtn,
+    VisitListCtrl,
 )
 from ui.menubar import MyMenuBar
-import wx
 
 
 class MainView(wx.Frame):

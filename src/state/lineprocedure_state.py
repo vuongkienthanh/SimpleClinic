@@ -1,8 +1,10 @@
 from dataclasses import dataclass
 
-from db import Visit, Connection, LineProcedure, Procedure
-from . import main_state
 import wx
+
+from db import Connection, LineProcedure, Procedure, Visit
+
+from . import main_state
 
 
 @dataclass(slots=True, match_args=False)

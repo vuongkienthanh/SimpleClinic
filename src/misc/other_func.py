@@ -1,9 +1,9 @@
 import datetime as dt
 from fractions import Fraction
-from itertools import cycle
-from math import ceil
-from misc import Config
 from functools import cache
+from math import ceil
+
+from misc import Config
 
 
 @cache
@@ -95,21 +95,11 @@ def calc_quantity(
 
 
 def num_to_str_price(price: int) -> str:
-    s = str(price)
-    res = []
-    for char, cyc in zip(s[::-1], cycle(range(3))):
-        res.append(char)
-        if cyc == 2:
-            res.append(".")
-    else:
-        if res[-1] == ".":
-            res.pop()
-    res.reverse()
-    return "".join(res)
+    return f"{price:,}"
 
 
 def str_to_int_price(price: str) -> int:
-    return int(price.replace(".", ""))
+    return int(price.replace(",", ""))
 
 
 def vn_weekdays(d: int) -> str:

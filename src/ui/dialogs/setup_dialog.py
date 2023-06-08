@@ -1,9 +1,11 @@
-from ui import mainview
-from misc import plus_bm, minus_bm
 from itertools import chain
+
 import wx
 import wx.adv as adv
 import wx.grid
+
+from misc import minus_bm, plus_bm
+from ui import mainview
 
 
 def widget(w: wx.Window, p: wx.Window):

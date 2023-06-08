@@ -1,10 +1,9 @@
 import datetime as dt
 import enum
-from dataclasses import dataclass
-from typing import ClassVar, TypeVar
-from decimal import Decimal
-from typing import Any
 from collections.abc import Mapping
+from dataclasses import dataclass
+from decimal import Decimal
+from typing import Any, ClassVar, Self, TypeVar
 
 
 class Gender(enum.Enum):
@@ -38,7 +37,7 @@ class BASE:
     id: int
 
     @classmethod
-    def parse(cls, row: Mapping[str, Any]):
+    def parse(cls, row: Mapping[str, Any]) -> Self:
         return cls(**row)
 
     @classmethod

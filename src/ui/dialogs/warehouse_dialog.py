@@ -1,17 +1,18 @@
-from db import Warehouse
-from misc import check_none_to_blank, check_blank_to_none
-from ui import mainview
-from ui.generic_widgets import CalendarDatePicker, NumberTextCtrl
 import wx
+
+from db import Warehouse
+from misc import check_blank_to_none, check_none_to_blank
+from ui import mainview as mv
+from ui.generics.widgets import CalendarDatePicker, NumberTextCtrl
 
 
 class WarehouseDialog(wx.Dialog):
-    def __init__(self, mv: "mainview.MainView"):
+    def __init__(self, mv: "mv.MainView"):
         "`_list`: internal list"
         super().__init__(
             mv,
             title="Kho thuốc",
-            style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.MAXIMIZE_BOX,
+            style=wx.RESIZE_BORDER | wx.MAXIMIZE_BOX,
         )
         self.mv = mv
 

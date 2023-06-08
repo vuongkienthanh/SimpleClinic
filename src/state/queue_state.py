@@ -1,8 +1,9 @@
+import datetime as dt
 from dataclasses import dataclass
-import datetime as dt
+
+from db import Connection, Gender, Patient, Queue
+
 from . import main_state
-from db import Queue, Patient, Connection, Gender
-import datetime as dt
 
 
 @dataclass(slots=True, match_args=False)

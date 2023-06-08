@@ -1,13 +1,14 @@
-from misc.paths import DEFAULT_CONFIG_PATH, CONFIG_PATH
-import json
-import shutil
-from typing import Any
-from collections import namedtuple
-from dataclasses import dataclass
 import dataclasses
 import datetime as dt
-from wx import DisplaySize, Colour
+import json
+import shutil
+from collections import namedtuple
+from dataclasses import dataclass
+from typing import Any, Self
 
+from wx import Colour, DisplaySize
+
+from misc.paths import CONFIG_PATH, DEFAULT_CONFIG_PATH
 
 Color = namedtuple("Color", ["r", "g", "b"])
 
@@ -35,7 +36,7 @@ class Config:
     background_color: dict[str, Color]
 
     @classmethod
-    def load(cls) -> "Config":
+    def load(cls) -> Self:
         config_json: dict[str, Any]
         try:
             with (

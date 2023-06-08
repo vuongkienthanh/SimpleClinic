@@ -1,11 +1,12 @@
-from misc import APP_DIR
-from ui import mainview as mv
-from db import LineDrug, LineProcedure, Visit, Warehouse, Procedure, Connection
-from misc import num_to_str_price, Config
-import wx
 import datetime as dt
-import sqlite3
 import os
+import sqlite3
+
+import wx
+
+from db import Connection, LineDrug, LineProcedure, Procedure, Visit, Warehouse
+from misc import APP_DIR, Config, num_to_str_price
+from ui import mainview as mv
 
 
 def finance_report(
@@ -107,6 +108,7 @@ class FinanceReportDialog(wx.Dialog):
                 ),
             ]
         )
+        sizer.Add(self.CreateStdDialogButtonSizer(wx.OK), 0, wx.EXPAND | wx.ALL, 5)
         self.SetSizerAndFit(sizer)
 
     def report(self) -> sqlite3.Row:
@@ -148,26 +150,34 @@ class MonthWarehouseReportDialog(wx.Dialog):
         self.scroll.SetScrollRate(0, 20)
 
         def w(row: sqlite3.Row):
-            name = row["name"]
-            quantity = row["quantity"]
-            sale_unit = row["sale_unit"] or row["usage_unit"]
-            s = f"{quantity} {sale_unit}"
             return (
-                wx.StaticText(self.scroll, label=name),
-                0,
-                wx.EXPAND | wx.ALL,
-                5,
-            ), (
-                wx.StaticText(self.scroll, label=s),
-                0,
-                wx.EXPAND | wx.ALL,
-                5,
+                (
+                    wx.StaticText(self.scroll, label=row["name"]),
+                    0,
+                    wx.EXPAND | wx.ALL,
+                    5,
+                ),
+                (
+                    wx.StaticText(self.scroll, label=row["element"]),
+                    0,
+                    wx.EXPAND | wx.ALL,
+                    5,
+                ),
+                (
+                    wx.StaticText(
+                        self.scroll,
+                        label=f"{row['quantity']} {row['sale_unit'] or row['usage_unit']}",
+                    ),
+                    0,
+                    wx.EXPAND | wx.ALL,
+                    5,
+                ),
             )
 
         self.export_btn = wx.Button(self, label="Xuất file text")
         self.export_btn.Bind(wx.EVT_BUTTON, self.export)
 
-        scroll_sizer = wx.FlexGridSizer(len(self.res), 2, 5, 5)
+        scroll_sizer = wx.FlexGridSizer(len(self.res), 3, 5, 5)
         for row in self.res:
             scroll_sizer.AddMany([*w(row)])
 
@@ -181,6 +191,7 @@ class MonthWarehouseReportDialog(wx.Dialog):
         query = f"""
             SELECT
                 wh.name AS name,
+                wh.element AS element,
                 SUM(ld.quantity) AS quantity,
                 wh.sale_unit AS sale_unit,
                 wh.usage_unit AS usage_unit
@@ -201,12 +212,18 @@ class MonthWarehouseReportDialog(wx.Dialog):
         return ret
 
     def export(self, _):
-        path = os.path.join(APP_DIR, "dungthuoctrongthang.txt")
-        with open(path, mode="w", encoding="utf-8") as f:
+        import sys
+
+        if sys.platform == "win32":
+            encoding = "utf-8-sig"
+        else:
+            encoding = "utf-8"
+        path = os.path.join(APP_DIR, "dungthuoctrongthang.csv")
+        with open(path, mode="w", encoding=encoding) as f:
+            f.write("tên,thành phần,số lượng, đơn vị\n")
             for row in self.res:
-                name = row["name"]
-                quantity = row["quantity"]
-                sale_unit = row["sale_unit"] or row["usage_unit"]
-                s = f"{name:<30}: {quantity:>3} {sale_unit}\n"
-                f.write(s)
+                f.write(
+                    f"{row['name']},{row['element']},{row['quantity']},"
+                    f"{row['sale_unit'] or row['usage_unit']}\n"
+                )
         wx.LaunchDefaultApplication(path)

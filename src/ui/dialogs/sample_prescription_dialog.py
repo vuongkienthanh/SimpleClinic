@@ -1,8 +1,10 @@
 from collections.abc import Iterable
-from ui import mainview
-from ui.generic_widgets import DoseTextCtrl, NumberTextCtrl
-from db import *
+
 import wx
+
+from db import *
+from ui import mainview
+from ui.generics.widgets import DoseTextCtrl, NumberTextCtrl
 
 
 class SampleDialog(wx.Dialog):

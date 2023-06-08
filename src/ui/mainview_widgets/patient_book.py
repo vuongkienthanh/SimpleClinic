@@ -1,10 +1,11 @@
+import wx
+
+from db import Patient, Visit
 from state.appointment_state import AppointmentStateItem
-from ui import mainview
-from ui.dialogs import EditPatientDialog
 from state.queue_state import QueueStateItem
 from state.seentoday_state import SeenTodayStateItem
-from db import Patient, Visit
-import wx
+from ui import mainview
+from ui.dialogs import EditPatientDialog
 
 StateList = list[QueueStateItem] | list[SeenTodayStateItem] | list[AppointmentStateItem]
 StateItem = QueueStateItem | SeenTodayStateItem | AppointmentStateItem

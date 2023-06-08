@@ -1,5 +1,7 @@
 import wx
+
 from ui.mainview_widgets import order_book
+
 from .buttons import *
 from .picker import *
 from .widgets import *

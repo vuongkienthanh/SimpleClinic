@@ -1,8 +1,9 @@
-from .prescription_page import PrescriptionPage
-from .procedure_page import ProcedurePage
+import wx
+
 from ui import mainview
 
-import wx
+from .prescription_page import PrescriptionPage
+from .procedure_page import ProcedurePage
 
 
 class OrderBook(wx.Notebook):

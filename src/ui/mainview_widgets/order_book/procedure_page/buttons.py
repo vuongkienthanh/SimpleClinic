@@ -1,8 +1,8 @@
-from ui.mainview_widgets.order_book import order_book
-from misc import plus_bm, minus_bm
-from state.lineprocedure_state import NewLineProcedureListStateItem
-
 import wx
+
+from misc import minus_bm, plus_bm
+from state.lineprocedure_state import NewLineProcedureListStateItem
+from ui.mainview_widgets.order_book import order_book
 
 
 class AddProcedureButton(wx.BitmapButton):

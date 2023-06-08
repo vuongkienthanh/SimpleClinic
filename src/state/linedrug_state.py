@@ -1,7 +1,9 @@
-from misc.other_func import note_str
-from . import main_state
 from dataclasses import dataclass
-from db import Connection, Visit, LineDrug, Warehouse
+
+from db import Connection, LineDrug, Visit, Warehouse
+from misc.other_func import note_str
+
+from . import main_state
 
 
 @dataclass(slots=True, match_args=False)

@@ -1,9 +1,11 @@
-from db import Patient
-from . import main_state
-from ui import menubar
-from .visit_list_state import VisitListState
-from misc import bd_to_vn_age, check_none_to_blank
 import wx
+
+from db import Patient
+from misc import bd_to_vn_age, check_none_to_blank
+from ui import menubar
+
+from . import main_state
+from .visit_list_state import VisitListState
 
 
 class PatientState:

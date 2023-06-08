@@ -1,19 +1,20 @@
-from state.seentoday_state import SeenTodayState
-from db import Patient, Patient, Queue
-from state.queue_state import QueueState, QueueStateItem
-from ui.generic_widgets import (
-    DateTextCtrl,
-    CalendarDatePicker,
-    ReadonlyVNAgeCtrl,
-    PhoneTextCtrl,
-    GenderChoice,
-)
-from misc import check_blank_to_none, check_none_to_blank
-from ui import mainview
 import datetime as dt
-import sqlite3
+
 import wx
 import wx.adv as adv
+
+from db import Patient, Queue
+from misc import check_blank_to_none, check_none_to_blank
+from state.queue_state import QueueState, QueueStateItem
+from state.seentoday_state import SeenTodayState
+from ui import mainview
+from ui.generics.widgets import (
+    CalendarDatePicker,
+    DateTextCtrl,
+    GenderChoice,
+    PhoneTextCtrl,
+    ReadonlyVNAgeCtrl,
+)
 
 
 class BasePatientDialog(wx.Dialog):

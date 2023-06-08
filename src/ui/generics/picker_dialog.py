@@ -1,6 +1,8 @@
-import wx
-from ui.generic_widgets import CalendarDatePicker, NumberTextCtrl
 import datetime as dt
+
+import wx
+
+from ui.generics.widgets import CalendarDatePicker, NumberTextCtrl
 
 
 class DatePickerDialog(wx.Dialog):

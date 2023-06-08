@@ -1,16 +1,17 @@
-from ui import mainview as mv
-from state.linedrug_state import LineDrugListStateItem, LineDrugListState
-from ui.mainview_widgets.order_book import order_book
+import wx
+
 from misc import (
     calc_quantity,
-    k_tab,
-    k_special,
     k_number,
-    times_dose_quantity_note_str,
+    k_special,
+    k_tab,
     note_str,
+    times_dose_quantity_note_str,
 )
-from ui.generic_widgets import NumberTextCtrl, DoseTextCtrl
-import wx
+from state.linedrug_state import LineDrugListState, LineDrugListStateItem
+from ui import mainview as mv
+from ui.generics.widgets import DoseTextCtrl, NumberTextCtrl
+from ui.mainview_widgets.order_book import order_book
 
 
 class DrugListCtrl(wx.ListCtrl):

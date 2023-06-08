@@ -1,12 +1,14 @@
-from db.classes import Gender
 import datetime as dt
+import sqlite3
+
+import wx
+
+from db import Patient, Queue, Visit
+from db.classes import Gender
+from state.queue_state import QueueStateItem
 from ui import mainview
 from ui.dialogs.patient_dialog import EditPatientDialog
-from db import Patient, Queue, Visit
-from ui.dialogs.picker_dialog import DatePickerDialog
-from state.queue_state import QueueStateItem
-import wx
-import sqlite3
+from ui.generics.picker_dialog import DatePickerDialog
 
 
 class SearchPatientList(wx.ListCtrl):

@@ -1,7 +1,8 @@
-from ui import mainview as mv
+import wx
+
 from db import Visit
 from state.visit_list_state import VisitListStateItem
-import wx
+from ui import mainview as mv
 
 
 class VisitListCtrl(wx.ListCtrl):

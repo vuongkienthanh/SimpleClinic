@@ -1,11 +1,18 @@
-from misc import weight_bm, update_druglist_bm
-from db import LineProcedure, Visit, Patient, LineDrug
-from misc import calc_quantity, check_blank_to_none, sale_unit_str
-from ui import mainview as mv
-from misc.printer import PrintOut, printdata
 import dataclasses
-import wx
 from itertools import chain
+
+import wx
+
+from db import LineDrug, LineProcedure, Patient, Visit
+from misc import (
+    calc_quantity,
+    check_blank_to_none,
+    sale_unit_str,
+    update_druglist_bm,
+    weight_bm,
+)
+from misc.printer import PrintOut, printdata
+from ui import mainview as mv
 
 
 class GetWeightBtn(wx.BitmapButton):

@@ -1,7 +1,7 @@
+import os.path
+
 from db.sql import *
 from misc import SRC_DIR
-
-import os.path
 
 dst = os.path.join(SRC_DIR, "output.sql")
 

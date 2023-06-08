@@ -1,8 +1,9 @@
-from ui import mainview as mv
-from ui.generic_widgets import NumberTextCtrl
+import wx
+
 from db import Procedure
 from misc import num_to_str_price
-import wx
+from ui import mainview as mv
+from ui.generics.widgets import NumberTextCtrl
 
 
 class ProcedureDialog(wx.Dialog):

@@ -462,7 +462,9 @@ class SetupDialog(wx.Dialog):
             set_color("procedure_list", bgcolorpage.procedure_list_color)
 
             self.mv.config.dump()
-            wx.MessageBox("Đã lưu cài đặt\nKhởi động lại để thay đổi màu", "Cài đặt")
+            wx.MessageBox("Đã lưu cài đặt", "Cài đặt")
+            self.mv.refresh_color()
+            self.mv.Refresh()  # refresh_color require
             self.mv.price.FetchPrice()
             e.Skip()
         except Exception as error:

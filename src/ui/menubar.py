@@ -51,7 +51,7 @@ class MyMenuBar(wx.MenuBar):
             wx.ID_ANY, "Lưu lượt khám\tCTRL+S"
         )
         self.menuUpdateVisit: wx.MenuItem = menuVisit.Append(
-            wx.ID_ANY, "Cập nhật lượt khám\tCTRL+S"
+            wx.ID_ANY, "Cập nhật lượt khám\tCTRL+Shift+S"
         )
         self.menuDeleteVisit: wx.MenuItem = menuVisit.Append(
             wx.ID_ANY, "Xóa lượt khám cũ"

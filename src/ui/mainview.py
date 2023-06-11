@@ -79,10 +79,10 @@ class MainView(wx.Frame):
         self.weight = WeightCtrl(self, max=200, name="Cân nặng (kg):")
         self.get_weight_btn = GetWeightBtn(self)
         self.days = DaysCtrl(self, name="Số ngày cho toa:")
-        self.updatequantitybtn = UpdateQuantityBtn(self)
         self.recheck_weekday = wx.StaticText(
             self, label=vn_weekdays(self.config.default_days_for_prescription)
         )
+        self.updatequantitybtn = UpdateQuantityBtn(self)
         self.order_book = OrderBook(self)
         self.recheck = RecheckCtrl(self, name="Số ngày tái khám:")
         self.norecheck = NoRecheckBtn(self)
@@ -91,49 +91,12 @@ class MainView(wx.Frame):
         self.newvisitbtn = NewVisitBtn(self)
         self.savebtn = SaveBtn(self)
 
-        def set_color(p: list[tuple[wx.Window, str]]):
-            for widget, name in p:
-                widget.SetBackgroundColour(self.config.get_background_color(name))
-
-        set_color(
-            [
-                (self, "mainview"),
-                (self.name, "name"),
-                (self.gender, "gender"),
-                (self.birthdate, "birthdate"),
-                (self.age, "age"),
-                (self.address, "address"),
-                (self.phone, "phone"),
-                (self.diagnosis, "diagnosis"),
-                (self.past_history, "past_history"),
-                (self.vnote, "visit_note"),
-                (self.days, "days"),
-                (self.recheck, "recheck"),
-                (self.price, "price"),
-                (self.weight, "weight"),
-                (self.follow, "follow"),
-                (self.visit_list, "visit_list"),
-                (self.patient_book.queuelistctrl, "queue"),
-                (self.patient_book.seentodaylistctrl, "seentoday"),
-                (self.patient_book.appointmentlistctrl, "appointment"),
-                (self.order_book.prescriptionpage.drug_list, "drug_list"),
-                (self.order_book.prescriptionpage.drug_picker, "drug_picker"),
-                (self.order_book.prescriptionpage.times, "drug_times"),
-                (self.order_book.prescriptionpage.dose, "drug_dose"),
-                (self.order_book.prescriptionpage.quantity, "drug_quantity"),
-                (self.order_book.prescriptionpage.note, "drug_note"),
-                (self.order_book.procedurepage.procedure_picker, "procedure_picker"),
-                (self.order_book.procedurepage.procedure_list, "procedure_list"),
-            ]
-        )
-
-        def widget(w, p, r):
+        def widget(w, p=0, r=5):
             return (w, p, wx.EXPAND | wx.RIGHT, r)
 
-        def comb(w, p=0, r=5):
-            s: str = w.Name
+        def widget_with_name(w, p=0, r=5):
             return (
-                (wx.StaticText(self, label=s), 0, wx.ALIGN_CENTER | wx.RIGHT, 2),
+                (wx.StaticText(self, label=w.Name), 0, wx.ALIGN_CENTER | wx.RIGHT, 2),
                 widget(w, p, r),
             )
 
@@ -148,40 +111,43 @@ class MainView(wx.Frame):
         name_row = wx.BoxSizer(wx.HORIZONTAL)
         name_row.AddMany(
             [
-                *comb(self.name, 1),
-                *comb(self.gender, 0),
-                *comb(self.birthdate, 0),
-                *comb(self.age, 0, 0),
+                *widget_with_name(self.name, 1),
+                *widget_with_name(self.gender),
+                *widget_with_name(self.birthdate),
+                *widget_with_name(self.age),
             ]
         )
         addr_row = wx.BoxSizer(wx.HORIZONTAL)
-        addr_row.AddMany([*comb(self.address, 1), *comb(self.phone, 0, 0)])
+        addr_row.AddMany(
+            [*widget_with_name(self.address, 1), *widget_with_name(self.phone)]
+        )
         diag_row = wx.BoxSizer(wx.HORIZONTAL)
-        diag_row.AddMany([*comb(self.diagnosis, 1, 0)])
+        diag_row.AddMany([*widget_with_name(self.diagnosis, 1)])
         weight_row = wx.BoxSizer(wx.HORIZONTAL)
         weight_row.AddMany(
             [
-                *comb(self.weight),
-                widget(self.get_weight_btn, 0, 5),
-                *comb(self.days),
-                widget(self.updatequantitybtn, 0, 5),
-                (self.recheck_weekday, 0, wx.ALIGN_CENTER, 0),
+                *widget_with_name(self.weight),
+                widget(self.get_weight_btn),
+                *widget_with_name(self.days),
+                (wx.StaticText(self, label="=>"), 0, wx.RIGHT | wx.ALIGN_CENTER, 5),
+                (self.recheck_weekday, 0, wx.RIGHT | wx.ALIGN_CENTER, 5),
+                widget(self.updatequantitybtn),
             ]
         )
         recheck_row = wx.BoxSizer(wx.HORIZONTAL)
         recheck_row.AddMany(
             [
-                *comb(self.recheck),
-                widget(self.norecheck, 0, 5),
+                *widget_with_name(self.recheck),
+                widget(self.norecheck),
                 (0, 0, 1),
-                *comb(self.price, 0, 0),
+                *widget_with_name(self.price, 0, 0),
             ]
         )
         btn_row = wx.BoxSizer(wx.HORIZONTAL)
         btn_row.AddMany(
             [
-                widget(self.newvisitbtn, 0, 5),
-                widget(self.savebtn, 0, 0),
+                widget(self.newvisitbtn),
+                widget(self.savebtn),
             ]
         )
         right_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -190,10 +156,10 @@ class MainView(wx.Frame):
                 (name_row, 0, wx.EXPAND),
                 (addr_row, 0, wx.EXPAND),
                 (wx.StaticText(self, label=self.past_history.Name), 0, wx.EXPAND),
-                widget(self.past_history, 1, 0),
+                widget(self.past_history, 1),
                 (diag_row, 0, wx.EXPAND),
                 (wx.StaticText(self, label=self.vnote.Name), 0, wx.EXPAND),
-                widget(self.vnote, 1, 0),
+                widget(self.vnote, 1),
                 (weight_row, 0, wx.EXPAND),
                 (self.order_book, 3, wx.EXPAND),
                 (recheck_row, 0, wx.EXPAND),
@@ -209,9 +175,9 @@ class MainView(wx.Frame):
             ]
         )
         self.SetSizerAndFit(sizer)
-
         self.SetMenuBar(MyMenuBar())
         self.Bind(wx.EVT_CLOSE, self.onClose)
+        self.refresh_color()
         self.state.refresh()
 
     def onClose(self, e: wx.CloseEvent):
@@ -230,3 +196,35 @@ class MainView(wx.Frame):
             return False
         else:
             return True
+
+    def refresh_color(self):
+        for widget, name in [
+            (self, "mainview"),
+            (self.name, "name"),
+            (self.gender, "gender"),
+            (self.birthdate, "birthdate"),
+            (self.age, "age"),
+            (self.address, "address"),
+            (self.phone, "phone"),
+            (self.diagnosis, "diagnosis"),
+            (self.past_history, "past_history"),
+            (self.vnote, "visit_note"),
+            (self.days, "days"),
+            (self.recheck, "recheck"),
+            (self.price, "price"),
+            (self.weight, "weight"),
+            (self.follow, "follow"),
+            (self.visit_list, "visit_list"),
+            (self.patient_book.queuelistctrl, "queue"),
+            (self.patient_book.seentodaylistctrl, "seentoday"),
+            (self.patient_book.appointmentlistctrl, "appointment"),
+            (self.order_book.prescriptionpage.drug_list, "drug_list"),
+            (self.order_book.prescriptionpage.drug_picker, "drug_picker"),
+            (self.order_book.prescriptionpage.times, "drug_times"),
+            (self.order_book.prescriptionpage.dose, "drug_dose"),
+            (self.order_book.prescriptionpage.quantity, "drug_quantity"),
+            (self.order_book.prescriptionpage.note, "drug_note"),
+            (self.order_book.procedurepage.procedure_picker, "procedure_picker"),
+            (self.order_book.procedurepage.procedure_list, "procedure_list"),
+        ]:
+            widget.SetBackgroundColour(self.config.get_background_color(name))

@@ -54,13 +54,14 @@ class NoRecheckBtn(wx.Button):
         self.mv.recheck.SetValue(0)
 
 
-class UpdateQuantityBtn(wx.BitmapButton):
+class UpdateQuantityBtn(wx.Button):
     "Update quantity in druglist based on days"
 
     def __init__(self, parent: "mv.MainView"):
-        super().__init__(parent, bitmap=wx.Bitmap(update_druglist_bm))
+        super().__init__(parent)
         self.mv = parent
-        self.SetToolTip("Cập nhật lại số lượng thuốc trong toa theo ngày")
+        self.SetLabelText("Cập nhật số lượng thuốc")
+        self.SetBitmap(wx.Bitmap(update_druglist_bm))
         self.Bind(wx.EVT_BUTTON, self.onClick)
         self.Disable()
 

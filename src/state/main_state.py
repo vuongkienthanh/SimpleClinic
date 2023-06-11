@@ -70,15 +70,9 @@ class State:
         self._seentoday: list[SeenTodayStateItem] = []
         self._appointment: list[AppointmentStateItem] = []
 
-        self.all_warehouse: dict[int, Warehouse] = self.mv.connection.selectall(
-            Warehouse
-        )
-        self.all_sampleprescription: dict[
-            int, SamplePrescription
-        ] = self.mv.connection.selectall(SamplePrescription)
-        self.all_procedure: dict[int, Procedure] = self.mv.connection.selectall(
-            Procedure
-        )
+        self.all_warehouse: dict[int, Warehouse] = {}
+        self.all_sampleprescription: dict[int, SamplePrescription] = {}
+        self.all_procedure: dict[int, Procedure] = {}
 
     def refresh(self) -> None:
         self.patient = None

@@ -129,8 +129,8 @@ class MainView(wx.Frame):
                 *widget_with_name(self.weight),
                 widget(self.get_weight_btn),
                 *widget_with_name(self.days),
-                (wx.StaticText(self, label="=>"), 0, wx.RIGHT | wx.ALIGN_CENTER, 5),
-                (self.recheck_weekday, 0, wx.RIGHT | wx.ALIGN_CENTER, 5),
+                (wx.StaticText(self, label="=>"), 0, wx.RIGHT | wx.ALIGN_CENTER, 0),
+                (self.recheck_weekday, 0, wx.RIGHT | wx.ALIGN_CENTER, 30),
                 widget(self.updatequantitybtn),
             ]
         )

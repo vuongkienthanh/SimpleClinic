@@ -12,10 +12,9 @@ class WarehouseDialog(wx.Dialog):
         super().__init__(
             mv,
             title="Kho thuốc",
-            style=wx.RESIZE_BORDER | wx.MAXIMIZE_BOX,
+            style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.MAXIMIZE_BOX,
         )
         self.mv = mv
-
         self.search = DrugSearchCtrl(self)
         self.warehouselistctrl = WarehouseListCtrl(self)
         self.addbtn = AddBtn(self)

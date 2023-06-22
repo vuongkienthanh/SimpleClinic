@@ -29,6 +29,7 @@
   "display_recent_visit_count": -1,
   "print_scale": 1,
   "preview_scale": 1,
+  "autochange_prescription_quantity_on_day_spin": true,
   "maximize_at_start": false,
   "listctrl_header_scale": 1,
   "background_color": {

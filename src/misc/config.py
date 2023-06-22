@@ -31,6 +31,7 @@ class Config:
     display_recent_visit_count: int
     print_scale: int
     preview_scale: int
+    autochange_prescription_quantity_on_day_spin: bool
     maximize_at_start: bool
     listctrl_header_scale: int
     background_color: dict[str, Color]
@@ -73,6 +74,7 @@ class Config:
             display_recent_visit_count=config_json["display_recent_visit_count"],
             print_scale=config_json["print_scale"],
             preview_scale=config_json["preview_scale"],
+            autochange_prescription_quantity_on_day_spin=config_json["autochange_prescription_quantity_on_day_spin"],
             maximize_at_start=config_json["maximize_at_start"],
             listctrl_header_scale=config_json["listctrl_header_scale"],
             background_color={

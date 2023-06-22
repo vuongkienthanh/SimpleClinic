@@ -11,6 +11,7 @@ from ui.generics.widgets import (
 )
 from ui.mainview_widgets import (
     DaysCtrl,
+    DaysCtrlWithAutoChangePrescriptionQuantity,
     Follow,
     GetWeightBtn,
     NewVisitBtn,
@@ -78,11 +79,18 @@ class MainView(wx.Frame):
         self.vnote = wx.TextCtrl(self, style=wx.TE_MULTILINE, name="Bệnh sử")
         self.weight = WeightCtrl(self, max=200, name="Cân nặng (kg):")
         self.get_weight_btn = GetWeightBtn(self)
-        self.days = DaysCtrl(self, name="Số ngày cho toa:")
+        if self.config.autochange_prescription_quantity_on_day_spin:
+            self.days = DaysCtrlWithAutoChangePrescriptionQuantity(
+                self, name="Số ngày cho toa:"
+            )
+            self.updatequantitybtn = UpdateQuantityBtn(self)
+            self.updatequantitybtn.Hide()
+        else:
+            self.days = DaysCtrl(self, name="Số ngày cho toa:")
+            self.updatequantitybtn = UpdateQuantityBtn(self)
         self.recheck_weekday = wx.StaticText(
             self, label=vn_weekdays(self.config.default_days_for_prescription)
         )
-        self.updatequantitybtn = UpdateQuantityBtn(self)
         self.order_book = OrderBook(self)
         self.recheck = RecheckCtrl(self, name="Số ngày tái khám:")
         self.norecheck = NoRecheckBtn(self)

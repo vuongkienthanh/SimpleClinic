@@ -135,6 +135,12 @@ class FollowChoicePage(wx.Panel):
 class SystemPage(BasePage):
     def __init__(self, parent: wx.Notebook):
         super().__init__(parent)
+        self.autochange_prescription_quantity_on_day_spin = wx.CheckBox(
+            self, name="Tự động cập nhật số lượng thuốc khi thay đổi số ngày của toa"
+        )
+        self.autochange_prescription_quantity_on_day_spin.SetValue(
+            self.mv.config.autochange_prescription_quantity_on_day_spin
+        )
         self.ask_print = wx.CheckBox(self, name="Hỏi in toa thuốc")
         self.ask_print.SetValue(self.mv.config.ask_print)
         self.print_price = wx.CheckBox(self, name="In giá tiền trên toa")
@@ -160,9 +166,10 @@ class SystemPage(BasePage):
         )
         self.maximize_at_start = wx.CheckBox(self, name="Phóng to khi khởi động")
         self.maximize_at_start.SetValue(self.mv.config.maximize_at_start)
-        entry_sizer = wx.FlexGridSizer(6, 2, 5, 5)
+        entry_sizer = wx.FlexGridSizer(7, 2, 5, 5)
         entry_sizer.AddMany(
             [
+                *widget(self.autochange_prescription_quantity_on_day_spin, self),
                 *widget(self.ask_print, self),
                 *widget(self.print_price, self),
                 *widget(self.alert, self),
@@ -422,6 +429,9 @@ class SetupDialog(wx.Dialog):
                 self.mv.follow.Append(item)
 
             systempage = self.systempage
+            self.mv.config.autochange_prescription_quantity_on_day_spin = (
+                systempage.autochange_prescription_quantity_on_day_spin.Value
+            )
             self.mv.config.ask_print = systempage.ask_print.Value
             self.mv.config.print_price = systempage.print_price.Value
             self.mv.config.minimum_drug_quantity_alert = systempage.alert.Value

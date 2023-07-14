@@ -3,11 +3,11 @@ from itertools import chain
 import wx
 
 from misc import (
+    calc_quantity,
     num_to_str_price,
+    sale_unit_from_db,
     str_to_int_price,
     vn_weekdays,
-    calc_quantity,
-    sale_unit_str,
 )
 from ui import mainview as mv
 
@@ -64,7 +64,7 @@ class DaysCtrlWithAutoChangePrescriptionQuantity(DaysCtrl):
             drug_list.SetItem(
                 idx,
                 4,
-                f"{item.quantity} {sale_unit_str(wh.sale_unit , wh.usage_unit)}",
+                f"{item.quantity} {sale_unit_from_db(wh.sale_unit , wh.usage_unit)}",
             )
         self.mv.price.FetchPrice()
 

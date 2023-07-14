@@ -46,12 +46,22 @@ def note_str(
             return n
 
 
-def sale_unit_str(sale_unit: str | None, usage_unit: str) -> str:
+def sale_unit_from_db(sale_unit: str | None, usage_unit: str) -> str:
     match sale_unit:
         case None:
             return usage_unit
         case str(v):
             return v
+
+
+def sale_unit_to_db(sale_unit:str, usage_unit:str) -> str | None:
+    match sale_unit.strip():
+        case "":
+            return None
+        case s if s == usage_unit.strip():
+            return None
+        case s:
+            return s
 
 
 @cache
@@ -67,7 +77,7 @@ def times_dose_quantity_note_str(
     return (
         str(times),
         f"{dose} {usage_unit}",
-        f"{quantity} {sale_unit_str(sale_unit, usage_unit)}",
+        f"{quantity} {sale_unit_from_db(sale_unit, usage_unit)}",
         note_str(usage, times, dose, usage_unit, note),
     )
 

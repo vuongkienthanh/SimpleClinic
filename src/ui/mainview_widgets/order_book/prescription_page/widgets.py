@@ -8,33 +8,21 @@ from misc import (
     note_str,
     times_dose_quantity_note_str,
 )
-from state.linedrug_state import LineDrugListState, LineDrugListStateItem
+from state.linedrug_state import LineDrugListStateItem
 from ui import mainview as mv
-from ui.generics.widgets import DoseTextCtrl, NumberTextCtrl
-from ui.mainview_widgets.order_book import order_book
+from ui.generics.widgets import DoseTextCtrl, GenericListCtrl, NumberTextCtrl
+from ui.mainview_widgets.order_book.prescription_page import page
 
 
-class DrugListCtrl(wx.ListCtrl):
-    def __init__(self, parent: "order_book.PrescriptionPage"):
-        super().__init__(parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
-        self.parent = parent
-        self.mv = parent.mv
-        self.AppendColumn("STT", width=self.mv.config.header_width(0.02))
-        self.AppendColumn("Thuốc", width=self.mv.config.header_width(0.1))
-        self.AppendColumn("Số cữ", width=self.mv.config.header_width(0.03))
-        self.AppendColumn("Liều", width=self.mv.config.header_width(0.03))
-        self.AppendColumn("Tổng cộng", width=self.mv.config.header_width(0.05))
-        self.AppendColumn("Cách dùng", width=self.mv.config.header_width(0.15))
-        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onSelect)
-        self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onDeselect)
-
-    def build(self, _list: LineDrugListState):
-        for item in _list:
-            self.append_ui(item)
-
-    def rebuild(self, _list: LineDrugListState):
-        self.DeleteAllItems()
-        self.build(_list)
+class DrugListCtrl(GenericListCtrl):
+    def __init__(self, parent: "page.PrescriptionPage"):
+        super().__init__(parent, mv=parent.mv)
+        self.AppendColumn("STT", 0.02)
+        self.AppendColumn("Thuốc", 0.1)
+        self.AppendColumn("Số cữ", 0.03)
+        self.AppendColumn("Liều", 0.03)
+        self.AppendColumn("Tổng cộng", 0.05)
+        self.AppendColumn("Cách dùng", 0.15)
 
     def append_ui(self, item: LineDrugListStateItem):
         wh = self.mv.state.all_warehouse[item.warehouse_id]
@@ -76,8 +64,8 @@ class DrugListCtrl(wx.ListCtrl):
         self.SetItem(idx, 5, note)
 
     def pop_ui(self, idx: int):
-        assert idx >= 0
-        self.DeleteItem(idx)
+        super().pop_ui(idx)
+        # reset STT
         for i in range(idx, self.ItemCount):
             self.SetItem(i, 0, str(i + 1))
 
@@ -101,7 +89,7 @@ class DrugListCtrl(wx.ListCtrl):
 
 
 class Times(NumberTextCtrl):
-    def __init__(self, parent: "order_book.PrescriptionPage"):
+    def __init__(self, parent: "page.PrescriptionPage"):
         super().__init__(parent, size=parent.mv.config.header_size(0.03))
         self.parent = parent
         self.mv = mv
@@ -115,7 +103,7 @@ class Times(NumberTextCtrl):
 
 
 class Dose(DoseTextCtrl):
-    def __init__(self, parent: "order_book.PrescriptionPage"):
+    def __init__(self, parent: "page.PrescriptionPage"):
         super().__init__(parent, size=parent.mv.config.header_size(0.03))
         self.parent = parent
         self.mv = mv
@@ -129,7 +117,7 @@ class Dose(DoseTextCtrl):
 
 
 class Quantity(NumberTextCtrl):
-    def __init__(self, parent: "order_book.PrescriptionPage"):
+    def __init__(self, parent: "page.PrescriptionPage"):
         super().__init__(
             parent, size=parent.mv.config.header_size(0.03), style=wx.TE_PROCESS_TAB
         )
@@ -162,8 +150,8 @@ class Quantity(NumberTextCtrl):
             e.Skip()
 
 
-class Note(wx.TextCtrl):
-    def __init__(self, parent: "order_book.PrescriptionPage"):
+class NoteCtrl(wx.TextCtrl):
+    def __init__(self, parent: "page.PrescriptionPage"):
         super().__init__(parent, style=wx.TE_PROCESS_ENTER)
         self.parent = parent
         self.Bind(wx.EVT_CHAR, self.onChar)

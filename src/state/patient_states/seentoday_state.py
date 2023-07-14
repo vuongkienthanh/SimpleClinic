@@ -1,9 +1,8 @@
 import datetime as dt
 from dataclasses import dataclass
 
+import state
 from db import Connection, Gender, Patient, SeenToday, Visit
-
-from . import main_state
 
 
 @dataclass(slots=True, match_args=False)
@@ -17,10 +16,10 @@ class SeenTodayStateItem:
 
 
 class SeenTodayState:
-    def __get__(self, obj: "main_state.State", _) -> list[SeenTodayStateItem]:
+    def __get__(self, obj: "state.main_state.State", _) -> list[SeenTodayStateItem]:
         return obj._seentoday
 
-    def __set__(self, obj: "main_state.State", _list: list[SeenTodayStateItem]):
+    def __set__(self, obj: "state.main_state.State", _list: list[SeenTodayStateItem]):
         obj._seentoday = _list
         obj.mv.patient_book.seentodaylistctrl.rebuild(_list)
 

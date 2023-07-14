@@ -1,18 +1,17 @@
 import wx
 
+import state
 from db import Patient
 from misc import bd_to_vn_age, check_none_to_blank
+from state.visit_states.visit_list_state import VisitListState
 from ui import menubar
-
-from . import main_state
-from .visit_list_state import VisitListState
 
 
 class PatientState:
-    def __get__(self, obj: "main_state.State", objtype=None) -> Patient | None:
+    def __get__(self, obj: "state.main_state.State", _) -> Patient | None:
         return obj._patient
 
-    def __set__(self, obj: "main_state.State", value: Patient | None):
+    def __set__(self, obj: "state.main_state.State", value: Patient | None):
         obj._patient = value
         match value:
             case None:
@@ -20,7 +19,7 @@ class PatientState:
             case val:
                 self.onSet(obj, val)
 
-    def onSet(self, obj: "main_state.State", p: Patient) -> None:
+    def onSet(self, obj: "state.main_state.State", p: Patient) -> None:
         mv = obj.mv
         mv.name.ChangeValue(p.name)
         mv.gender.ChangeValue(str(p.gender))
@@ -55,7 +54,7 @@ class PatientState:
             menubar.menuPrint.Enable(False)
             menubar.menuPreview.Enable(False)
 
-    def onUnset(self, obj: "main_state.State") -> None:
+    def onUnset(self, obj: "state.main_state.State") -> None:
         mv = obj.mv
         mv.name.Clear()
         mv.gender.Clear()

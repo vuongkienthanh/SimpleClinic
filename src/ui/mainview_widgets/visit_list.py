@@ -1,29 +1,19 @@
 import wx
 
 from db import Visit
-from state.visit_list_state import VisitListStateItem
+from state import VisitListStateItem
 from ui import mainview as mv
+from ui.generics.widgets import GenericListCtrl
 
 
-class VisitListCtrl(wx.ListCtrl):
+class VisitListCtrl(GenericListCtrl):
     "Set `state.visit` when select item"
 
     def __init__(self, parent: "mv.MainView"):
-        super().__init__(parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
-        self.mv = parent
-        self.AppendColumn("Mã lượt khám", width=self.mv.config.header_width(0.07))
-        self.AppendColumn("Ngày giờ khám", width=self.mv.config.header_width(0.075))
-        self.AppendColumn("Chẩn đoán", width=self.mv.config.header_width(0.15))
-        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onSelect)
-        self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onDeselect)
-
-    def build(self, _list: list[VisitListStateItem]):
-        for item in _list:
-            self.append_ui(item)
-
-    def rebuild(self, _list: list[VisitListStateItem]):
-        self.DeleteAllItems()
-        self.build(_list)
+        super().__init__(parent, mv=parent)
+        self.AppendColumn("Mã lượt khám", 0.07)
+        self.AppendColumn("Ngày giờ khám", 0.075)
+        self.AppendColumn("Chẩn đoán", 0.15)
 
     def append_ui(self, item: VisitListStateItem):
         self.Append(

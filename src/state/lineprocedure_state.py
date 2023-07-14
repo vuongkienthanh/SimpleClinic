@@ -2,9 +2,8 @@ from dataclasses import dataclass
 
 import wx
 
+import state
 from db import Connection, LineProcedure, Procedure, Visit
-
-from . import main_state
 
 
 @dataclass(slots=True, match_args=False)
@@ -29,11 +28,13 @@ LineProcedureListState = (
 
 
 class LineProcedureState:
-    def __get__(self, obj: "main_state.State", _) -> LineProcedureListStateItem | None:
+    def __get__(
+        self, obj: "state.main_state.State", _
+    ) -> LineProcedureListStateItem | None:
         return obj._lineprocedure
 
     def __set__(
-        self, obj: "main_state.State", value: LineProcedureListStateItem | None
+        self, obj: "state.main_state.State", value: LineProcedureListStateItem | None
     ) -> None:
         obj._lineprocedure = value
         match value:
@@ -42,12 +43,12 @@ class LineProcedureState:
             case item:
                 self.onSet(obj, item)
 
-    def onSet(self, obj: "main_state.State", item: LineProcedureListStateItem):
+    def onSet(self, obj: "state.main_state.State", item: LineProcedureListStateItem):
         page = obj.mv.order_book.procedurepage
-        page.procedure_picker.SetSelectionProcedureID(item.procedure_id)
+        page.procedure_picker.SetDBID(item.procedure_id)
         page.SetFocus()
 
-    def onUnset(self, obj: "main_state.State") -> None:
+    def onUnset(self, obj: "state.main_state.State") -> None:
         page = obj.mv.order_book.procedurepage
         page.procedure_picker.SetSelection(wx.NOT_FOUND)
         page.SetFocus()
@@ -55,25 +56,25 @@ class LineProcedureState:
 
 class NewLineProcedureListState:
     def __get__(
-        self, obj: "main_state.State", _
+        self, obj: "state.main_state.State", _
     ) -> list[NewLineProcedureListStateItem]:
         return obj._new_lineprocedure_list
 
 
 class OldLineProcedureListState:
     def __get__(
-        self, obj: "main_state.State", _
+        self, obj: "state.main_state.State", _
     ) -> list[OldLineProcedureListStateItem]:
         return obj._old_lineprocedure_list
 
     def __set__(
-        self, obj: "main_state.State", _list: list[OldLineProcedureListStateItem]
+        self, obj: "state.main_state.State", _list: list[OldLineProcedureListStateItem]
     ):
         obj._old_lineprocedure_list = _list
         obj.mv.order_book.procedurepage.procedure_list.rebuild(_list)
 
     @staticmethod
-    def fetch(v: Visit, connection: Connection):
+    def fetch(v: Visit, connection: Connection) -> list[OldLineProcedureListStateItem]:
         query = f"""
             SELECT 
                 lp.id, pr.id AS procedure_id

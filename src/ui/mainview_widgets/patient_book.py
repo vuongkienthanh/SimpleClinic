@@ -1,11 +1,10 @@
 import wx
 
 from db import Patient, Visit
-from state.appointment_state import AppointmentStateItem
-from state.queue_state import QueueStateItem
-from state.seentoday_state import SeenTodayStateItem
+from state import AppointmentStateItem, QueueStateItem, SeenTodayStateItem
 from ui import mainview
 from ui.dialogs import EditPatientDialog
+from ui.generics.widgets import GenericListCtrl
 
 StateList = list[QueueStateItem] | list[SeenTodayStateItem] | list[AppointmentStateItem]
 StateItem = QueueStateItem | SeenTodayStateItem | AppointmentStateItem
@@ -32,35 +31,13 @@ class PatientBook(wx.Notebook):
         oldpage.Select(item, 0)
 
 
-class BasePatientListCtrl(wx.ListCtrl):
+class BasePatientListCtrl(GenericListCtrl):
     def __init__(self, parent: PatientBook):
-        super().__init__(parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
-        self.parent = parent
-        self.mv = parent.mv
-        self.AppendColumn("Mã BN", width=self.mv.config.header_width(0.03))
-        self.AppendColumn("Họ tên", width=self.mv.config.header_width(0.1))
-        self.AppendColumn("Giới", width=self.mv.config.header_width(0.03))
-        self.AppendColumn("Ngày sinh", width=self.mv.config.header_width(0.05))
-        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onSelect)
-        self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onDeselect)
-        self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onDoubleClick)
-
-    def build(self, _list: StateList):
-        for item in _list:
-            self.append_ui(item)
-
-    def rebuild(self, _list: StateList):
-        self.DeleteAllItems()
-        self.build(_list)
-
-    def append_ui(self, item: StateItem):
-        ...
-
-    def onSelect(self, _):
-        ...
-
-    def onDeselect(self, _):
-        ...
+        super().__init__(parent, mv=parent.mv)
+        self.AppendColumn("Mã BN", 0.03)
+        self.AppendColumn("Họ tên", 0.1)
+        self.AppendColumn("Giới", 0.03)
+        self.AppendColumn("Ngày sinh", 0.05)
 
     def onDoubleClick(self, _):
         EditPatientDialog(self.mv).ShowModal()
@@ -69,9 +46,9 @@ class BasePatientListCtrl(wx.ListCtrl):
 class QueuePatientListCtrl(BasePatientListCtrl):
     "Set `state.patient` when select item"
 
-    def __init__(self, parent: PatientBook):
+    def __init__(self, parent):
         super().__init__(parent)
-        self.AppendColumn("Giờ đăng ký", width=self.mv.config.header_width(0.075))
+        self.AppendColumn("Giờ đăng ký", 0.075)
 
     def append_ui(self, item: QueueStateItem):
         self.Append(
@@ -101,9 +78,9 @@ class QueuePatientListCtrl(BasePatientListCtrl):
 class SeenTodayListCtrl(BasePatientListCtrl):
     "Set `state.patient` and `state.visit` when select item"
 
-    def __init__(self, parent: PatientBook):
+    def __init__(self, parent):
         super().__init__(parent)
-        self.AppendColumn("Giờ khám", width=self.mv.config.header_width(0.075))
+        self.AppendColumn("Giờ khám", 0.075)
 
     def append_ui(self, item: SeenTodayStateItem):
         self.Append(
@@ -138,7 +115,7 @@ class SeenTodayListCtrl(BasePatientListCtrl):
 class AppointmentListCtrl(BasePatientListCtrl):
     "Set `state.patient` when select item"
 
-    def __init__(self, parent: PatientBook):
+    def __init__(self, parent):
         super().__init__(parent)
 
     def append_ui(self, item: AppointmentStateItem):

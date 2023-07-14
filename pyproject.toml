@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "SimpleClinic"
-version = "3.1"
+version = "3.2"
 description = "Phần mềm phòng khám Simple Clinic"
 license = "MIT"
 authors = ["vuongkienthanh <thanhstardust@outlook.com>"]
@@ -19,8 +19,9 @@ optional = true
 [tool.poetry.group.dev.dependencies]
 pyinstaller = "^5.3"
 pynvim = "^0.4.3"
-isort = "^5.12.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]

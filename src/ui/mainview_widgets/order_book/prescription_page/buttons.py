@@ -1,20 +1,17 @@
 import wx
 
 from db import LineSamplePrescription
-from misc import calc_quantity, minus_bm, note_str, plus_bm
+from misc import calc_quantity, note_str
 from state.linedrug_state import LineDrugListStateItem, NewLineDrugListStateItem
 from ui.dialogs.sample_prescription_dialog import SampleDialog
-from ui.mainview_widgets.order_book import order_book
+from ui.mainview_widgets.order_book.base_page import BaseAddButton, BaseDeleteButton
+from ui.mainview_widgets.order_book.prescription_page import page
 
 
-class AddDrugButton(wx.BitmapButton):
-    def __init__(self, parent: "order_book.PrescriptionPage"):
-        super().__init__(parent, bitmap=wx.Bitmap(plus_bm))
-        self.parent = parent
-        self.Bind(wx.EVT_BUTTON, self.onClick)
-
-    def onClick(self, _):
-        self.Add()
+class AddDrugButton(BaseAddButton):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent: page.PrescriptionPage
 
     def Add(self):
         page = self.parent
@@ -56,13 +53,12 @@ class AddDrugButton(wx.BitmapButton):
             page.drug_picker.SetFocus()
 
 
-class DeleteDrugButton(wx.BitmapButton):
-    def __init__(self, parent: "order_book.PrescriptionPage"):
-        super().__init__(parent, bitmap=wx.Bitmap(minus_bm))
-        self.parent = parent
-        self.Bind(wx.EVT_BUTTON, self.onClick)
+class DeleteDrugButton(BaseDeleteButton):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent: page.PrescriptionPage
 
-    def onClick(self, _):
+    def Delete(self):
         idx: int = self.parent.drug_list.GetFirstSelected()
         if idx != -1:
             old = self.parent.mv.state.old_linedrug_list
@@ -80,7 +76,7 @@ class DeleteDrugButton(wx.BitmapButton):
 
 
 class ReuseDrugListButton(wx.Button):
-    def __init__(self, parent: "order_book.PrescriptionPage"):
+    def __init__(self, parent: "page.PrescriptionPage"):
         super().__init__(parent, label="Lượt khám mới với toa cũ này")
         self.parent = parent
         self.mv = parent.parent.mv
@@ -106,7 +102,7 @@ class ReuseDrugListButton(wx.Button):
 
 
 class UseSamplePrescriptionBtn(wx.Button):
-    def __init__(self, parent: "order_book.PrescriptionPage"):
+    def __init__(self, parent: "page.PrescriptionPage"):
         super().__init__(parent, label="Sử dụng toa mẫu")
         self.parent = parent
         self.mv = parent.parent.mv

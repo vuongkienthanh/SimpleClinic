@@ -14,7 +14,7 @@ class Gender(enum.Enum):
         return ["Nam", "Nữ"][self.value]
 
     @classmethod
-    def from_s(cls, s: str) -> "Gender":
+    def from_str(cls, s: str) -> Self:
         match s:
             case "Nam":
                 return Gender.m

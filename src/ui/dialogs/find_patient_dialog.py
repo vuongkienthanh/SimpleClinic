@@ -3,36 +3,30 @@ import sqlite3
 
 import wx
 
-from db import Patient, Queue, Visit
-from db.classes import Gender
-from state.queue_state import QueueStateItem
+from db import Gender, Patient, Queue, Visit
+from state.patient_states.queue_state import QueueStateItem
 from ui import mainview
 from ui.dialogs.patient_dialog import EditPatientDialog
 from ui.generics.picker_dialog import DatePickerDialog
+from ui.generics.widgets import GenericListCtrl
 
 
-class SearchPatientList(wx.ListCtrl):
+class SearchPatientList(GenericListCtrl):
     """Listctrl with next,prev button, fetch cursor when needed"""
 
     def __init__(self, parent: "FindPatientDialog", num_of_lines: int):
-        super().__init__(
-            parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL, size=(-1, 26 * num_of_lines)
-        )
-        self.mv = parent.mv
-        self.AppendColumn("Mã BN", width=self.mv.config.header_width(0.03))
-        self.AppendColumn("Họ tên", width=self.mv.config.header_width(0.1))
-        self.AppendColumn("Giới", width=self.mv.config.header_width(0.03))
-        self.AppendColumn("Ngày sinh", width=self.mv.config.header_width(0.06))
+        super().__init__(parent, mv=parent.mv, size=(-1, 26 * num_of_lines))
+        self.AppendColumn("Mã BN", 0.03)
+        self.AppendColumn("Họ tên", 0.1)
+        self.AppendColumn("Giới", 0.03)
+        self.AppendColumn("Ngày sinh", 0.06)
         self.num_of_lines = num_of_lines
-        self.page_index: int = 0
-        self.saved_pages: list[list] = []
-        self.temp_page: list = []
-        self.cur_page: list = []
-        self._done: bool = False
+        self.page_index = 0
+        self.saved_pages: list[list[sqlite3.Row]] = []
+        self.temp_page: list[sqlite3.Row] = []
+        self.cur_page: list[sqlite3.Row] = []
+        self._done = False
         self.pid: int | None = None
-
-        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onSelect)
-        self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onDeselect)
 
     def onSelect(self, e: wx.ListEvent):
         idx: int = e.Index
@@ -59,7 +53,7 @@ class SearchPatientList(wx.ListCtrl):
         self.page_index += 1
         self.DeleteAllItems()
 
-    def append(self, row: sqlite3.Row):
+    def append_row(self, row: sqlite3.Row):
         if len(self.cur_page) == self.num_of_lines:
             self.new_page()
         self.cur_page.append(row)
@@ -70,6 +64,12 @@ class SearchPatientList(wx.ListCtrl):
 
     def is_last(self) -> bool:
         return self.page_index == len(self.saved_pages)
+
+    def is_done(self) -> bool:
+        return self._done
+
+    def done(self):
+        self._done = True
 
     def prev(self):
         if self.is_last():
@@ -92,13 +92,7 @@ class SearchPatientList(wx.ListCtrl):
             for row in self.cur_page:
                 self.append_ui(row)
 
-    def is_done(self) -> bool:
-        return self._done
-
-    def done(self):
-        self._done = True
-
-    def clear(self):
+    def Clear(self):
         self.page_index = 0
         self.saved_pages = []
         self.cur_page = []
@@ -189,21 +183,8 @@ class FindPatientDialog(wx.Dialog):
         self.delbtn.Bind(wx.EVT_BUTTON, self.onDelete)
         self.Bind(wx.EVT_CLOSE, self.onClose)
 
-    def onSearch(self, e: wx.CommandEvent):
-        "Enter (EVT_SEARCH) to activate"
-        s: str = e.GetString()
-        self.cur = self.mv.connection.execute(
-            f"""
-            SELECT id AS pid, name, gender, birthdate
-            FROM {Patient.__tablename__}
-            WHERE name LIKE ?
-        """,
-            ("%" + s.upper() + "%",),
-        )
-        self.rebuild()
-
     def rebuild(self):
-        self.lc.clear()
+        self.lc.Clear()
         self.prevbtn.Disable()
         self.nextbtn.Disable()
         self.addqueuebtn.Disable()
@@ -215,16 +196,16 @@ class FindPatientDialog(wx.Dialog):
     def build(self):
         assert self.cur is not None
         for _ in range(self.num_of_lines):
-            row = self.cur.fetchone()
-            if row is not None:
-                self.lc.append(row)
-            else:
-                self.lc.done()
-                break
+            match self.cur.fetchone():
+                case None:
+                    self.lc.done()
+                    break
+                case row:
+                    self.lc.append_row(row)
 
-    def clear(self):
+    def Clear(self):
         self.search.Clear()
-        self.lc.clear()
+        self.lc.Clear()
         self.prevbtn.Disable()
         self.nextbtn.Disable()
         self.addqueuebtn.Disable()
@@ -232,18 +213,8 @@ class FindPatientDialog(wx.Dialog):
         self.delbtn.Disable()
 
     def next_prev_status_check(self):
-        if self.lc.is_first():
-            self.prevbtn.Disable()
-        else:
-            self.prevbtn.Enable()
-
-        if self.lc.is_last():
-            if self.lc.is_done():
-                self.nextbtn.Disable()
-            else:
-                self.nextbtn.Enable()
-        else:
-            self.nextbtn.Enable()
+        self.prevbtn.Enable(not self.lc.is_first())
+        self.nextbtn.Enable((not self.lc.is_last()) or (not self.lc.is_done()))
 
     def onSelect(self, e: wx.CommandEvent):
         self.addqueuebtn.Enable()
@@ -256,6 +227,18 @@ class FindPatientDialog(wx.Dialog):
         self.editbtn.Disable()
         self.delbtn.Disable()
         e.Skip()
+
+    def onSearch(self, e: wx.CommandEvent):
+        s: str = e.GetString()
+        self.cur = self.mv.connection.execute(
+            f"""
+            SELECT id AS pid, name, gender, birthdate
+            FROM {Patient.__tablename__}
+            WHERE name LIKE ?
+        """,
+            ("%" + s.upper() + "%",),
+        )
+        self.rebuild()
 
     def onAll(self, _):
         self.cur = self.mv.connection.execute(
@@ -301,11 +284,10 @@ class FindPatientDialog(wx.Dialog):
             wx.MessageBox("Thêm vào danh sách chờ thành công", "OK", style=wx.ICON_NONE)
             idx: int = self.lc.GetFirstSelected()
             assert idx != -1
-            self.lc.GetItemText(idx, 2)
             item = QueueStateItem(
                 pid,
                 self.lc.GetItemText(idx, 1),
-                Gender.from_s(self.lc.GetItemText(idx, 2)),
+                Gender.from_str(self.lc.GetItemText(idx, 2)),
                 dt.datetime.strptime(self.lc.GetItemText(idx, 3), "%d/%m/%Y").date(),
                 dt.datetime.now(),
             )
@@ -338,7 +320,7 @@ class FindPatientDialog(wx.Dialog):
                 self.mv.connection.delete(Patient, pid)
                 wx.MessageBox("Xóa thành công", "OK", style=wx.ICON_NONE)
                 self.mv.state.refresh()
-                self.clear()
+                self.Clear()
             except sqlite3.Error as error:
                 wx.MessageBox(f"Lỗi không xóa được\n{error}", "Lỗi")
             finally:

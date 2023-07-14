@@ -9,21 +9,7 @@ import wx
 
 from db import *
 from misc import APP_DIR, CONFIG_PATH, DEFAULT_CONFIG_PATH, MY_DATABASE_PATH
-from misc.printer import PrintOut, printdata
 from ui import mainview
-from ui.dialogs import (
-    DayFinanceReportDialog,
-    EditPatientDialog,
-    FindPatientDialog,
-    MonthFinanceReportDialog,
-    MonthWarehouseReportDialog,
-    NewPatientDialog,
-    ProcedureDialog,
-    SampleDialog,
-    SetupDialog,
-    WarehouseDialog,
-)
-from ui.generics.picker_dialog import DatePickerDialog, MonthPickerDialog
 
 
 class MyMenuBar(wx.MenuBar):
@@ -149,14 +135,20 @@ class MyMenuBar(wx.MenuBar):
         mv.Close()
 
     def onNewPatient(self, _):
+        from ui.dialogs import NewPatientDialog
+
         mv: "mainview.MainView" = self.GetFrame()
         NewPatientDialog(mv).ShowModal()
 
     def onFindPatient(self, _):
+        from ui.dialogs import FindPatientDialog
+
         mv: "mainview.MainView" = self.GetFrame()
         FindPatientDialog(mv).ShowModal()
 
     def onEditPatient(self, _):
+        from ui.dialogs import EditPatientDialog
+
         mv: "mainview.MainView" = self.GetFrame()
         page: wx.ListCtrl = mv.patient_book.GetPage(mv.patient_book.Selection)
         idx: int = page.GetFirstSelected()
@@ -229,11 +221,15 @@ class MyMenuBar(wx.MenuBar):
                 wx.MessageBox("Lỗi không xóa được\n" + str(error), "Lỗi")
 
     def onPrint(self, _):
+        from misc.printer import PrintOut, printdata
+
         mv: "mainview.MainView" = self.GetFrame()
         printout = PrintOut(mv)
         wx.Printer(wx.PrintDialogData(printdata)).Print(self, printout, False)
 
     def onPreview(self, _):
+        from misc.printer import PrintOut, printdata
+
         mv: "mainview.MainView" = self.GetFrame()
         printout = PrintOut(mv, preview=True)
         printdialogdata = wx.PrintDialogData(printdata)
@@ -297,24 +293,36 @@ class MyMenuBar(wx.MenuBar):
             cb.Close()
 
     def onWarehouse(self, _):
+        from ui.dialogs import WarehouseDialog
+
         mv: "mainview.MainView" = self.GetFrame()
         WarehouseDialog(mv).ShowModal()
 
     def onSample(self, _):
+        from ui.dialogs import SampleDialog
+
         mv: "mainview.MainView" = self.GetFrame()
         SampleDialog(mv).ShowModal()
 
     def onProcedure(self, _):
+        from ui.dialogs import ProcedureDialog
+
         mv: "mainview.MainView" = self.GetFrame()
         ProcedureDialog(mv).ShowModal()
 
     def onDayReport(self, _):
+        from ui.dialogs import DayFinanceReportDialog
+        from ui.generics.picker_dialog import DatePickerDialog
+
         mv: "mainview.MainView" = self.GetFrame()
         datepickerdialog = DatePickerDialog(mv)
         if datepickerdialog.ShowModal() == wx.ID_OK:
             DayFinanceReportDialog(mv, datepickerdialog.GetDate()).ShowModal()
 
     def onMonthReport(self, _):
+        from ui.dialogs import MonthFinanceReportDialog
+        from ui.generics.picker_dialog import MonthPickerDialog
+
         mv: "mainview.MainView" = self.GetFrame()
         monthpickerdialog = MonthPickerDialog(mv)
         if monthpickerdialog.ShowModal() == wx.ID_OK:
@@ -323,6 +331,9 @@ class MyMenuBar(wx.MenuBar):
             ).ShowModal()
 
     def onMonthWarehouseReport(self, _):
+        from ui.dialogs import MonthWarehouseReportDialog
+        from ui.generics.picker_dialog import MonthPickerDialog
+
         mv: "mainview.MainView" = self.GetFrame()
         monthpickerdialog = MonthPickerDialog(mv)
         if monthpickerdialog.ShowModal() == wx.ID_OK:
@@ -331,6 +342,8 @@ class MyMenuBar(wx.MenuBar):
             ).ShowModal()
 
     def onSetup(self, _):
+        from ui.dialogs import SetupDialog
+
         mv: "mainview.MainView" = self.GetFrame()
         SetupDialog(mv).ShowModal()
 

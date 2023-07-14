@@ -1,9 +1,8 @@
 from dataclasses import dataclass
 
+import state
 from db import Connection, LineDrug, Visit, Warehouse
 from misc.other_func import note_str
-
-from . import main_state
 
 
 @dataclass(slots=True, match_args=False)
@@ -34,11 +33,11 @@ LineDrugListState = (
 
 
 class LineDrugState:
-    def __get__(self, obj: "main_state.State", _) -> LineDrugListStateItem | None:
+    def __get__(self, obj: "state.main_state.State", _) -> LineDrugListStateItem | None:
         return obj._linedrug
 
     def __set__(
-        self, obj: "main_state.State", value: LineDrugListStateItem | None
+        self, obj: "state.main_state.State", value: LineDrugListStateItem | None
     ) -> None:
         obj._linedrug = value
         match value:
@@ -47,7 +46,7 @@ class LineDrugState:
             case item:
                 self.onSet(obj, item)
 
-    def onSet(self, obj: "main_state.State", item: LineDrugListStateItem) -> None:
+    def onSet(self, obj: "state.main_state.State", item: LineDrugListStateItem) -> None:
         mv = obj.mv
         page = mv.order_book.prescriptionpage
         obj.warehouse = obj.all_warehouse[item.warehouse_id]
@@ -67,7 +66,7 @@ class LineDrugState:
 
     def onUnset(
         self,
-        obj: "main_state.State",
+        obj: "state.main_state.State",
     ) -> None:
         mv = obj.mv
         page = mv.order_book.prescriptionpage
@@ -80,15 +79,21 @@ class LineDrugState:
 
 
 class NewLineDrugListState:
-    def __get__(self, obj: "main_state.State", _) -> list[NewLineDrugListStateItem]:
+    def __get__(
+        self, obj: "state.main_state.State", _
+    ) -> list[NewLineDrugListStateItem]:
         return obj._new_linedrug_list
 
 
 class OldLineDrugListState:
-    def __get__(self, obj: "main_state.State", _) -> list[OldLineDrugListStateItem]:
+    def __get__(
+        self, obj: "state.main_state.State", _
+    ) -> list[OldLineDrugListStateItem]:
         return obj._old_linedrug_list
 
-    def __set__(self, obj: "main_state.State", _list: list[OldLineDrugListStateItem]):
+    def __set__(
+        self, obj: "state.main_state.State", _list: list[OldLineDrugListStateItem]
+    ):
         obj._old_linedrug_list = _list
         obj.mv.order_book.prescriptionpage.drug_list.rebuild(_list)
 

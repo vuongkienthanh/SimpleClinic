@@ -1,7 +1,9 @@
 from db import *
 from ui import mainview
 
-from .appointment_state import AppointmentState, AppointmentStateItem
+from .all_dict_states.all_procedure_state import AllProcedureState
+from .all_dict_states.all_sampleprescription_state import AllSamplePrescriptionState
+from .all_dict_states.all_warehouse_state import AllWarehouseState
 from .linedrug_state import (
     LineDrugListStateItem,
     LineDrugState,
@@ -18,11 +20,12 @@ from .lineprocedure_state import (
     OldLineProcedureListState,
     OldLineProcedureListStateItem,
 )
-from .patient_state import PatientState
-from .queue_state import QueueState, QueueStateItem
-from .seentoday_state import SeenTodayState, SeenTodayStateItem
-from .visit_list_state import VisitListState, VisitListStateItem
-from .visit_state import VisitState
+from .patient_states.appointment_state import AppointmentState, AppointmentStateItem
+from .patient_states.patient_state import PatientState
+from .patient_states.queue_state import QueueState, QueueStateItem
+from .patient_states.seentoday_state import SeenTodayState, SeenTodayStateItem
+from .visit_states.visit_list_state import VisitListState, VisitListStateItem
+from .visit_states.visit_state import VisitState
 from .warehouse_state import WarehouseState
 
 
@@ -45,6 +48,10 @@ class State:
     queue = QueueState()
     seentoday = SeenTodayState()
     appointment = AppointmentState()
+
+    all_procedure = AllProcedureState()
+    all_sampleprescription = AllSamplePrescriptionState()
+    all_warehouse = AllWarehouseState()
 
     def __init__(self, mv: "mainview.MainView") -> None:
         self.mv = mv
@@ -70,9 +77,9 @@ class State:
         self._seentoday: list[SeenTodayStateItem] = []
         self._appointment: list[AppointmentStateItem] = []
 
-        self.all_warehouse: dict[int, Warehouse] = {}
-        self.all_sampleprescription: dict[int, SamplePrescription] = {}
-        self.all_procedure: dict[int, Procedure] = {}
+        self._all_warehouse: dict[int, Warehouse] = {}
+        self._all_sampleprescription: dict[int, SamplePrescription] = {}
+        self._all_procedure: dict[int, Procedure] = {}
 
     def refresh(self) -> None:
         self.patient = None
@@ -94,7 +101,9 @@ class State:
         self.seentoday = SeenTodayState.fetch(self.mv.connection)
         self.appointment = AppointmentState.fetch(self.mv.connection)
 
-        self.all_warehouse = self.mv.connection.selectall(Warehouse)
-        self.all_sampleprescription = self.mv.connection.selectall(SamplePrescription)
-        self.all_procedure = self.mv.connection.selectall(Procedure)
+        self._all_warehouse = AllWarehouseState.fetch(self.mv.connection)
+        self._all_sampleprescription = AllSamplePrescriptionState.fetch(
+            self.mv.connection
+        )
+        self.all_procedure = AllProcedureState.fetch(self.mv.connection)
         self.mv.order_book.SetSelection(0)

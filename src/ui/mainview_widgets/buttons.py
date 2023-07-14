@@ -7,7 +7,7 @@ from db import LineDrug, LineProcedure, Patient, Visit
 from misc import (
     calc_quantity,
     check_blank_to_none,
-    sale_unit_str,
+    sale_unit_from_db,
     update_druglist_bm,
     weight_bm,
 )
@@ -86,7 +86,7 @@ class UpdateQuantityBtn(wx.Button):
             drug_list.SetItem(
                 idx,
                 4,
-                f"{item.quantity} {sale_unit_str(wh.sale_unit , wh.usage_unit)}",
+                f"{item.quantity} {sale_unit_from_db(wh.sale_unit , wh.usage_unit)}",
             )
         self.mv.price.FetchPrice()
         self.Disable()

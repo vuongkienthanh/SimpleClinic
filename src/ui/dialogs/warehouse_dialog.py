@@ -1,14 +1,13 @@
 import wx
 
 from db import Warehouse
-from misc import check_blank_to_none, check_none_to_blank
-from ui import mainview as mv
-from ui.generics.widgets import CalendarDatePicker, NumberTextCtrl
+from misc import check_blank_to_none, check_none_to_blank, sale_unit_to_db
+from ui import mainview
+from ui.generics.widgets import CalendarDatePicker, GenericListCtrl, NumberTextCtrl
 
 
 class WarehouseDialog(wx.Dialog):
-    def __init__(self, mv: "mv.MainView"):
-        "`_list`: internal list"
+    def __init__(self, mv: "mainview.MainView"):
         super().__init__(
             mv,
             title="Kho thuốc",
@@ -52,7 +51,7 @@ class WarehouseDialog(wx.Dialog):
         self.Bind(wx.EVT_CLOSE, self.onClose)
         self.Bind(wx.EVT_BUTTON, self.onClose, okbtn)
         self.Maximize()
-        self.warehouselistctrl.rebuild()
+        self.warehouselistctrl.start()
 
     def onClose(self, e):
         self.mv.state.new_linedrug_list = []
@@ -63,97 +62,72 @@ class WarehouseDialog(wx.Dialog):
         e.Skip()
 
 
-class WarehouseListCtrl(wx.ListCtrl):
+class WarehouseListCtrl(GenericListCtrl):
     def __init__(self, parent: WarehouseDialog):
-        super().__init__(parent, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
+        super().__init__(parent, mv=parent.mv)
         self.parent = parent
-        self.mv = parent.mv
         self._list: list[Warehouse] = []
-        self.AppendColumn("Mã", width=self.mv.config.header_width(0.03))
-        self.AppendColumn("Tên", width=self.mv.config.header_width(0.1))
-        self.AppendColumn("Thành phần", width=self.mv.config.header_width(0.1))
-        self.AppendColumn("Số lượng", width=self.mv.config.header_width(0.04))
-        self.AppendColumn("Đơn vị sử dụng", width=self.mv.config.header_width(0.06))
-        self.AppendColumn("Cách sử dụng", width=self.mv.config.header_width(0.06))
-        self.AppendColumn("Giá mua", width=self.mv.config.header_width(0.03))
-        self.AppendColumn("Giá bán", width=self.mv.config.header_width(0.03))
-        self.AppendColumn("Đơn vị bán", width=self.mv.config.header_width(0.04))
-        self.AppendColumn("Ngày hết hạn", width=self.mv.config.header_width(0.05))
-        self.AppendColumn("Xuất xứ", width=self.mv.config.header_width(0.06))
-        self.AppendColumn("Ghi chú", width=self.mv.config.header_width(0.06))
-        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onSelect)
-        self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onDeselect)
-        self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onDoubleClick)
+        self.AppendColumn("Mã", 0.03)
+        self.AppendColumn("Tên", 0.1)
+        self.AppendColumn("Thành phần", 0.1)
+        self.AppendColumn("Số lượng", 0.04)
+        self.AppendColumn("Đơn vị sử dụng", 0.06)
+        self.AppendColumn("Cách sử dụng", 0.06)
+        self.AppendColumn("Giá mua", 0.03)
+        self.AppendColumn("Giá bán", 0.03)
+        self.AppendColumn("Đơn vị bán", 0.04)
+        self.AppendColumn("Ngày hết hạn", 0.05)
+        self.AppendColumn("Xuất xứ", 0.06)
+        self.AppendColumn("Ghi chú", 0.06)
 
-    def fetch_list(self, s: str):
-        match s.strip().casefold():
-            case "":
-                self._list = list(self.mv.state.all_warehouse.values())
-            case s:
-                self._list = list(
-                    filter(
-                        lambda wh: (s in wh.name.casefold())
-                        or (s in wh.element.casefold()),
-                        self.mv.state.all_warehouse.values(),
-                    )
-                )
+    def start(self):
+        self.rebuild(self.mv.state.all_warehouse.values())
 
-    def build(self):
-        for wh in self._list:
-            self.append_ui(wh)
-
-    def rebuild(self, s: str = ""):
-        self.fetch_list(s)
-        self.DeleteAllItems()
-        self.build()
-
-    def append_ui(self, wh: Warehouse):
+    def append_ui(self, item: Warehouse):
         self.Append(
             [
-                str(wh.id),
-                wh.name,
-                wh.element,
-                str(wh.quantity),
-                wh.usage_unit,
-                wh.usage,
-                str(wh.purchase_price),
-                str(wh.sale_price),
-                wh.sale_unit if wh.sale_unit is not None else wh.usage_unit,
-                wh.expire_date.strftime("%d/%m/%Y")
-                if wh.expire_date is not None
+                str(item.id),
+                item.name,
+                item.element,
+                str(item.quantity),
+                item.usage_unit,
+                item.usage,
+                str(item.purchase_price),
+                str(item.sale_price),
+                item.sale_unit if item.sale_unit is not None else item.usage_unit,
+                item.expire_date.strftime("%d/%m/%Y")
+                if item.expire_date is not None
                 else "",
-                check_none_to_blank(wh.made_by),
-                check_none_to_blank(wh.drug_note),
+                check_none_to_blank(item.made_by),
+                check_none_to_blank(item.drug_note),
             ]
         )
-        self.check_min_quantity_and_change_color(wh, self.ItemCount - 1)
+        self.check_min_quantity_and_change_color(self.ItemCount - 1, item)
 
-    def pop_ui(self, idx: int):
-        self.DeleteItem(idx)
-        del self._list[idx]
-
-    def update_ui(self, idx: int, wh: Warehouse):
-        self.SetItem(idx, 1, wh.name)
-        self.SetItem(idx, 2, wh.element)
-        self.SetItem(idx, 3, str(wh.quantity))
-        self.SetItem(idx, 4, wh.usage_unit)
-        self.SetItem(idx, 5, wh.usage)
-        self.SetItem(idx, 6, str(wh.purchase_price))
-        self.SetItem(idx, 7, str(wh.sale_price))
+    def update_ui(self, idx: int, item: Warehouse):
+        self.SetItem(idx, 1, item.name)
+        self.SetItem(idx, 2, item.element)
+        self.SetItem(idx, 3, str(item.quantity))
+        self.SetItem(idx, 4, item.usage_unit)
+        self.SetItem(idx, 5, item.usage)
+        self.SetItem(idx, 6, str(item.purchase_price))
+        self.SetItem(idx, 7, str(item.sale_price))
         self.SetItem(
-            idx, 8, wh.sale_unit if wh.sale_unit is not None else wh.usage_unit
+            idx, 8, item.sale_unit if item.sale_unit is not None else item.usage_unit
         )
         self.SetItem(
             idx,
             9,
-            wh.expire_date.strftime("%d/%m/%Y") if wh.expire_date is not None else "",
+            item.expire_date.strftime("%d/%m/%Y")
+            if item.expire_date is not None
+            else "",
         )
-        self.SetItem(idx, 10, check_none_to_blank(wh.made_by))
-        self.SetItem(idx, 11, check_none_to_blank(wh.drug_note))
-        self.check_min_quantity_and_change_color(wh, idx)
+        self.SetItem(idx, 10, check_none_to_blank(item.made_by))
+        self.SetItem(idx, 11, check_none_to_blank(item.drug_note))
+        self.check_min_quantity_and_change_color(idx, item)
 
-    def check_min_quantity_and_change_color(self, wh: Warehouse, idx: int):
-        if wh.quantity <= self.mv.config.minimum_drug_quantity_alert:
+    def check_min_quantity_and_change_color(self, idx: int, item: Warehouse):
+        if item.quantity <= self.mv.config.minimum_drug_quantity_alert:
             self.SetItemTextColour(idx, wx.Colour(252, 3, 57))
 
     def onSelect(self, _):
@@ -173,16 +147,27 @@ class DrugSearchCtrl(wx.SearchCtrl):
         super().__init__(parent)
         self.SetHint("Tên thuốc hoặc thành phần thuốc")
         self.parent = parent
+        self.mv = parent.mv
         self.Bind(wx.EVT_SEARCH, self.onSearchEnter)
         self.Bind(wx.EVT_TEXT, self.onText)
 
     def onSearchEnter(self, e):
-        self.parent.warehouselistctrl.rebuild(self.Value)
+        match self.Value.strip().casefold():
+            case "":
+                self.parent.warehouselistctrl.start()
+            case s:
+                self.parent.warehouselistctrl.rebuild(
+                    filter(
+                        lambda wh: (s in wh.name.casefold())
+                        or (s in wh.element.casefold()),
+                        self.mv.state.all_warehouse.values(),
+                    )
+                )
         e.Skip()
 
     def onText(self, e: wx.CommandEvent):
         if len(e.EventObject.Value) == 0:
-            self.parent.warehouselistctrl.rebuild()
+            self.parent.warehouselistctrl.start()
         e.Skip()
 
 
@@ -221,12 +206,16 @@ class DeleteBtn(wx.Button):
         wh = self.mv.state.all_warehouse[
             int(self.parent.warehouselistctrl.GetItemText(idx, 0))
         ]
-        try:
-            self.mv.connection.delete(wh)
-            del self.mv.state.all_warehouse[wh.id]
-            self.parent.warehouselistctrl.pop_ui(idx)
-        except Exception as error:
-            wx.MessageBox(f"Không xoá được\n{error}", "Lỗi")
+        if (
+            wx.MessageBox(f"Xoá thuốc {wh.name}", "Xoá thuốc", style=wx.OK | wx.CANCEL)
+            == wx.OK
+        ):
+            try:
+                self.mv.connection.delete(wh)
+                del self.mv.state.all_warehouse[wh.id]
+                self.parent.warehouselistctrl.pop_ui(idx)
+            except Exception as error:
+                wx.MessageBox(f"Không xoá được\n{error}", "Lỗi")
 
 
 class BaseDialog(wx.Dialog):
@@ -252,7 +241,7 @@ class BaseDialog(wx.Dialog):
         self.cancelbtn = wx.Button(self, id=wx.ID_CANCEL)
         self.okbtn = wx.Button(self, id=wx.ID_OK)
 
-        self.mandatory: tuple = (
+        self.mandatory = (
             self.name,
             self.element,
             self.quantity,
@@ -326,19 +315,20 @@ class BaseDialog(wx.Dialog):
         else:
             return True
 
-    def get_sale_unit(self) -> str | None:
-        sale_unit: str = self.sale_unit.Value
-        sale_unit = sale_unit.strip()
-        usage_unit: str = self.usage_unit.Value
-        usage_unit = usage_unit.strip()
-
-        match sale_unit:
-            case "":
-                return None
-            case s if s == usage_unit:
-                return None
-            case _:
-                return sale_unit
+    def get_wh(self):
+        return {
+            "name": self.name.Value.strip(),
+            "element": self.element.Value.strip(),
+            "quantity": int(self.quantity.Value.strip()),
+            "usage_unit": self.usage_unit.Value.strip(),
+            "usage": self.usage.Value.strip(),
+            "purchase_price": int(self.purchase_price.Value.strip()),
+            "sale_price": int(self.sale_price.Value.strip()),
+            "sale_unit": sale_unit_to_db(self.sale_unit.Value, self.usage_unit.Value),
+            "expire_date": self.expire_date.checked_GetDate(),
+            "made_by": check_blank_to_none(self.made_by.Value),
+            "drug_note": check_blank_to_none(self.drug_note.Value),
+        }
 
 
 class AddDialog(BaseDialog):
@@ -347,19 +337,7 @@ class AddDialog(BaseDialog):
 
     def onClick(self, e):
         if self.is_valid():
-            wh = {
-                "name": self.name.Value.strip(),
-                "element": self.element.Value.strip(),
-                "quantity": int(self.quantity.Value.strip()),
-                "usage_unit": self.usage_unit.Value.strip(),
-                "usage": self.usage.Value.strip(),
-                "purchase_price": int(self.purchase_price.Value.strip()),
-                "sale_price": int(self.sale_price.Value.strip()),
-                "sale_unit": self.get_sale_unit(),
-                "expire_date": self.expire_date.checked_GetDate(),
-                "made_by": check_blank_to_none(self.made_by.Value),
-                "drug_note": check_blank_to_none(self.drug_note.Value),
-            }
+            wh = self.get_wh()
             try:
                 new_wh_id = self.mv.connection.insert(Warehouse, wh)
                 assert new_wh_id is not None
@@ -399,6 +377,7 @@ class UpdateDialog(BaseDialog):
 
     def onClick(self, e):
         if self.is_valid():
+            wh = self.get_wh()
             wh = {
                 "name": self.name.Value.strip(),
                 "element": self.element.Value.strip(),
@@ -407,7 +386,9 @@ class UpdateDialog(BaseDialog):
                 "usage": self.usage.Value.strip(),
                 "purchase_price": int(self.purchase_price.Value.strip()),
                 "sale_price": int(self.sale_price.Value.strip()),
-                "sale_unit": self.get_sale_unit(),
+                "sale_unit": sale_unit_to_db(
+                    self.sale_unit.Value, self.usage_unit.Value
+                ),
                 "expire_date": self.expire_date.checked_GetDate(),
                 "made_by": check_blank_to_none(self.made_by.Value),
                 "drug_note": check_blank_to_none(self.drug_note.Value),

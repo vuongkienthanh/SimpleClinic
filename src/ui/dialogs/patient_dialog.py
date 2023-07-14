@@ -5,8 +5,7 @@ import wx.adv as adv
 
 from db import Patient, Queue
 from misc import check_blank_to_none, check_none_to_blank
-from state.queue_state import QueueState, QueueStateItem
-from state.seentoday_state import SeenTodayState
+from state import QueueState, QueueStateItem, SeenTodayState
 from ui import mainview
 from ui.generics.widgets import (
     CalendarDatePicker,

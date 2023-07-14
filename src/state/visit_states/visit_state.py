@@ -1,19 +1,18 @@
 import wx
 
+import state
 from db import Visit
 from misc import check_none_to_blank, vn_weekdays
+from state.linedrug_state import OldLineDrugListState
+from state.lineprocedure_state import OldLineProcedureListState
 from ui import menubar
-
-from . import main_state
-from .linedrug_state import OldLineDrugListState
-from .lineprocedure_state import OldLineProcedureListState
 
 
 class VisitState:
-    def __get__(self, obj: "main_state.State", _) -> Visit | None:
+    def __get__(self, obj: "state.main_state.State", _) -> Visit | None:
         return obj._visit
 
-    def __set__(self, obj: "main_state.State", value: Visit | None):
+    def __set__(self, obj: "state.main_state.State", value: Visit | None):
         obj._visit = value
         match value:
             case None:
@@ -21,7 +20,7 @@ class VisitState:
             case val:
                 self.onSet(obj, val)
 
-    def onSet(self, obj: "main_state.State", v: Visit) -> None:
+    def onSet(self, obj: "state.main_state.State", v: Visit) -> None:
         mv = obj.mv
         mv.diagnosis.ChangeValue(v.diagnosis)
         mv.vnote.ChangeValue(check_none_to_blank(v.vnote))
@@ -52,7 +51,7 @@ class VisitState:
 
     def onUnset(
         self,
-        obj: "main_state.State",
+        obj: "state.main_state.State",
     ) -> None:
         mv = obj.mv
         mv.diagnosis.Clear()

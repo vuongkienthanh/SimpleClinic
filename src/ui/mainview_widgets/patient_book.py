@@ -4,7 +4,7 @@ from db import Patient, Visit
 from state import AppointmentStateItem, QueueStateItem, SeenTodayStateItem
 from ui import mainview
 from ui.dialogs import EditPatientDialog
-from ui.generics.widgets import GenericListCtrl
+from ui.generics import StateListCtrl
 
 StateList = list[QueueStateItem] | list[SeenTodayStateItem] | list[AppointmentStateItem]
 StateItem = QueueStateItem | SeenTodayStateItem | AppointmentStateItem
@@ -31,7 +31,7 @@ class PatientBook(wx.Notebook):
         oldpage.Select(item, 0)
 
 
-class BasePatientListCtrl(GenericListCtrl):
+class BasePatientListCtrl(StateListCtrl):
     def __init__(self, parent: PatientBook):
         super().__init__(parent, mv=parent.mv)
         self.AppendColumn("Mã BN", 0.03)

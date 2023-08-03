@@ -1,11 +1,11 @@
 import wx
 
 from state import LineProcedureListStateItem
-from ui.generics.widgets import GenericListCtrl
+from ui.generics import StateListCtrl
 from ui.mainview_widgets.order_book import order_book
 
 
-class ProcedureListCtrl(GenericListCtrl):
+class ProcedureListCtrl(StateListCtrl):
     def __init__(self, parent: "order_book.ProcedurePage"):
         super().__init__(parent, mv=parent.mv)
         self.AppendColumn("Tên thủ thuật", 0.2)

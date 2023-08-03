@@ -1,14 +1,14 @@
 import wx
 
 from db import LineSamplePrescription
-from misc import calc_quantity, note_str
-from state.linedrug_state import LineDrugListStateItem, NewLineDrugListStateItem
+from misc import calc_quantity, note_str_to_db
+from state.linedrug_states import NewLineDrugListState, NewLineDrugListStateItem
 from ui.dialogs.sample_prescription_dialog import SampleDialog
-from ui.mainview_widgets.order_book.base_page import BaseAddButton, BaseDeleteButton
+from ui.generics import AddBitmapBtn, DeleteBitMapBtn
 from ui.mainview_widgets.order_book.prescription_page import page
 
 
-class AddDrugButton(BaseAddButton):
+class AddDrugButton(AddBitmapBtn):
     def __init__(self, parent):
         super().__init__(parent)
         self.parent: page.PrescriptionPage
@@ -21,39 +21,34 @@ class AddDrugButton(BaseAddButton):
         ld = state.linedrug
         if wh is None:
             return
-        note: str | None
-        match page.note.Value:
-            case n if n == note_str(
-                wh.usage, int(page.times.Value), page.dose.Value, wh.usage_unit, None
-            ):
-                note = None
-            case n:
-                note = n
+
+        times = int(page.times.Value.strip())
+        dose = page.dose.Value.strip()
+        quantity = int(page.quantity.Value.strip())
+        note = note_str_to_db(
+            wh.usage, times, dose, wh.usage_unit, self.parent.note.Value
+        )
+
         if page.check_wh_do_ti_qua_filled():
-            if ld is None:
-                new_ld = NewLineDrugListStateItem(
-                    wh.id,
-                    int(page.times.Value),
-                    page.dose.Value,
-                    int(page.quantity.Value),
-                    note,
-                )
-                state.new_linedrug_list.append(new_ld)
-                page.drug_list.append_ui(new_ld)
-            elif isinstance(ld, LineDrugListStateItem):
-                ld.times = int(page.times.Value)
-                ld.dose = page.dose.Value
-                ld.quantity = int(page.quantity.Value)
+            if ld:
+                ld.times = times
+                ld.dose = dose
+                ld.quantity = quantity
                 ld.usage_note = note
                 idx: int = page.drug_list.GetFirstSelected()
                 page.drug_list.update_ui(idx, ld)
+            else:
+                new_ld = NewLineDrugListStateItem(
+                    wh.id, times, dose, quantity, note, False
+                )
+                NewLineDrugListState.append_state(mv, new_ld)
             state.warehouse = None
             state.linedrug = None
             mv.price.FetchPrice()
             page.drug_picker.SetFocus()
 
 
-class DeleteDrugButton(BaseDeleteButton):
+class DeleteDrugButton(DeleteBitMapBtn):
     def __init__(self, parent):
         super().__init__(parent)
         self.parent: page.PrescriptionPage
@@ -83,10 +78,11 @@ class ReuseDrugListButton(wx.Button):
         self.Bind(wx.EVT_BUTTON, self.onClick)
 
     def onClick(self, _):
-        _list = self.mv.state.old_linedrug_list
+        _list = self.mv.state.old_linedrug_list.copy()
         weight = self.mv.weight.GetWeight()
         self.mv.state.visit = None
         self.mv.weight.SetWeight(weight)
+        self.mv.state.old_linedrug_list = []
         self.parent.drug_list.rebuild(_list)
         for old_linedrug in _list:
             self.mv.state.new_linedrug_list.append(
@@ -96,6 +92,7 @@ class ReuseDrugListButton(wx.Button):
                     dose=old_linedrug.dose,
                     quantity=old_linedrug.quantity,
                     usage_note=old_linedrug.usage_note,
+                    outclinic=old_linedrug.outclinic,
                 )
             )
         self.mv.updatequantitybtn.update_quantity()
@@ -139,6 +136,7 @@ class UseSamplePrescriptionBtn(wx.Button):
                             self.mv.config,
                         ),
                         usage_note=None,
+                        outclinic=False,
                     )
                     self.parent.drug_list.append_ui(item)
                     self.mv.state.new_linedrug_list.append(item)

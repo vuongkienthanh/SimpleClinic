@@ -1,15 +1,17 @@
 import wx
 
-from ui.mainview_widgets.order_book.base_page import BasePage
+from ui.mainview_widgets import order_book
 
 from .buttons import *
 from .picker import *
 from .widgets import *
 
 
-class PrescriptionPage(BasePage):
-    def __init__(self, parent):
+class PrescriptionPage(wx.Panel):
+    def __init__(self, parent: "order_book.OrderBook"):
         super().__init__(parent)
+        self.parent = parent
+        self.mv = parent.mv
 
         self.drug_picker = DrugPicker(self)
         self.usage = wx.StaticText(
@@ -64,6 +66,9 @@ class PrescriptionPage(BasePage):
                 widget(self.use_sample_prescription_btn),
             ]
         )
+        if self.mv.config.outclinic_drug_checkbox:
+            btn_row.AddMany([(0, 0, 1), static("\u2705: thuốc mua ngoài")])
+
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.AddMany(
             [

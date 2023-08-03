@@ -1,15 +1,17 @@
 import wx
 
-from ui.mainview_widgets.order_book.base_page import BasePage
+from ui.mainview_widgets import order_book
 
 from .buttons import *
 from .picker import *
 from .widgets import *
 
 
-class ProcedurePage(BasePage):
-    def __init__(self, parent):
+class ProcedurePage(wx.Panel):
+    def __init__(self, parent: "order_book.OrderBook"):
         super().__init__(parent)
+        self.parent = parent
+        self.mv = parent.mv
 
         self.procedure_picker = ProcedurePicker(self)
         self.addbtn = AddProcedureButton(self)

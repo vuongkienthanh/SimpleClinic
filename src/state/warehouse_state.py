@@ -1,5 +1,6 @@
 import state
 from db import Warehouse
+from misc import sale_unit_from_db
 
 
 class WarehouseState:
@@ -19,7 +20,7 @@ class WarehouseState:
         pg.drug_picker.SetValue(wh.name)
         pg.usage.SetLabel(wh.usage)
         pg.usage_unit.SetLabel(wh.usage_unit)
-        pg.sale_unit.SetLabel(wh.sale_unit if wh.sale_unit else wh.usage_unit)
+        pg.sale_unit.SetLabel(sale_unit_from_db(wh.sale_unit, wh.usage_unit))
         pg.drug_picker.SelectAll()
 
     def onUnset(self, obj: "state.main_state.State") -> None:

@@ -3,7 +3,7 @@ from fractions import Fraction
 from functools import cache
 from math import ceil
 
-from misc import Config
+from misc.config import Config
 
 
 @cache
@@ -16,7 +16,8 @@ def bd_to_vn_age(bd: dt.date) -> str:
         case d if d <= (30 * 24):
             return f"{d // 30} tháng tuổi"
         case _:
-            return f"{today.year - bd.year - ((today.month, today.day) < (bd.month, bd.day))} tuổi"
+            s = today.year - bd.year - ((today.month, today.day) < (bd.month, bd.day))
+            return f"{s} tuổi"
 
 
 def check_blank_to_none(val: str) -> str | None:
@@ -36,12 +37,25 @@ def check_none_to_blank(val: str | None) -> str:
 
 
 @cache
-def note_str(
+def note_str_from_db(
     usage: str, times: int | str, dose: str, usage_unit: str, note: str | None
 ) -> str:
     match note:
         case None:
             return f"{usage} ngày {times} lần, lần {dose} {usage_unit}"
+        case n:
+            return n
+
+
+@cache
+def note_str_to_db(
+    usage: str, times: int | str, dose: str, usage_unit: str, note: str
+) -> str | None:
+    match note.strip():
+        case "":
+            return None
+        case n if n == f"{usage} ngày {times} lần, lần {dose} {usage_unit}":
+            return None
         case n:
             return n
 
@@ -54,7 +68,7 @@ def sale_unit_from_db(sale_unit: str | None, usage_unit: str) -> str:
             return v
 
 
-def sale_unit_to_db(sale_unit:str, usage_unit:str) -> str | None:
+def sale_unit_to_db(sale_unit: str, usage_unit: str) -> str | None:
     match sale_unit.strip():
         case "":
             return None
@@ -78,7 +92,7 @@ def times_dose_quantity_note_str(
         str(times),
         f"{dose} {usage_unit}",
         f"{quantity} {sale_unit_from_db(sale_unit, usage_unit)}",
-        note_str(usage, times, dose, usage_unit, note),
+        note_str_from_db(usage, times, dose, usage_unit, note),
     )
 
 

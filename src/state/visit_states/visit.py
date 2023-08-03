@@ -3,8 +3,8 @@ import wx
 import state
 from db import Visit
 from misc import check_none_to_blank, vn_weekdays
-from state.linedrug_state import OldLineDrugListState
-from state.lineprocedure_state import OldLineProcedureListState
+from state.linedrug_states import OldLineDrugListState
+from state.lineprocedure_states import OldLineProcedureListState
 from ui import menubar
 
 

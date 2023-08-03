@@ -4,14 +4,13 @@ import sqlite3
 import wx
 
 from db import Gender, Patient, Queue, Visit
-from state.patient_states.queue_state import QueueStateItem
+from state.patient_states import QueueState, QueueStateItem
 from ui import mainview
 from ui.dialogs.patient_dialog import EditPatientDialog
-from ui.generics.picker_dialog import DatePickerDialog
-from ui.generics.widgets import GenericListCtrl
+from ui.generics import DatePickerDialog, StatelessListCtrl
 
 
-class SearchPatientList(GenericListCtrl):
+class SearchPatientList(StatelessListCtrl):
     """Listctrl with next,prev button, fetch cursor when needed"""
 
     def __init__(self, parent: "FindPatientDialog", num_of_lines: int):
@@ -279,8 +278,7 @@ class FindPatientDialog(wx.Dialog):
         pid = self.lc.pid
         assert pid is not None
         try:
-            qid = self.mv.connection.insert(Queue, {"patient_id": pid})
-            assert qid is not None
+            self.mv.connection.insert(Queue, {"patient_id": pid})
             wx.MessageBox("Thêm vào danh sách chờ thành công", "OK", style=wx.ICON_NONE)
             idx: int = self.lc.GetFirstSelected()
             assert idx != -1
@@ -291,8 +289,7 @@ class FindPatientDialog(wx.Dialog):
                 dt.datetime.strptime(self.lc.GetItemText(idx, 3), "%d/%m/%Y").date(),
                 dt.datetime.now(),
             )
-            self.mv.state.queue.append(item)
-            self.mv.patient_book.queuelistctrl.append_ui(item)
+            QueueState.append_state(self.mv, item)
         except sqlite3.IntegrityError as error:
             wx.MessageBox(f"Đã có tên trong danh sách chờ.\n{error}", "Lỗi")
         finally:
@@ -310,7 +307,7 @@ class FindPatientDialog(wx.Dialog):
             wx.MessageBox(
                 "Xác nhận?",
                 "Xóa bệnh nhân",
-                style=wx.YES_NO | wx.NO_DEFAULT | wx.CENTRE,
+                style=wx.YES_NO | wx.NO_DEFAULT | wx.CANCEL,
             )
             == wx.YES
         ):

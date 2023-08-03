@@ -34,7 +34,7 @@ if __name__ == "__main__":
     connection = db.Connection(MY_DATABASE_PATH)
     try:
         connection.update_last_open_date()
-    except Exception as e:
+    except Exception:
         connection.make_db()
         connection.update_last_open_date()
     finally:

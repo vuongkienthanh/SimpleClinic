@@ -7,7 +7,6 @@ import wx.adv
 
 from db import Gender
 from misc import bd_to_vn_age, k_decimal, k_hash, k_number, k_slash, k_special, k_tab
-from ui import mainview
 
 
 class GenderChoice(wx.Choice):
@@ -20,6 +19,40 @@ class GenderChoice(wx.Choice):
 
     def SetGender(self, gender: Gender):
         self.SetSelection(gender.value)
+
+
+class DatabaseChoice(wx.Choice):
+    "A Choice that memorize db id"
+
+    def __init__(self, parent: wx.Window, *args, choices: list = [], **kwargs):
+        self.parent = parent
+        self._choice_to_db: dict[int, int] = {}
+        self._db_to_choice: dict[int, int] = {}
+        super().__init__(parent, *args, choices=choices, **kwargs)
+
+    def rebuild(self, _dict: dict[int, Any]):
+        self.Clear()
+
+        for choice_id, item_id in enumerate(_dict.keys()):
+            self._choice_to_db[choice_id] = item_id
+            self._db_to_choice[item_id] = choice_id
+
+        for item in _dict.values():
+            self.append_ui(item)
+
+    def append_ui(self, item):
+        ...
+
+    def GetDBID(self):
+        return self._choice_to_db[self.GetSelection()]
+
+    def SetDBID(self, db_id: int):
+        self.SetSelection(self._db_to_choice[db_id])
+
+    def Clear(self):
+        super().Clear()
+        self._choice_to_db = {}
+        self._db_to_choice = {}
 
 
 class WeightCtrl(wx.SpinCtrlDouble):
@@ -158,81 +191,3 @@ class DoseTextCtrl(NumberTextCtrl):
         if "/" not in s and "." not in s:
             ret = ret + k_slash + k_decimal
         return ret
-
-
-class DatabaseChoice(wx.Choice):
-    "A Choice that memorize db id"
-
-    def __init__(self, parent: wx.Window, *args, choices: list = [], **kwargs):
-        self.parent = parent
-        self._choice_to_db: dict[int, int] = {}
-        self._db_to_choice: dict[int, int] = {}
-        super().__init__(parent, *args, choices=choices, **kwargs)
-
-    def rebuild(self, _dict: dict[int, Any]):
-        self.Clear()
-
-        for choice_id, item_id in enumerate(_dict.keys()):
-            self._choice_to_db[choice_id] = item_id
-            self._db_to_choice[item_id] = choice_id
-
-        for item in _dict.values():
-            self.append_ui(item)
-
-    def append_ui(self, item):
-        ...
-
-    def GetDBID(self):
-        return self._choice_to_db[self.GetSelection()]
-
-    def SetDBID(self, db_id: int):
-        self.SetSelection(self._db_to_choice[db_id])
-
-    def Clear(self):
-        super().Clear()
-        self._choice_to_db = {}
-        self._db_to_choice = {}
-
-
-class GenericListCtrl(wx.ListCtrl):
-    def __init__(self, parent: wx.Window, *args, mv: "mainview.MainView", **kwargs):
-        super().__init__(parent, *args, style=wx.LC_REPORT | wx.LC_SINGLE_SEL, **kwargs)
-        self.parent = parent
-        self.mv = mv
-        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onSelect)
-        self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onDeselect)
-        self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onDoubleClick)
-
-    def AppendColumn(self, heading, width: int | float = -1):
-        return super().AppendColumn(heading, width=self.mv.config.header_width(width))
-
-    def fetch_list(self) -> list:
-        "if there is no state.fetch, use this instead"
-        ...
-
-    def build(self, _list):
-        for item in _list:
-            self.append_ui(item)
-
-    def rebuild(self, _list=[]):
-        self.DeleteAllItems()
-        self.build(_list)
-
-    def append_ui(self, item):
-        ...
-
-    def update_ui(self, idx: int, item):
-        ...
-
-    def pop_ui(self, idx: int):
-        assert idx >= 0
-        self.DeleteItem(idx)
-
-    def onSelect(self, e: wx.ListEvent):
-        ...
-
-    def onDeselect(self, _):
-        ...
-
-    def onDoubleClick(self, _):
-        ...

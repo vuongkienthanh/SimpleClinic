@@ -2,9 +2,8 @@ import wx
 
 from db import Procedure
 from misc import num_to_str_price
-from state.all_dict_states.all_procedure_state import AllProcedureState
 from ui import mainview as mv
-from ui.generics.widgets import GenericListCtrl, NumberTextCtrl
+from ui.generics import AddBtn, DeleteBtn, EditBtn, NumberTextCtrl, StatelessListCtrl
 
 
 class ProcedureDialog(wx.Dialog):
@@ -17,16 +16,16 @@ class ProcedureDialog(wx.Dialog):
         self.mv = parent
 
         self.procedurelistctrl = ProcedureListCtrl(self)
-        self.addbtn = AddBtn(self)
-        self.updatebtn = UpdateBtn(self)
-        self.deletebtn = DeleteBtn(self)
+        self.addbtn = DialogAddBtn(self)
+        self.editbtn = DialogEditBtn(self)
+        self.deletebtn = DialogDeleteBtn(self)
         okbtn = wx.Button(self, id=wx.ID_OK)
 
         btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
         btn_sizer.AddMany(
             [
                 (self.addbtn, 0, wx.ALL, 5),
-                (self.updatebtn, 0, wx.ALL, 5),
+                (self.editbtn, 0, wx.ALL, 5),
                 (self.deletebtn, 0, wx.ALL, 5),
                 (0, 0, 1),
                 (okbtn, 0, wx.ALL, 5),
@@ -42,7 +41,7 @@ class ProcedureDialog(wx.Dialog):
         self.SetSizerAndFit(sizer)
         self.Bind(wx.EVT_CLOSE, self.onClose)
         self.Bind(wx.EVT_BUTTON, self.onClose, okbtn)
-        self.procedurelistctrl.start()
+        self.procedurelistctrl.preload()
 
     def onClose(self, e):
         self.mv.order_book.procedurepage.procedure_picker.rebuild(
@@ -56,7 +55,7 @@ class ProcedureDialog(wx.Dialog):
         e.Skip()
 
 
-class ProcedureListCtrl(GenericListCtrl):
+class ProcedureListCtrl(StatelessListCtrl):
     def __init__(self, parent: ProcedureDialog):
         super().__init__(parent, mv=parent.mv)
         self.parent = parent
@@ -64,8 +63,8 @@ class ProcedureListCtrl(GenericListCtrl):
         self.AppendColumn("Tên thủ thuật", 0.15)
         self.AppendColumn("Giá tiền", 0.05)
 
-    def start(self):
-        self.rebuild(self.mv.state.all_procedure.values())
+    def fetch(self):
+        return self.mv.state.all_procedure.values()
 
     def append_ui(self, item: Procedure):
         self.Append((item.id, item.name, num_to_str_price(item.price)))
@@ -75,46 +74,43 @@ class ProcedureListCtrl(GenericListCtrl):
         self.SetItem(idx, 2, num_to_str_price(item.price))
 
     def onSelect(self, _):
-        self.parent.updatebtn.Enable()
+        self.parent.editbtn.Enable()
         self.parent.deletebtn.Enable()
 
     def onDeselect(self, _):
-        self.parent.updatebtn.Disable()
+        self.parent.editbtn.Disable()
         self.parent.deletebtn.Disable()
 
     def onDoubleClick(self, _):
-        UpdateDialog(self.parent).ShowModal()
+        EditDialog(self.parent).ShowModal()
 
 
-class AddBtn(wx.Button):
+class DialogAddBtn(AddBtn):
     def __init__(self, parent: ProcedureDialog):
-        super().__init__(parent, label="Thêm mới")
-        self.parent = parent
-        self.Bind(wx.EVT_BUTTON, self.onClick)
+        super().__init__(parent)
+        self.parent: ProcedureDialog
 
-    def onClick(self, _):
+    def Add(self):
         AddDialog(self.parent).ShowModal()
 
 
-class UpdateBtn(wx.Button):
+class DialogEditBtn(EditBtn):
     def __init__(self, parent: ProcedureDialog):
-        super().__init__(parent, label="Cập nhật")
-        self.parent = parent
-        self.Bind(wx.EVT_BUTTON, self.onClick)
+        super().__init__(parent)
+        self.parent: ProcedureDialog
         self.Disable()
 
-    def onClick(self, _):
-        UpdateDialog(self.parent).ShowModal()
+    def Edit(self):
+        EditDialog(self.parent).ShowModal()
 
 
-class DeleteBtn(wx.Button):
+class DialogDeleteBtn(DeleteBtn):
     def __init__(self, parent: ProcedureDialog):
-        super().__init__(parent, label="Xóa")
-        self.parent = parent
-        self.Bind(wx.EVT_BUTTON, self.onClick)
+        super().__init__(parent)
+        self.parent: ProcedureDialog
         self.Disable()
 
-    def onClick(self, _):
+    def Delete(self):
         mv = self.parent.mv
         idx: int = self.parent.procedurelistctrl.GetFirstSelected()
         assert idx >= 0
@@ -122,8 +118,12 @@ class DeleteBtn(wx.Button):
             int(self.parent.procedurelistctrl.GetItemText(idx, 0))
         ]
         if (
-            wx.MessageBox("Xác nhận?", "Xoá thủ thuật", style=wx.OK | wx.CANCEL)
-            == wx.ID_OK
+            wx.MessageBox(
+                "Xác nhận?",
+                "Xoá thủ thuật",
+                style=wx.YES_NO | wx.NO_DEFAULT | wx.CANCEL,
+            )
+            == wx.YES
         ):
             try:
                 mv.connection.delete(pr)
@@ -133,7 +133,7 @@ class DeleteBtn(wx.Button):
                 wx.MessageBox(f"Không xoá được\n{error}", "Lỗi")
 
 
-class BaseDialog(wx.Dialog):
+class Dialog(wx.Dialog):
     def __init__(self, parent: ProcedureDialog, title: str):
         super().__init__(parent, title=title)
         self.parent = parent
@@ -169,15 +169,19 @@ class BaseDialog(wx.Dialog):
         self.SetSizerAndFit(sizer)
         self.okbtn.Bind(wx.EVT_BUTTON, self.onClick)
 
-    def onClick(self, _):
+    def onClick(self, e):
+        self.OK()
+        e.Skip()
+
+    def OK(self):
         ...
 
 
-class AddDialog(BaseDialog):
+class AddDialog(Dialog):
     def __init__(self, parent: ProcedureDialog):
         super().__init__(parent, title="Thêm thủ thuật mới")
 
-    def onClick(self, e):
+    def OK(self):
         new = {
             "name": self.name.Value.strip(),
             "price": int(self.price.Value.strip()),
@@ -189,12 +193,11 @@ class AddDialog(BaseDialog):
             new_pr = Procedure(new_pr_id, **new)
             self.parent.procedurelistctrl.append_ui(new_pr)
             self.mv.state.all_procedure[new_pr_id] = new_pr
-            e.Skip()
         except Exception as error:
             wx.MessageBox(f"Không thêm mới được\n{error}", "Lỗi")
 
 
-class UpdateDialog(BaseDialog):
+class EditDialog(Dialog):
     def __init__(self, parent: ProcedureDialog):
         super().__init__(parent, title="Cập nhật thủ thuật")
         self.idx = self.parent.procedurelistctrl.GetFirstSelected()
@@ -205,7 +208,7 @@ class UpdateDialog(BaseDialog):
         self.name.ChangeValue(self.pr.name)
         self.price.ChangeValue(str(self.pr.price))
 
-    def onClick(self, e):
+    def OK(self):
         old = {
             "id": self.pr.id,
             "name": self.name.Value.strip(),
@@ -216,6 +219,5 @@ class UpdateDialog(BaseDialog):
             for field in self.pr.fields():
                 setattr(self.pr, field, old[field])
             self.parent.procedurelistctrl.update_ui(self.idx, self.pr)
-            e.Skip()
         except Exception as error:
             wx.MessageBox(f"Không cập nhật được\n{error}", "Lỗi")

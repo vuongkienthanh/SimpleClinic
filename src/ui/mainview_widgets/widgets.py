@@ -84,7 +84,8 @@ class RecheckCtrl(wx.SpinCtrl):
 
 
 class PriceCtrl(wx.TextCtrl):
-    """A TextCtrl with proper Vietnamese currency format with default set according to config"""
+    """A TextCtrl with proper Vietnamese currency format
+    with default set according to config"""
 
     def __init__(self, parent: "mv.MainView", **kwargs):
         super().__init__(parent, **kwargs)
@@ -97,6 +98,7 @@ class PriceCtrl(wx.TextCtrl):
         price += sum(
             state.all_warehouse[item.warehouse_id].sale_price * item.quantity
             for item in chain(state.old_linedrug_list, state.new_linedrug_list)
+            if not item.outclinic
         )
         price += sum(
             state.all_procedure[item.procedure_id].price

@@ -1,13 +1,10 @@
+import sqlite3
+
 import wx
 
-from db import *
+from db import LineSamplePrescription, SamplePrescription, Warehouse
 from ui import mainview
-from ui.generics.widgets import (
-    DatabaseChoice,
-    DoseTextCtrl,
-    GenericListCtrl,
-    NumberTextCtrl,
-)
+from ui.generics import DatabaseChoice, DoseTextCtrl, NumberTextCtrl, StatelessListCtrl
 
 
 class SampleDialog(wx.Dialog):
@@ -76,17 +73,17 @@ class SampleDialog(wx.Dialog):
             ]
         )
         self.SetSizerAndFit(sizer)
-        self.samplelistctrl.build(self.samplelistctrl.fetch_list())
+        self.samplelistctrl.preload()
 
 
-class SampleListCtrl(GenericListCtrl):
+class SampleListCtrl(StatelessListCtrl):
     def __init__(self, parent: SampleDialog, name: str):
         super().__init__(parent, mv=parent.mv, name=name)
         self.parent = parent
         self.AppendColumn("Mã", 0.05)
         self.AppendColumn("Tên", 0.2)
 
-    def fetch_list(self):
+    def fetch(self):
         return self.mv.state.all_sampleprescription.values()
 
     def append_ui(self, sp: SamplePrescription):
@@ -108,7 +105,7 @@ class SampleListCtrl(GenericListCtrl):
         idx: int = e.GetIndex()
         sp_id = int(self.GetItemText(idx, 0))
         self.parent.sampleitemlistctrl.build(
-            self.parent.sampleitemlistctrl.fetch_list(sp_id)
+            self.parent.sampleitemlistctrl.fetch(sp_id)
         )
 
     def onDeselect(self, _):
@@ -179,8 +176,10 @@ class DeleteSampleButton(wx.Button):
         assert idx >= 0
         sp_id = int(self.parent.samplelistctrl.GetItemText(idx))
         if (
-            wx.MessageBox("Xác nhận?", "Xoá toa mẫu", style=wx.OK | wx.CANCEL)
-            == wx.ID_OK
+            wx.MessageBox(
+                "Xác nhận?", "Xoá toa mẫu", style=wx.YES_NO | wx.NO_DEFAULT | wx.CANCEL
+            )
+            == wx.YES
         ):
             try:
                 rowcount = self.parent.mv.connection.delete(SamplePrescription, sp_id)
@@ -294,7 +293,7 @@ class DeleteDrugButton(wx.Button):
             wx.MessageBox(f"Không xoá thuốc được\n{error}", "Lỗi")
 
 
-class SampleItemListCtrl(GenericListCtrl):
+class SampleItemListCtrl(StatelessListCtrl):
     def __init__(self, parent: SampleDialog, name: str):
         super().__init__(parent, mv=parent.mv, name=name)
         self.parent = parent
@@ -304,7 +303,7 @@ class SampleItemListCtrl(GenericListCtrl):
         self.AppendColumn("Số cữ", 0.05)
         self.AppendColumn("Liều 1 cữ", 0.05)
 
-    def fetch_list(self, sp_id: int):
+    def fetch(self, sp_id: int) -> list[sqlite3.Row]:
         return self.mv.connection.execute(
             f"""
             SELECT lsp.id, wh.name, wh.element, lsp.times, lsp.dose

@@ -1,10 +1,12 @@
 from db import *
 from ui import mainview
 
-from .all_dict_states.all_procedure_state import AllProcedureState
-from .all_dict_states.all_sampleprescription_state import AllSamplePrescriptionState
-from .all_dict_states.all_warehouse_state import AllWarehouseState
-from .linedrug_state import (
+from .all_dict_states import (
+    AllProcedureState,
+    AllSamplePrescriptionState,
+    AllWarehouseState,
+)
+from .linedrug_states import (
     LineDrugListStateItem,
     LineDrugState,
     NewLineDrugListState,
@@ -12,7 +14,7 @@ from .linedrug_state import (
     OldLineDrugListState,
     OldLineDrugListStateItem,
 )
-from .lineprocedure_state import (
+from .lineprocedure_states import (
     LineProcedureListStateItem,
     LineProcedureState,
     NewLineProcedureListState,
@@ -20,12 +22,16 @@ from .lineprocedure_state import (
     OldLineProcedureListState,
     OldLineProcedureListStateItem,
 )
-from .patient_states.appointment_state import AppointmentState, AppointmentStateItem
-from .patient_states.patient_state import PatientState
-from .patient_states.queue_state import QueueState, QueueStateItem
-from .patient_states.seentoday_state import SeenTodayState, SeenTodayStateItem
-from .visit_states.visit_list_state import VisitListState, VisitListStateItem
-from .visit_states.visit_state import VisitState
+from .patient_states import (
+    AppointmentState,
+    AppointmentStateItem,
+    PatientState,
+    QueueState,
+    QueueStateItem,
+    SeenTodayState,
+    SeenTodayStateItem,
+)
+from .visit_states import VisitListState, VisitListStateItem, VisitState
 from .warehouse_state import WarehouseState
 
 
@@ -81,6 +87,10 @@ class State:
         self._all_sampleprescription: dict[int, SamplePrescription] = {}
         self._all_procedure: dict[int, Procedure] = {}
 
+    def refresh_all(self) -> None:
+        self.refresh()
+        self.refresh_rest()
+
     def refresh(self) -> None:
         self.patient = None
         self.visit = None
@@ -102,8 +112,14 @@ class State:
         self.appointment = AppointmentState.fetch(self.mv.connection)
 
         self._all_warehouse = AllWarehouseState.fetch(self.mv.connection)
+
+        self.mv.order_book.SetSelection(0)
+        VisitListState.clear_cache()
+        OldLineDrugListState.clear_cache()
+        OldLineProcedureListState.clear_cache()
+
+    def refresh_rest(self) -> None:
         self._all_sampleprescription = AllSamplePrescriptionState.fetch(
             self.mv.connection
         )
         self.all_procedure = AllProcedureState.fetch(self.mv.connection)
-        self.mv.order_book.SetSelection(0)

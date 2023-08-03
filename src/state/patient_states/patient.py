@@ -3,7 +3,7 @@ import wx
 import state
 from db import Patient
 from misc import bd_to_vn_age, check_none_to_blank
-from state.visit_states.visit_list_state import VisitListState
+from state.visit_states import VisitListState
 from ui import menubar
 
 

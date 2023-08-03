@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 import state
 from db import Connection, Gender, Patient, Queue
+from ui import mainview
 
 
 @dataclass(slots=True, match_args=False)
@@ -38,3 +39,8 @@ class QueueState:
         """
         rows = connection.execute(query).fetchall()
         return [QueueStateItem(*row) for row in rows]
+
+    @staticmethod
+    def append_state(mv: "mainview.MainView", item: QueueStateItem):
+        mv.state._queue.append(item)
+        mv.patient_book.queuelistctrl.append_ui(item)

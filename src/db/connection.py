@@ -1,7 +1,7 @@
 import datetime as dt
 import sqlite3
 from decimal import Decimal
-from typing import overload
+from typing import Self, overload
 
 from db.classes import BASE, Gender
 from db.sql import *
@@ -86,7 +86,9 @@ class Connection:
 
     def select(self, t: type[T], id: int) -> T | None:
         row = self.execute(
-            f"SELECT * FROM {t.__tablename__} WHERE id={id}",
+            f"""
+            SELECT id, {",".join(t.select_fields())}
+            FROM {t.__tablename__} WHERE id={id}""",
         ).fetchone()
         if row is None:
             return None
@@ -94,7 +96,11 @@ class Connection:
             return t.parse(row)
 
     def selectall(self, t: type[T]) -> dict[int, T]:
-        rows = self.execute(f"SELECT * FROM {t.__tablename__}").fetchall()
+        rows = self.execute(
+            f"""
+            SELECT id, {",".join(t.select_fields())}
+            FROM {t.__tablename__}"""
+        ).fetchall()
         return {row["id"]: t.parse(row) for row in rows}
 
     @overload

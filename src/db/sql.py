@@ -12,7 +12,8 @@ CREATE TABLE {Patient.__tablename__} (
     birthdate DATE NOT NULL,
     address TEXT,
     phone TEXT,
-    past_history TEXT
+    past_history TEXT,
+    miscs TEXT
 );
 CREATE TABLE {Visit.__tablename__} (
     id INTEGER PRIMARY KEY,
@@ -25,7 +26,8 @@ CREATE TABLE {Visit.__tablename__} (
     patient_id INTEGER NOT NULL,
     vnote TEXT,
     follow TEXT,
-    CONSTRAINT visit_ref_patient FOREIGN KEY (patient_id) REFERENCES {Patient.__tablename__} (id)
+    miscs TEXT,
+    CONSTRAINT ref_patient FOREIGN KEY (patient_id) REFERENCES {Patient.__tablename__} (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
     CONSTRAINT recheck_BE_0 CHECK (recheck >=0),
@@ -36,7 +38,8 @@ CREATE TABLE {Queue.__tablename__} (
     id INTEGER PRIMARY KEY,
     patient_id INTEGER UNIQUE NOT NULL,
     added_datetime TIMESTAMP DEFAULT (datetime('now', 'localtime')),
-    CONSTRAINT queue_ref_patient FOREIGN KEY (patient_id) REFERENCES {Patient.__tablename__} (id)
+    miscs TEXT,
+    CONSTRAINT ref_patient FOREIGN KEY (patient_id) REFERENCES {Patient.__tablename__} (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
@@ -44,11 +47,12 @@ CREATE TABLE {SeenToday.__tablename__} (
     id INTEGER PRIMARY KEY,
     patient_id INTEGER NOT NULL,
     visit_id INTEGER NOT NULL,
+    miscs TEXT,
     CONSTRAINT patient_visit_unique_for_seentoday UNIQUE (patient_id, visit_id),
-    CONSTRAINT seentoday_ref_patient FOREIGN KEY (patient_id) REFERENCES {Patient.__tablename__} (id)
+    CONSTRAINT ref_patient FOREIGN KEY (patient_id) REFERENCES {Patient.__tablename__} (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    CONSTRAINT seentoday_ref_visit FOREIGN KEY (visit_id) REFERENCES {Visit.__tablename__} (id)
+    CONSTRAINT ref_visit FOREIGN KEY (visit_id) REFERENCES {Visit.__tablename__} (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
@@ -56,7 +60,8 @@ CREATE TABLE {Appointment.__tablename__} (
     id INTEGER PRIMARY KEY,
     patient_id INTEGER UNIQUE NOT NULL,
     appointed_date DATE NOT NULL,
-    CONSTRAINT appointment_ref_patient FOREIGN KEY (patient_id) REFERENCES {Patient.__tablename__} (id)
+    miscs TEXT,
+    CONSTRAINT ref_patient FOREIGN KEY (patient_id) REFERENCES {Patient.__tablename__} (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
@@ -73,6 +78,7 @@ CREATE TABLE {Warehouse.__tablename__} (
     expire_date DATE,
     made_by TEXT,
     drug_note TEXT,
+    miscs TEXT,
     CONSTRAINT quantity_BE_0 CHECK (quantity >= 0),
     CONSTRAINT price_check CHECK (
         sale_price >= purchase_price AND 
@@ -87,10 +93,11 @@ CREATE TABLE {LineDrug.__tablename__} (
     quantity INTEGER NOT NULL,
     visit_id INTEGER NOT NULL,
     usage_note TEXT,
-    CONSTRAINT linedrug_ref_visit FOREIGN KEY (visit_id) REFERENCES {Visit.__tablename__} (id)
+    miscs TEXT,
+    CONSTRAINT ref_visit FOREIGN KEY (visit_id) REFERENCES {Visit.__tablename__} (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    CONSTRAINT linedrug_ref_warehouse FOREIGN KEY (warehouse_id) REFERENCES {Warehouse.__tablename__} (id)
+    CONSTRAINT ref_warehouse FOREIGN KEY (warehouse_id) REFERENCES {Warehouse.__tablename__} (id)
         ON DELETE RESTRICT
         ON UPDATE NO ACTION,
     CONSTRAINT qt_ti_do_check CHECK (
@@ -101,7 +108,8 @@ CREATE TABLE {LineDrug.__tablename__} (
 );
 CREATE TABLE {SamplePrescription.__tablename__} (
     id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL
+    name TEXT NOT NULL,
+    miscs TEXT
 );
 CREATE TABLE {LineSamplePrescription.__tablename__} (
     id INTEGER PRIMARY KEY,
@@ -109,10 +117,11 @@ CREATE TABLE {LineSamplePrescription.__tablename__} (
     sample_id INTEGER NOT NULL,
     times INTEGER NOT NULL,
     dose TEXT NOT NULL,
-    CONSTRAINT linesampleprescription_ref_warehouse FOREIGN KEY (warehouse_id) REFERENCES {Warehouse.__tablename__} (id)
+    miscs TEXT,
+    CONSTRAINT ref_warehouse FOREIGN KEY (warehouse_id) REFERENCES {Warehouse.__tablename__} (id)
         ON DELETE RESTRICT
         ON UPDATE NO ACTION,
-    CONSTRAINT linesampleprescription_ref_sample FOREIGN KEY (sample_id) REFERENCES {SamplePrescription.__tablename__} (id)
+    CONSTRAINT ref_sample FOREIGN KEY (sample_id) REFERENCES {SamplePrescription.__tablename__} (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
     CONSTRAINT ti_do_check CHECK (times > 0 AND dose != ''),
@@ -122,16 +131,18 @@ CREATE TABLE {Procedure.__tablename__} (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     price INTEGER NOT NULL,
+    miscs TEXT,
     CONSTRAINT price_BE_0 CHECK (price >= 0)
 );
 CREATE TABLE {LineProcedure.__tablename__} (
     id INTEGER PRIMARY KEY,
     procedure_id INTEGER NOT NULL,
     visit_id INTEGER NOT NULL,
-    CONSTRAINT lineprocedure_ref_visit FOREIGN KEY (visit_id) REFERENCES {Visit.__tablename__} (id)
+    miscs TEXT,
+    CONSTRAINT ref_visit FOREIGN KEY (visit_id) REFERENCES {Visit.__tablename__} (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    CONSTRAINT lineprocedure_ref_procedure FOREIGN KEY (procedure_id) REFERENCES {Procedure.__tablename__} (id)
+    CONSTRAINT ref_procedure FOREIGN KEY (procedure_id) REFERENCES {Procedure.__tablename__} (id)
         ON DELETE RESTRICT
         ON UPDATE NO ACTION
 );
@@ -267,6 +278,6 @@ DELETE FROM {Appointment.__tablename__} WHERE patient_id = OLD.patient_id;
 END;
 """
 
-finalized_sql = f"""
+finalized_sql = """
 INSERT OR IGNORE INTO singleton (id, last_open_date) VALUES ( 1, DATE('now', 'localtime'));
 """

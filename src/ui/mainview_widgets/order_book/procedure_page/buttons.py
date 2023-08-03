@@ -1,11 +1,14 @@
 import wx
 
-from state.lineprocedure_state import NewLineProcedureListStateItem
-from ui.mainview_widgets.order_book.base_page import BaseAddButton, BaseDeleteButton
+from state.lineprocedure_states import (
+    NewLineProcedureListState,
+    NewLineProcedureListStateItem,
+)
+from ui.generics import AddBitmapBtn, DeleteBitMapBtn
 from ui.mainview_widgets.order_book.procedure_page import page
 
 
-class AddProcedureButton(BaseAddButton):
+class AddProcedureButton(AddBitmapBtn):
     def __init__(self, parent):
         super().__init__(parent)
         self.parent: page.ProcedurePage
@@ -14,14 +17,13 @@ class AddProcedureButton(BaseAddButton):
         choice_idx: int = self.parent.procedure_picker.GetSelection()
         if choice_idx != wx.NOT_FOUND:
             pr_id = self.parent.procedure_picker.GetDBID()
-            item = NewLineProcedureListStateItem(pr_id)
-            self.parent.mv.state.new_lineprocedure_list.append(item)
-            self.parent.procedure_list.append_ui(item)
+            new_pr = NewLineProcedureListStateItem(pr_id)
+            NewLineProcedureListState.append_state(self.parent.mv, new_pr)
             self.parent.mv.price.FetchPrice()
             self.parent.procedure_picker.SetSelection(wx.NOT_FOUND)
 
 
-class DelProcedureButton(BaseDeleteButton):
+class DelProcedureButton(DeleteBitMapBtn):
     def __init__(self, parent):
         super().__init__(parent)
         self.parent: page.ProcedurePage

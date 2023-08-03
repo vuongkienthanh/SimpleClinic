@@ -29,11 +29,13 @@ class BASE:
     """
     Base Class for derived sql table
     - `__table_name__`: name of table in sqlite database
-    - `__match_args__`: names of fields for sql query
+    - `__fields__`: names of fields for sql query insert/update
+    - `__extra_fields__`: names of extra fields for sql query select
     """
 
     __tablename__: ClassVar[str]
-    __match_args__: ClassVar[list[str]]
+    __fields__: ClassVar[list[str]]
+    __extra_fields__: ClassVar[list[str]]
     id: int
 
     @classmethod
@@ -42,7 +44,11 @@ class BASE:
 
     @classmethod
     def fields(cls) -> list[str]:
-        return cls.__match_args__
+        return cls.__fields__
+
+    @classmethod
+    def select_fields(cls) -> list[str]:
+        return cls.__fields__ + cls.__extra_fields__
 
     @classmethod
     def commna_joined_field_names(cls) -> str:
@@ -66,10 +72,10 @@ class BASE:
 
 @dataclass(slots=True)
 class Patient(BASE):
-    """Bệnh nhân"""
+    "Bệnh nhân"
 
     __tablename__ = "patients"
-    __match_args__ = [
+    __fields__ = [
         "name",
         "gender",
         "birthdate",
@@ -77,6 +83,7 @@ class Patient(BASE):
         "phone",
         "past_history",
     ]
+    __extra_fields__ = []
     id: int
     name: str
     gender: Gender
@@ -88,10 +95,11 @@ class Patient(BASE):
 
 @dataclass(slots=True)
 class Queue(BASE):
-    """Lượt chờ khám"""
+    "Lượt chờ khám"
 
     __tablename__ = "queue"
-    __match_args__ = ["patient_id"]
+    __fields__ = ["patient_id"]
+    __extra_fields__ = ["added_datetime"]
     id: int
     patient_id: int
     added_datetime: dt.datetime
@@ -99,10 +107,11 @@ class Queue(BASE):
 
 @dataclass(slots=True)
 class SeenToday(BASE):
-    """Danh sách đã khám hôm nay"""
+    "Danh sách đã khám hôm nay"
 
     __tablename__ = "seen_today"
-    __match_args__ = ["patient_id", "visit_id"]
+    __fields__ = ["patient_id", "visit_id"]
+    __extra_fields__ = []
     id: int
     patient_id: int
     visit_id: int
@@ -110,10 +119,11 @@ class SeenToday(BASE):
 
 @dataclass(slots=True)
 class Appointment(BASE):
-    """Danh sách hẹn tái khám"""
+    "Danh sách hẹn tái khám"
 
     __tablename__ = "appointment"
-    __match_args__ = ["patient_id", "appointed_date"]
+    __fields__ = ["patient_id", "appointed_date"]
+    __extra_fields__ = []
     id: int
     patient_id: int
     appointed_date: dt.date
@@ -134,7 +144,7 @@ class Visit(BASE):
     """
 
     __tablename__ = "visits"
-    __match_args__ = [
+    __fields__ = [
         "diagnosis",
         "weight",
         "days",
@@ -144,6 +154,7 @@ class Visit(BASE):
         "follow",
         "vnote",
     ]
+    __extra_fields__ = ["exam_datetime"]
     id: int
     exam_datetime: dt.datetime
     diagnosis: str
@@ -160,25 +171,25 @@ class Visit(BASE):
 class LineDrug(BASE):
     """Thuốc trong toa
     - `warehouse_id`: Mã thuốc
-    - `dose`: Liều một cữ
     - `times`: Số cữ
+    - `dose`: Liều một cữ
     - `quantity`: Số lượng
     """
 
     __tablename__ = "linedrugs"
-    __match_args__ = [
+    __fields__ = [
         "warehouse_id",
-        "dose",
         "times",
+        "dose",
         "quantity",
         "visit_id",
         "usage_note",
     ]
-
+    __extra_fields__ = []
     id: int
     warehouse_id: int
-    dose: str
     times: int
+    dose: str
     quantity: int
     visit_id: int
     usage_note: str | None = None
@@ -201,7 +212,7 @@ class Warehouse(BASE):
     """
 
     __tablename__ = "warehouse"
-    __match_args__ = [
+    __fields__ = [
         "name",
         "element",
         "quantity",
@@ -214,6 +225,7 @@ class Warehouse(BASE):
         "made_by",
         "drug_note",
     ]
+    __extra_fields__ = []
     id: int
     name: str
     element: str
@@ -230,10 +242,11 @@ class Warehouse(BASE):
 
 @dataclass(slots=True)
 class SamplePrescription(BASE):
-    """Toa mẫu"""
+    "Toa mẫu"
 
     __tablename__ = "sampleprescription"
-    __match_args__ = ["name"]
+    __fields__ = ["name"]
+    __extra_fields__ = []
     id: int
     name: str
 
@@ -245,13 +258,14 @@ class LineSamplePrescription(BASE):
     - `dose`: Số cữ
     """
 
-    __tablename__ = "linesampleprescription"
-    __match_args__ = [
+    __tablename__ = "linesampleprescriptions"
+    __fields__ = [
         "warehouse_id",
         "sample_id",
         "times",
         "dose",
     ]
+    __extra_fields__ = []
     id: int
     warehouse_id: int
     sample_id: int
@@ -261,10 +275,11 @@ class LineSamplePrescription(BASE):
 
 @dataclass(slots=True)
 class Procedure(BASE):
-    """Danh sách thủ thuật"""
+    "Danh sách thủ thuật"
 
     __tablename__ = "procedures"
-    __match_args__ = ["name", "price"]
+    __fields__ = ["name", "price"]
+    __extra_fields__ = []
     id: int
     name: str
     price: int
@@ -272,10 +287,11 @@ class Procedure(BASE):
 
 @dataclass(slots=True)
 class LineProcedure(BASE):
-    """Thủ thuật của lượt khám"""
+    "Thủ thuật của lượt khám"
 
     __tablename__ = "lineprocedures"
-    __match_args__ = ["procedure_id", "visit_id"]
+    __fields__ = ["procedure_id", "visit_id"]
+    __extra_fields__ = []
     id: int
     procedure_id: int
     visit_id: int

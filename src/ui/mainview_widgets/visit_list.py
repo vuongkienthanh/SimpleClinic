@@ -3,10 +3,10 @@ import wx
 from db import Visit
 from state import VisitListStateItem
 from ui import mainview as mv
-from ui.generics.widgets import GenericListCtrl
+from ui.generics import StateListCtrl
 
 
-class VisitListCtrl(GenericListCtrl):
+class VisitListCtrl(StateListCtrl):
     "Set `state.visit` when select item"
 
     def __init__(self, parent: "mv.MainView"):

@@ -7,7 +7,7 @@ from db import Patient, Queue
 from misc import check_blank_to_none, check_none_to_blank
 from state import QueueState, QueueStateItem, SeenTodayState
 from ui import mainview
-from ui.generics.widgets import (
+from ui.generics import (
     CalendarDatePicker,
     DateTextCtrl,
     GenderChoice,

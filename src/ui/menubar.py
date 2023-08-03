@@ -7,7 +7,7 @@ from pathlib import Path
 
 import wx
 
-from db import *
+from db import LineDrug, Queue, Visit
 from misc import APP_DIR, CONFIG_PATH, DEFAULT_CONFIG_PATH, MY_DATABASE_PATH
 from ui import mainview
 
@@ -122,11 +122,13 @@ class MyMenuBar(wx.MenuBar):
 
     def onRefresh(self, _):
         mv: "mainview.MainView" = self.GetFrame()
-        mv.state.refresh()
+        mv.state.refresh_all()
 
     def onAbout(self, _):
         wx.MessageBox(
-            "Phần mềm phòng khám Simple Clinic\nTác giả: Vương Kiến Thanh\nEmail: thanhstardust@outlook.com",
+            "Phần mềm phòng khám Simple Clinic"
+            "Tác giả: Vương Kiến Thanh"
+            "Email: thanhstardust@outlook.com",
             style=wx.OK | wx.CENTRE | wx.ICON_NONE,
         )
 
@@ -312,7 +314,7 @@ class MyMenuBar(wx.MenuBar):
 
     def onDayReport(self, _):
         from ui.dialogs import DayFinanceReportDialog
-        from ui.generics.picker_dialog import DatePickerDialog
+        from ui.generics import DatePickerDialog
 
         mv: "mainview.MainView" = self.GetFrame()
         datepickerdialog = DatePickerDialog(mv)
@@ -321,7 +323,7 @@ class MyMenuBar(wx.MenuBar):
 
     def onMonthReport(self, _):
         from ui.dialogs import MonthFinanceReportDialog
-        from ui.generics.picker_dialog import MonthPickerDialog
+        from ui.generics import MonthPickerDialog
 
         mv: "mainview.MainView" = self.GetFrame()
         monthpickerdialog = MonthPickerDialog(mv)
@@ -332,7 +334,7 @@ class MyMenuBar(wx.MenuBar):
 
     def onMonthWarehouseReport(self, _):
         from ui.dialogs import MonthWarehouseReportDialog
-        from ui.generics.picker_dialog import MonthPickerDialog
+        from ui.generics import MonthPickerDialog
 
         mv: "mainview.MainView" = self.GetFrame()
         monthpickerdialog = MonthPickerDialog(mv)
@@ -360,7 +362,8 @@ class MyMenuBar(wx.MenuBar):
         connection.execute("VACUUM")
         post = os.path.getsize(connection.path) >> 10
         wx.MessageBox(
-            f"Kích thước trước khi thu gọn: {pre} KB\nKích thước sau khi thu gọn: {post} KB",
+            f"Kích thước trước khi thu gọn: {pre} KB"
+            f"Kích thước sau khi thu gọn: {post} KB",
             "Thu gọn dữ liệu",
             style=wx.OK_DEFAULT | wx.ICON_NONE,
         )

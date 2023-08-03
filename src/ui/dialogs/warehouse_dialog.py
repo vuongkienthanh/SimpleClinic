@@ -3,7 +3,7 @@ import wx
 from db import Warehouse
 from misc import check_blank_to_none, check_none_to_blank, sale_unit_to_db
 from ui import mainview
-from ui.generics.widgets import CalendarDatePicker, GenericListCtrl, NumberTextCtrl
+from ui.generics import CalendarDatePicker, NumberTextCtrl, StatelessListCtrl
 
 
 class WarehouseDialog(wx.Dialog):
@@ -51,7 +51,7 @@ class WarehouseDialog(wx.Dialog):
         self.Bind(wx.EVT_CLOSE, self.onClose)
         self.Bind(wx.EVT_BUTTON, self.onClose, okbtn)
         self.Maximize()
-        self.warehouselistctrl.start()
+        self.warehouselistctrl.preload()
 
     def onClose(self, e):
         self.mv.state.new_linedrug_list = []
@@ -62,11 +62,10 @@ class WarehouseDialog(wx.Dialog):
         e.Skip()
 
 
-class WarehouseListCtrl(GenericListCtrl):
+class WarehouseListCtrl(StatelessListCtrl):
     def __init__(self, parent: WarehouseDialog):
         super().__init__(parent, mv=parent.mv)
         self.parent = parent
-        self._list: list[Warehouse] = []
         self.AppendColumn("Mã", 0.03)
         self.AppendColumn("Tên", 0.1)
         self.AppendColumn("Thành phần", 0.1)
@@ -80,8 +79,8 @@ class WarehouseListCtrl(GenericListCtrl):
         self.AppendColumn("Xuất xứ", 0.06)
         self.AppendColumn("Ghi chú", 0.06)
 
-    def start(self):
-        self.rebuild(self.mv.state.all_warehouse.values())
+    def fetch(self):
+        return self.mv.state.all_warehouse.values()
 
     def append_ui(self, item: Warehouse):
         self.Append(
@@ -154,7 +153,7 @@ class DrugSearchCtrl(wx.SearchCtrl):
     def onSearchEnter(self, e):
         match self.Value.strip().casefold():
             case "":
-                self.parent.warehouselistctrl.start()
+                self.parent.warehouselistctrl.reload()
             case s:
                 self.parent.warehouselistctrl.rebuild(
                     filter(
@@ -167,7 +166,7 @@ class DrugSearchCtrl(wx.SearchCtrl):
 
     def onText(self, e: wx.CommandEvent):
         if len(e.EventObject.Value) == 0:
-            self.parent.warehouselistctrl.start()
+            self.parent.warehouselistctrl.reload()
         e.Skip()
 
 
@@ -207,8 +206,12 @@ class DeleteBtn(wx.Button):
             int(self.parent.warehouselistctrl.GetItemText(idx, 0))
         ]
         if (
-            wx.MessageBox(f"Xoá thuốc {wh.name}", "Xoá thuốc", style=wx.OK | wx.CANCEL)
-            == wx.OK
+            wx.MessageBox(
+                f"Xoá thuốc {wh.name}",
+                "Xoá thuốc",
+                style=wx.YES_NO | wx.NO_DEFAULT | wx.CANCEL,
+            )
+            == wx.YES
         ):
             try:
                 self.mv.connection.delete(wh)

@@ -117,13 +117,13 @@ class FollowChoicePage(wx.Panel):
         ):
             try:
                 self.grid.SetCellValue(idx, 0, item)
-            except:
+            except Exception:
                 self.grid.AppendRows()
                 self.grid.SetCellValue(idx, 0, item)
         for idx, item in enumerate(mv.config.follow_choices_dict.values()):
             try:
                 self.grid.SetCellValue(idx, 1, item)
-            except:
+            except Exception:
                 self.grid.AppendRows()
                 self.grid.SetCellValue(idx, 1, item)
         addbtn.Bind(wx.EVT_BUTTON, lambda _: self.grid.AppendRows())
@@ -166,7 +166,11 @@ class SystemPage(BasePage):
         )
         self.maximize_at_start = wx.CheckBox(self, name="Phóng to khi khởi động")
         self.maximize_at_start.SetValue(self.mv.config.maximize_at_start)
-        entry_sizer = wx.FlexGridSizer(7, 2, 5, 5)
+        self.outclinic_drug_checkbox = wx.CheckBox(
+            self, name="Checkbox thuốc mua ngoài"
+        )
+        self.outclinic_drug_checkbox.SetValue(self.mv.config.outclinic_drug_checkbox)
+        entry_sizer = wx.FlexGridSizer(8, 2, 5, 5)
         entry_sizer.AddMany(
             [
                 *widget(self.autochange_prescription_quantity_on_day_spin, self),
@@ -176,6 +180,7 @@ class SystemPage(BasePage):
                 *widget(self.num_of_ld, self),
                 *widget(self.visit_count, self),
                 *widget(self.maximize_at_start, self),
+                *widget(self.outclinic_drug_checkbox, self),
             ]
         )
         self.SetSizer(entry_sizer)
@@ -438,6 +443,9 @@ class SetupDialog(wx.Dialog):
             self.mv.config.max_number_of_drugs_in_one_page = systempage.num_of_ld.Value
             self.mv.config.display_recent_visit_count = systempage.visit_count.Value
             self.mv.config.maximize_at_start = systempage.maximize_at_start.Value
+            self.mv.config.outclinic_drug_checkbox = (
+                systempage.outclinic_drug_checkbox.Value
+            )
 
             def set_color(name: str, widget: wx.ColourPickerCtrl):
                 self.mv.config.background_color[name] = widget.Colour.GetIM()[:3]
@@ -475,6 +483,9 @@ class SetupDialog(wx.Dialog):
             wx.MessageBox("Đã lưu cài đặt", "Cài đặt")
             self.mv.refresh_color()
             self.mv.Refresh()  # refresh_color require
+            self.mv.order_book.prescriptionpage.drug_list.EnableCheckBoxes(
+                self.mv.config.outclinic_drug_checkbox
+            )
             self.mv.price.FetchPrice()
             e.Skip()
         except Exception as error:

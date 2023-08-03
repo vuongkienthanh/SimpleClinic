@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 import state
 from db import Connection, Gender, Patient, SeenToday, Visit
+from ui import mainview
 
 
 @dataclass(slots=True, match_args=False)

@@ -13,7 +13,7 @@ from misc.paths import CONFIG_PATH, DEFAULT_CONFIG_PATH
 Color = namedtuple("Color", ["r", "g", "b"])
 
 
-@dataclass(slots=True, eq=False, repr=False, kw_only=True)
+@dataclass(eq=False, repr=False, kw_only=True)
 class Config:
     clinic_name: str
     doctor_name: str
@@ -33,6 +33,7 @@ class Config:
     preview_scale: int
     autochange_prescription_quantity_on_day_spin: bool
     maximize_at_start: bool
+    outclinic_drug_checkbox: bool
     listctrl_header_scale: int
     background_color: dict[str, Color]
 
@@ -78,6 +79,7 @@ class Config:
                 "autochange_prescription_quantity_on_day_spin"
             ],
             maximize_at_start=config_json["maximize_at_start"],
+            outclinic_drug_checkbox=config_json["outclinic_drug_checkbox"],
             listctrl_header_scale=config_json["listctrl_header_scale"],
             background_color={
                 name: Color(r, g, b)
@@ -95,6 +97,12 @@ class Config:
         bak = CONFIG_PATH + dt.datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + ".bak"
         shutil.copyfile(CONFIG_PATH, bak)
         shutil.copyfile(DEFAULT_CONFIG_PATH, CONFIG_PATH)
+
+    def __eq__(self, __value: Self) -> bool:
+        return vars(self).values() == vars(__value).values()
+
+    def __hash__(self) -> int:
+        return hash(vars(self).values())
 
     def header_width(self, p: float) -> int:
         w: int = DisplaySize()[0]

@@ -5,16 +5,16 @@ from misc import (
     k_number,
     k_special,
     k_tab,
-    note_str,
+    note_str_from_db,
     times_dose_quantity_note_str,
 )
-from state.linedrug_state import LineDrugListStateItem
+from state.linedrug_states import LineDrugListStateItem
 from ui import mainview as mv
-from ui.generics.widgets import DoseTextCtrl, GenericListCtrl, NumberTextCtrl
+from ui.generics import DoseTextCtrl, NumberTextCtrl, StateListCtrl
 from ui.mainview_widgets.order_book.prescription_page import page
 
 
-class DrugListCtrl(GenericListCtrl):
+class DrugListCtrl(StateListCtrl):
     def __init__(self, parent: "page.PrescriptionPage"):
         super().__init__(parent, mv=parent.mv)
         self.AppendColumn("STT", 0.02)
@@ -23,6 +23,10 @@ class DrugListCtrl(GenericListCtrl):
         self.AppendColumn("Liều", 0.03)
         self.AppendColumn("Tổng cộng", 0.05)
         self.AppendColumn("Cách dùng", 0.15)
+        if self.mv.config.outclinic_drug_checkbox:
+            self.EnableCheckBoxes()
+        self.Bind(wx.EVT_LIST_ITEM_CHECKED, self.onCheck)
+        self.Bind(wx.EVT_LIST_ITEM_UNCHECKED, self.onUnCheck)
 
     def append_ui(self, item: LineDrugListStateItem):
         wh = self.mv.state.all_warehouse[item.warehouse_id]
@@ -46,6 +50,8 @@ class DrugListCtrl(GenericListCtrl):
                 note,
             ]
         )
+        if item.outclinic:
+            self.CheckItem(self.ItemCount - 1)
 
     def update_ui(self, idx: int, item: LineDrugListStateItem):
         wh = self.mv.state.all_warehouse[item.warehouse_id]
@@ -86,6 +92,34 @@ class DrugListCtrl(GenericListCtrl):
     def onDeselect(self, _):
         self.mv.state.warehouse = None
         self.mv.state.linedrug = None
+
+    def onCheck(self, e: wx.ListEvent):
+        idx: int = e.Index
+        old = self.mv.state.old_linedrug_list
+        new = self.mv.state.new_linedrug_list
+        if idx < len(old):
+            target = old
+        else:
+            idx -= len(old)
+            target = new
+        item = target[idx]
+        item.outclinic = True
+        self.mv.price.FetchPrice()
+        e.Skip()
+
+    def onUnCheck(self, e: wx.ListEvent):
+        idx: int = e.Index
+        old = self.mv.state.old_linedrug_list
+        new = self.mv.state.new_linedrug_list
+        if idx < len(old):
+            target = old
+        else:
+            idx -= len(old)
+            target = new
+        item = target[idx]
+        item.outclinic = False
+        self.mv.price.FetchPrice()
+        e.Skip()
 
 
 class Times(NumberTextCtrl):
@@ -168,7 +202,7 @@ class NoteCtrl(wx.TextCtrl):
         wh = self.parent.parent.mv.state.warehouse
         assert wh is not None
         self.ChangeValue(
-            note_str(
+            note_str_from_db(
                 wh.usage,
                 self.parent.times.Value,
                 self.parent.dose.Value,

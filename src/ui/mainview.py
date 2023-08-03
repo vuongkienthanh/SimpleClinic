@@ -3,12 +3,7 @@ import wx
 import db
 from misc import Config, vn_weekdays
 from state import State
-from ui.generics.widgets import (
-    DateTextCtrl,
-    PhoneTextCtrl,
-    ReadonlyVNAgeCtrl,
-    WeightCtrl,
-)
+from ui.generics import DateTextCtrl, PhoneTextCtrl, ReadonlyVNAgeCtrl, WeightCtrl
 from ui.mainview_widgets import (
     DaysCtrl,
     DaysCtrlWithAutoChangePrescriptionQuantity,
@@ -186,7 +181,7 @@ class MainView(wx.Frame):
         self.SetMenuBar(MyMenuBar())
         self.Bind(wx.EVT_CLOSE, self.onClose)
         self.refresh_color()
-        self.state.refresh()
+        self.state.refresh_all()
 
     def onClose(self, e: wx.CloseEvent):
         print("close sqlite3 connection")
@@ -200,7 +195,7 @@ class MainView(wx.Frame):
             wx.MessageBox("Chưa nhập chẩn đoán", "Lỗi")
             return False
         elif weight == 0:
-            wx.MessageBox(f"Cân nặng = 0", "Lỗi")
+            wx.MessageBox("Cân nặng = 0", "Lỗi")
             return False
         else:
             return True

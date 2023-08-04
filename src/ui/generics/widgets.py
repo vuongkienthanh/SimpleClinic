@@ -10,7 +10,7 @@ from misc import bd_to_vn_age, k_decimal, k_hash, k_number, k_slash, k_special, 
 
 
 class GenderChoice(wx.Choice):
-    def __init__(self, parent: wx.Window, **kwargs):
+    def __init__(self, parent, **kwargs):
         super().__init__(parent, choices=[str(Gender(0)), str(Gender(1))], **kwargs)
         self.Selection = 0
 
@@ -24,7 +24,7 @@ class GenderChoice(wx.Choice):
 class DatabaseChoice(wx.Choice):
     "A Choice that memorize db id"
 
-    def __init__(self, parent: wx.Window, *args, choices: list = [], **kwargs):
+    def __init__(self, parent, *args, choices: list = [], **kwargs):
         self.parent = parent
         self._choice_to_db: dict[int, int] = {}
         self._db_to_choice: dict[int, int] = {}

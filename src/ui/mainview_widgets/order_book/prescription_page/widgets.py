@@ -17,7 +17,7 @@ from ui.mainview_widgets.order_book.prescription_page import page
 class DrugListCtrl(StateListCtrl):
     def __init__(self, parent: "page.PrescriptionPage"):
         super().__init__(parent, mv=parent.mv)
-        self.AppendColumn("STT", 0.02)
+        self.AppendColumn("STT", 0.03)
         self.AppendColumn("Thuốc", 0.1)
         self.AppendColumn("Số cữ", 0.03)
         self.AppendColumn("Liều", 0.03)

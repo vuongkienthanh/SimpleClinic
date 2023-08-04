@@ -1,8 +1,8 @@
 import os
 import shutil
+import time
 
 from db import *
-from db.classes import *
 from misc import MY_DATABASE_PATH
 
 ans = input("This will back up the database in .SimpleClinic, confirm migration[y/N]")
@@ -61,7 +61,6 @@ for c in [
     LineDrug,
     Procedure,
     LineProcedure,
-    SamplePrescription,
     LineSamplePrescription,
 ]:
     new_con.executemany(
@@ -72,6 +71,16 @@ for c in [
         """,
         old_con.execute(f"SELECT id, {','.join(c.fields())} FROM {c.__tablename__}"),
     )
+new_con.executemany(
+    f"""
+    INSERT INTO {SamplePrescription.__tablename__} 
+    (id, {SamplePrescription.commna_joined_field_names()}) 
+    VALUES (?, {SamplePrescription.qmark_style_placeholders()})
+    """,
+    old_con.execute(
+        f"SELECT id, {','.join(SamplePrescription.fields())} FROM sampleprescription"
+    ),
+)
 
 new_con.executescript(create_view_sql)
 new_con.executescript(create_index_sql)
@@ -80,3 +89,5 @@ new_con.executescript(finalized_sql)
 new_con.commit()
 old_con.sqlcon.close()
 new_con.sqlcon.close()
+
+time.sleep(10)

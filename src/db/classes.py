@@ -244,7 +244,7 @@ class Warehouse(BASE):
 class SamplePrescription(BASE):
     "Toa mẫu"
 
-    __tablename__ = "sampleprescription"
+    __tablename__ = "sampleprescriptions"
     __fields__ = ["name"]
     __extra_fields__ = []
     id: int

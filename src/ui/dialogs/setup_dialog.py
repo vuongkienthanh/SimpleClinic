@@ -486,6 +486,7 @@ class SetupDialog(wx.Dialog):
             self.mv.order_book.prescriptionpage.drug_list.EnableCheckBoxes(
                 self.mv.config.outclinic_drug_checkbox
             )
+            self.mv.state.refresh_all()
             self.mv.price.FetchPrice()
             e.Skip()
         except Exception as error:

@@ -1,4 +1,5 @@
 import dataclasses
+import json
 from itertools import chain
 
 import wx
@@ -150,18 +151,23 @@ class SaveBtn(wx.Button):
                     vid = con.execute(
                         f"""
                         INSERT INTO {Visit.__tablename__} ({Visit.commna_joined_field_names()})
-                        VALUES ({Visit.named_style_placeholders()})
+                        VALUES ({Visit.qmark_style_placeholders()})
                     """,
                         v,
                     ).lastrowid
                     assert vid is not None
                     con.executemany(
                         f"""
-                        INSERT INTO {LineDrug.__tablename__} ({LineDrug.commna_joined_field_names()})
-                        VALUES ({LineDrug.named_style_placeholders()})
+                        INSERT INTO {LineDrug.__tablename__}
+                        ({LineDrug.commna_joined_field_names()} ,misc)
+                        VALUES ({LineDrug.named_style_placeholders()},:misc)
                     """,
                         (
-                            dataclasses.asdict(item) | {"visit_id": vid}
+                            dataclasses.asdict(item)
+                            | {
+                                "visit_id": vid,
+                                "misc": json.dumps({"outclinic": item.outclinic}),
+                            }
                             for item in state.new_linedrug_list
                         ),
                     )
@@ -227,7 +233,7 @@ class SaveBtn(wx.Button):
                     con.executemany(
                         f"""
                         UPDATE {LineDrug.__tablename__}
-                        SET (dose, times, quantity, usage_note) = (?,?,?,?)
+                        SET (dose, times, quantity, usage_note, misc) = (?,?,?,?,?)
                         WHERE id=?
                     """,
                         (
@@ -236,6 +242,7 @@ class SaveBtn(wx.Button):
                                 item.times,
                                 item.quantity,
                                 item.usage_note,
+                                json.dumps({"outclinic": item.outclinic}),
                                 item.id,
                             )
                             for item in state.old_linedrug_list
@@ -247,18 +254,16 @@ class SaveBtn(wx.Button):
                     )
                     con.executemany(
                         f"""
-                        INSERT INTO {LineDrug.__tablename__} ({LineDrug.commna_joined_field_names()})
-                        VALUES ({LineDrug.qmark_style_placeholders()})
+                        INSERT INTO {LineDrug.__tablename__}
+                        ({LineDrug.commna_joined_field_names()} ,misc)
+                        VALUES ({LineDrug.named_style_placeholders()},:misc)
                     """,
                         (
-                            (
-                                item.warehouse_id,
-                                item.dose,
-                                item.times,
-                                item.quantity,
-                                v.id,
-                                item.usage_note,
-                            )
+                            dataclasses.asdict(item)
+                            | {
+                                "visit_id": v.id,
+                                "misc": json.dumps({"outclinic": item.outclinic}),
+                            }
                             for item in state.new_linedrug_list
                         ),
                     )
@@ -292,4 +297,4 @@ class SaveBtn(wx.Button):
                         )
                 self.mv.state.refresh()
             except Exception as error:
-                wx.MessageBox(f"Lỗi không lưu lượt khám được\n{error}", "Lỗi")
+                wx.MessageBox(f"Lỗi không Cập nhật lượt khám được\n{error}", "Lỗi")

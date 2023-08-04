@@ -22,5 +22,5 @@ class NewLineDrugListState:
 
     @staticmethod
     def append_state(mv: "mainview.MainView", item: NewLineDrugListStateItem):
-        mv.state._new_linedrug_list.append(item)
+        mv.state.new_linedrug_list.append(item)
         mv.order_book.prescriptionpage.drug_list.append_ui(item)

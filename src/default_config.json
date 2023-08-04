@@ -1,8 +1,8 @@
 {
   "clinic_name": "Phòng khám chuyên khoa nhi - Bs xxxx yyyyy zzzz",
-  "doctor_name": "Bs xxxx yyyyy zzzz aaa",
+  "doctor_name": "Bs xxxx yyyyy zzzz",
   "clinic_address": "Qui laboriosam corporis non quasi maiores velit culpa",
-  "clinic_phone_number": "0909.222.111",
+  "clinic_phone_number": "0909.xxx.yyy",
   "checkup_price": 50000,
   "default_days_for_prescription": 2,
   "single_sale_units": [
@@ -22,7 +22,7 @@
     "Ăn nhiều rau củ",
     "Tập đi vệ sinh"
   ],
-  "ask_print": false,
+  "ask_print": true,
   "print_price": true,
   "minimum_drug_quantity_alert": 20,
   "max_number_of_drugs_in_one_page": 8,
@@ -31,7 +31,7 @@
   "preview_scale": 1,
   "autochange_prescription_quantity_on_day_spin": true,
   "maximize_at_start": false,
-  "outclinic_drug_checkbox": false,
+  "outclinic_drug_checkbox": true,
   "listctrl_header_scale": 1,
   "background_color": {
     "mainview": [

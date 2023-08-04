@@ -36,7 +36,6 @@ def check_none_to_blank(val: str | None) -> str:
             return v.strip()
 
 
-@cache
 def note_str_from_db(
     usage: str, times: int | str, dose: str, usage_unit: str, note: str | None
 ) -> str:
@@ -47,7 +46,6 @@ def note_str_from_db(
             return n
 
 
-@cache
 def note_str_to_db(
     usage: str, times: int | str, dose: str, usage_unit: str, note: str
 ) -> str | None:
@@ -118,8 +116,12 @@ def calc_quantity(
         return calc(times, dose, days)
 
 
-def num_to_str_price(price: int) -> str:
-    return f"{price:,}"
+def num_to_str_price(price: int | None) -> str:
+    match price:
+        case None:
+            return "0"
+        case _:
+            return f"{price:,}"
 
 
 def str_to_int_price(price: str) -> int:

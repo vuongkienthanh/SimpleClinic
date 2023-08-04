@@ -42,5 +42,5 @@ class QueueState:
 
     @staticmethod
     def append_state(mv: "mainview.MainView", item: QueueStateItem):
-        mv.state._queue.append(item)
+        mv.state.queue.append(item)
         mv.patient_book.queuelistctrl.append_ui(item)

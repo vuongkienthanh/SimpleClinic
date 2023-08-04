@@ -17,5 +17,5 @@ class NewLineProcedureListState:
 
     @staticmethod
     def append_state(mv: "mainview.MainView", item: NewLineProcedureListStateItem):
-        mv.state._new_lineprocedure_list.append(item)
+        mv.state.new_lineprocedure_list.append(item)
         mv.order_book.procedurepage.procedure_list.append_ui(item)

@@ -38,7 +38,7 @@ main_exe = EXE(
     icon=['logo\\logo.ico'],
 )
 migrate = Analysis(
-    ['src\\migratev2tov3.py'],
+    ['src\\migratev3_2tov3_3.py'],
     pathex=[],
     binaries=[],
     datas=[],
@@ -58,7 +58,7 @@ migrate_exe = EXE(
     migrate.scripts,
     [],
     exclude_binaries=True,
-    name='migratev2tov3',
+    name='migrate',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -83,5 +83,5 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='SimpleClinicV3.1',
+    name='SimpleClinicV3.3',
 )

@@ -1,8 +1,8 @@
 from dataclasses import dataclass
-from misc.config import Config
 
 import state
 from db import Connection, LineDrug, Visit, Warehouse
+from misc.config import Config
 
 _cache = dict()
 
@@ -39,7 +39,13 @@ class OldLineDrugListState:
                 SELECT
                     ld.id, ld.warehouse_id,
                     ld.times, ld.dose,
-                    ld.quantity, ld.usage_note, (ld.miscs ->> '$.outclinic' IS NOT NULL) AS outclinic
+                    ld.quantity, ld.usage_note,
+                    CASE ld.misc ->> '$.outclinic'
+                        WHEN NULL
+                            THEN FALSE
+                        ELSE
+                            ld.misc ->> '$.outclinic'
+                    END AS outclinic
                 FROM (SELECT * FROM {LineDrug.__tablename__}
                       WHERE visit_id = {v.id}
                 ) AS ld

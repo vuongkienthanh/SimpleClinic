@@ -90,4 +90,6 @@ new_con.commit()
 old_con.sqlcon.close()
 new_con.sqlcon.close()
 
-time.sleep(10)
+for i in range(5, 0, -1):
+    print("close in ", i)
+    time.sleep(1)

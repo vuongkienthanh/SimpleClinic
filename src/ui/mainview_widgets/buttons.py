@@ -132,16 +132,6 @@ class SaveBtn(wx.Button):
             assert state.old_linedrug_list == []
             assert state.old_lineprocedure_list == []
             past_history = check_blank_to_none(mv.past_history.Value)
-            v = {
-                "diagnosis": mv.diagnosis.Value.strip(),
-                "weight": mv.weight.GetWeight(),
-                "days": mv.days.Value,
-                "recheck": mv.recheck.Value,
-                "price": mv.price.GetPrice(),
-                "patient_id": p.id,
-                "vnote": check_blank_to_none(mv.vnote.Value),
-                "follow": check_blank_to_none(mv.follow.Value),
-            }
             try:
                 with mv.connection as con:
                     con.execute(
@@ -151,15 +141,24 @@ class SaveBtn(wx.Button):
                     vid = con.execute(
                         f"""
                         INSERT INTO {Visit.__tablename__} ({Visit.commna_joined_field_names()})
-                        VALUES ({Visit.qmark_style_placeholders()})
+                        VALUES ({Visit.named_style_placeholders()})
                     """,
-                        v,
+                        {
+                            "diagnosis": mv.diagnosis.Value.strip(),
+                            "weight": mv.weight.GetWeight(),
+                            "days": mv.days.Value,
+                            "recheck": mv.recheck.Value,
+                            "price": mv.price.GetPrice(),
+                            "patient_id": p.id,
+                            "vnote": check_blank_to_none(mv.vnote.Value),
+                            "follow": check_blank_to_none(mv.follow.Value),
+                        },
                     ).lastrowid
                     assert vid is not None
                     con.executemany(
                         f"""
                         INSERT INTO {LineDrug.__tablename__}
-                        ({LineDrug.commna_joined_field_names()} ,misc)
+                        ({LineDrug.commna_joined_field_names()},misc)
                         VALUES ({LineDrug.named_style_placeholders()},:misc)
                     """,
                         (
@@ -173,7 +172,8 @@ class SaveBtn(wx.Button):
                     )
                     con.executemany(
                         f"""
-                        INSERT INTO {LineProcedure.__tablename__} ({LineProcedure.commna_joined_field_names()})
+                        INSERT INTO {LineProcedure.__tablename__}
+                        ({LineProcedure.commna_joined_field_names()})
                         VALUES ({LineProcedure.named_style_placeholders()})
                     """,
                         (

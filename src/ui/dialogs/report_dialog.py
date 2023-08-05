@@ -69,6 +69,7 @@ def finance_report(
                 LEFT JOIN {LineProcedure.__tablename__} AS lp
                 ON lp.visit_id = v.id
                 WHERE ld.misc ->> '$.outclinic' == FALSE
+                    OR ld.misc ->> '$.outclinic' IS NULL
             ) as v2
             LEFT JOIN {Warehouse.__tablename__} AS wh
             ON v2.warehouse_id = wh.id
@@ -98,15 +99,11 @@ class FinanceReportDialog(wx.Dialog):
                 w(
                     f"Doanh thu (tiền công + thuốc + thủ thuật): {num_to_str_price(res['revenue'])}"
                 ),
-                w(
-                    f"Doanh thu (theo giá thu): {num_to_str_price(res['real_revenue'])}"
-                ),
+                w(f"Doanh thu (theo giá thu): {num_to_str_price(res['real_revenue'])}"),
                 w(
                     f"Tổng tiền thuốc (giá mua): {num_to_str_price(res['drug_purchase'])}"
                 ),
-                w(
-                    f"Tổng tiền thuốc (giá bán): {num_to_str_price(res['drug_sale'])}"
-                ),
+                w(f"Tổng tiền thuốc (giá bán): {num_to_str_price(res['drug_sale'])}"),
                 w(f"Lợi nhuận từ thuốc: {num_to_str_price(res['drug_profit'])}"),
                 w(
                     f"Lợi nhuận từ thủ thuật: {num_to_str_price(res['procedure_profit'])}"

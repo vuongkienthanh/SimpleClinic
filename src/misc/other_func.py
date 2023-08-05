@@ -100,8 +100,11 @@ def calc_quantity(
 ) -> int:
     def calc(times: int, dose: str, days: int) -> int:
         if "/" in dose:
-            numer, denom = [int(i) for i in dose.split("/")]
-            return ceil(times * Fraction(numer, denom) * days)
+            try:
+                numer, denom = [int(i) for i in dose.split("/")]
+                return ceil(times * Fraction(numer, denom) * days)
+            except Exception:
+                return 0
         else:
             return ceil(times * float(dose) * days)
 

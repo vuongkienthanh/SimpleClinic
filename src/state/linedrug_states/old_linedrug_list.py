@@ -40,12 +40,7 @@ class OldLineDrugListState:
                     ld.id, ld.warehouse_id,
                     ld.times, ld.dose,
                     ld.quantity, ld.usage_note,
-                    CASE ld.misc ->> '$.outclinic'
-                        WHEN NULL
-                            THEN FALSE
-                        ELSE
-                            ld.misc ->> '$.outclinic'
-                    END AS outclinic
+                    ld.outclinic
                 FROM (SELECT * FROM {LineDrug.__tablename__}
                       WHERE visit_id = {v.id}
                 ) AS ld

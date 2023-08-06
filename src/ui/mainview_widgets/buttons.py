@@ -158,15 +158,11 @@ class SaveBtn(wx.Button):
                     con.executemany(
                         f"""
                         INSERT INTO {LineDrug.__tablename__}
-                        ({LineDrug.commna_joined_field_names()},misc)
-                        VALUES ({LineDrug.named_style_placeholders()},:misc)
+                        ({LineDrug.commna_joined_field_names()})
+                        VALUES ({LineDrug.named_style_placeholders()})
                     """,
                         (
-                            dataclasses.asdict(item)
-                            | {
-                                "visit_id": vid,
-                                "misc": json.dumps({"outclinic": item.outclinic}),
-                            }
+                            dataclasses.asdict(item) | {"visit_id": vid}
                             for item in state.new_linedrug_list
                         ),
                     )
@@ -233,7 +229,7 @@ class SaveBtn(wx.Button):
                     con.executemany(
                         f"""
                         UPDATE {LineDrug.__tablename__}
-                        SET (dose, times, quantity, usage_note, misc) = (?,?,?,?,?)
+                        SET (dose, times, quantity, usage_note, outclinic) = (?,?,?,?,?)
                         WHERE id=?
                     """,
                         (
@@ -242,7 +238,7 @@ class SaveBtn(wx.Button):
                                 item.times,
                                 item.quantity,
                                 item.usage_note,
-                                json.dumps({"outclinic": item.outclinic}),
+                                item.outclinic,
                                 item.id,
                             )
                             for item in state.old_linedrug_list
@@ -255,15 +251,11 @@ class SaveBtn(wx.Button):
                     con.executemany(
                         f"""
                         INSERT INTO {LineDrug.__tablename__}
-                        ({LineDrug.commna_joined_field_names()} ,misc)
-                        VALUES ({LineDrug.named_style_placeholders()},:misc)
+                        ({LineDrug.commna_joined_field_names()})
+                        VALUES ({LineDrug.named_style_placeholders()})
                     """,
                         (
-                            dataclasses.asdict(item)
-                            | {
-                                "visit_id": v.id,
-                                "misc": json.dumps({"outclinic": item.outclinic}),
-                            }
+                            dataclasses.asdict(item) | {"visit_id": v.id}
                             for item in state.new_linedrug_list
                         ),
                     )

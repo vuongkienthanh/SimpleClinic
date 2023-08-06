@@ -174,6 +174,7 @@ class LineDrug(BASE):
     - `times`: Số cữ
     - `dose`: Liều một cữ
     - `quantity`: Số lượng
+    - `outclinic`: Thuốc mua ngoài
     """
 
     __tablename__ = "linedrugs"
@@ -183,6 +184,7 @@ class LineDrug(BASE):
         "dose",
         "quantity",
         "visit_id",
+        "outclinic",
         "usage_note",
     ]
     __extra_fields__ = []
@@ -192,6 +194,7 @@ class LineDrug(BASE):
     dose: str
     quantity: int
     visit_id: int
+    outclinic: bool
     usage_note: str | None = None
 
 

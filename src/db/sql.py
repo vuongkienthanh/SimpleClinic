@@ -12,8 +12,7 @@ CREATE TABLE {Patient.__tablename__} (
     birthdate DATE NOT NULL,
     address TEXT,
     phone TEXT,
-    past_history TEXT,
-    misc TEXT
+    past_history TEXT
 );
 CREATE TABLE {Visit.__tablename__} (
     id INTEGER PRIMARY KEY,
@@ -26,7 +25,6 @@ CREATE TABLE {Visit.__tablename__} (
     patient_id INTEGER NOT NULL,
     vnote TEXT,
     follow TEXT,
-    misc TEXT,
     CONSTRAINT ref_patient FOREIGN KEY (patient_id) REFERENCES {Patient.__tablename__} (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
@@ -38,7 +36,6 @@ CREATE TABLE {Queue.__tablename__} (
     id INTEGER PRIMARY KEY,
     patient_id INTEGER UNIQUE NOT NULL,
     added_datetime TIMESTAMP DEFAULT (datetime('now', 'localtime')),
-    misc TEXT,
     CONSTRAINT ref_patient FOREIGN KEY (patient_id) REFERENCES {Patient.__tablename__} (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
@@ -47,7 +44,6 @@ CREATE TABLE {SeenToday.__tablename__} (
     id INTEGER PRIMARY KEY,
     patient_id INTEGER NOT NULL,
     visit_id INTEGER NOT NULL,
-    misc TEXT,
     CONSTRAINT patient_visit_unique_for_seentoday UNIQUE (patient_id, visit_id),
     CONSTRAINT ref_patient FOREIGN KEY (patient_id) REFERENCES {Patient.__tablename__} (id)
         ON DELETE CASCADE
@@ -60,7 +56,6 @@ CREATE TABLE {Appointment.__tablename__} (
     id INTEGER PRIMARY KEY,
     patient_id INTEGER UNIQUE NOT NULL,
     appointed_date DATE NOT NULL,
-    misc TEXT,
     CONSTRAINT ref_patient FOREIGN KEY (patient_id) REFERENCES {Patient.__tablename__} (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
@@ -78,7 +73,6 @@ CREATE TABLE {Warehouse.__tablename__} (
     expire_date DATE,
     made_by TEXT,
     drug_note TEXT,
-    misc TEXT,
     CONSTRAINT quantity_BE_0 CHECK (quantity >= 0),
     CONSTRAINT price_check CHECK (
         sale_price >= purchase_price AND 
@@ -93,7 +87,7 @@ CREATE TABLE {LineDrug.__tablename__} (
     quantity INTEGER NOT NULL,
     visit_id INTEGER NOT NULL,
     usage_note TEXT,
-    misc TEXT,
+    outclinic BOOLEAN DEFAULT FALSE,
     CONSTRAINT ref_visit FOREIGN KEY (visit_id) REFERENCES {Visit.__tablename__} (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
@@ -108,8 +102,7 @@ CREATE TABLE {LineDrug.__tablename__} (
 );
 CREATE TABLE {SamplePrescription.__tablename__} (
     id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL,
-    misc TEXT
+    name TEXT NOT NULL
 );
 CREATE TABLE {LineSamplePrescription.__tablename__} (
     id INTEGER PRIMARY KEY,
@@ -117,7 +110,6 @@ CREATE TABLE {LineSamplePrescription.__tablename__} (
     sample_id INTEGER NOT NULL,
     times INTEGER NOT NULL,
     dose TEXT NOT NULL,
-    misc TEXT,
     CONSTRAINT ref_warehouse FOREIGN KEY (warehouse_id) REFERENCES {Warehouse.__tablename__} (id)
         ON DELETE RESTRICT
         ON UPDATE NO ACTION,
@@ -131,14 +123,12 @@ CREATE TABLE {Procedure.__tablename__} (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     price INTEGER NOT NULL,
-    misc TEXT,
     CONSTRAINT price_BE_0 CHECK (price >= 0)
 );
 CREATE TABLE {LineProcedure.__tablename__} (
     id INTEGER PRIMARY KEY,
     procedure_id INTEGER NOT NULL,
     visit_id INTEGER NOT NULL,
-    misc TEXT,
     CONSTRAINT ref_visit FOREIGN KEY (visit_id) REFERENCES {Visit.__tablename__} (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
@@ -197,6 +187,15 @@ CREATE VIEW {Appointment.__tablename__}_view AS
 """
 
 create_trigger_sql = f"""
+CREATE TRIGGER last_open_date_insert
+BEFORE INSERT ON singleton 
+BEGIN
+DELETE FROM {Queue.__tablename__};
+DELETE FROM {SeenToday.__tablename__};
+DELETE FROM {Appointment.__tablename__} 
+    WHERE JULIANDAY(appointed_date) < JULIANDAY(NEW.last_open_date);
+END;
+
 CREATE TRIGGER last_open_date_update
 BEFORE UPDATE OF last_open_date ON singleton 
 WHEN JULIANDAY(OLD.last_open_date) < JULIANDAY(NEW.last_open_date)
@@ -209,6 +208,7 @@ END;
 
 CREATE TRIGGER linedrug_insert 
 BEFORE INSERT ON {LineDrug.__tablename__}
+WHEN NEW.outclinic = FALSE
 BEGIN
 UPDATE {Warehouse.__tablename__} SET quantity = quantity - NEW.quantity
     WHERE id = NEW.warehouse_id;
@@ -216,6 +216,7 @@ END;
 
 CREATE TRIGGER linedrug_delete
 BEFORE DELETE ON {LineDrug.__tablename__}
+WHEN OLD.outclinic = FALSE
 BEGIN
 UPDATE {Warehouse.__tablename__} SET quantity = quantity + OLD.quantity
     WHERE id = OLD.warehouse_id;
@@ -223,9 +224,31 @@ END;
 
 CREATE TRIGGER linedrug_update
 BEFORE UPDATE ON {LineDrug.__tablename__}
-WHEN NEW.warehouse_id = OLD.warehouse_id
+WHEN NEW.warehouse_id = OLD.warehouse_id AND
+    NEW.outclinic = FALSE AND
+    OLD.outclinic = FALSE
 BEGIN
 UPDATE {Warehouse.__tablename__} SET quantity = quantity + OLD.quantity - NEW.quantity
+    WHERE id = OLD.warehouse_id;
+END;
+
+CREATE TRIGGER linedrug_update_from_no_outclinic_to_yes_outclinic
+BEFORE UPDATE ON {LineDrug.__tablename__}
+WHEN NEW.warehouse_id = OLD.warehouse_id AND
+    NEW.outclinic = TRUE AND
+    OLD.outclinic = FALSE
+BEGIN
+UPDATE {Warehouse.__tablename__} SET quantity = quantity - NEW.quantity
+    WHERE id = OLD.warehouse_id;
+END;
+
+CREATE TRIGGER linedrug_update_from_yes_outclinic_to_no_outclinic
+BEFORE UPDATE ON {LineDrug.__tablename__}
+WHEN NEW.warehouse_id = OLD.warehouse_id AND
+    NEW.outclinic = FALSE AND
+    OLD.outclinic = TRUE
+BEGIN
+UPDATE {Warehouse.__tablename__} SET quantity = quantity + OLD.quantity
     WHERE id = OLD.warehouse_id;
 END;
 

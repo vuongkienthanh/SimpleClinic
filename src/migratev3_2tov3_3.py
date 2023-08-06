@@ -58,7 +58,6 @@ for c in [
     SeenToday,
     Appointment,
     Warehouse,
-    LineDrug,
     Procedure,
     LineProcedure,
     LineSamplePrescription,
@@ -81,6 +80,19 @@ new_con.executemany(
         f"SELECT id, {','.join(SamplePrescription.fields())} FROM sampleprescription"
     ),
 )
+new_con.executemany(
+    f"""
+    INSERT INTO {LineDrug.__tablename__} 
+    (id, warehouse_id, times, dose, quantity, visit_id, usage_note)
+    VALUES (?,?,?,?,?,?,?)
+    """,
+    old_con.execute(
+        f"""
+        SELECT id, warehouse_id, times, dose, quantity, visit_id, usage_note
+        FROM {LineDrug.__tablename__}
+        """
+    ),
+)
 
 new_con.executescript(create_view_sql)
 new_con.executescript(create_index_sql)
@@ -92,4 +104,4 @@ new_con.sqlcon.close()
 
 for i in range(5, 0, -1):
     print("close in ", i)
-    time.sleep(1)
+    time.sleep(0.5)

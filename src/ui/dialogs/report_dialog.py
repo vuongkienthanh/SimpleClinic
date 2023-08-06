@@ -68,8 +68,7 @@ def finance_report(
                 ON ld.visit_id = v.id
                 LEFT JOIN {LineProcedure.__tablename__} AS lp
                 ON lp.visit_id = v.id
-                WHERE ld.misc ->> '$.outclinic' == FALSE
-                    OR ld.misc ->> '$.outclinic' IS NULL
+                WHERE ld.outclinic == FALSE
             ) as v2
             LEFT JOIN {Warehouse.__tablename__} AS wh
             ON v2.warehouse_id = wh.id

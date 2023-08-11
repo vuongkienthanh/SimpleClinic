@@ -64,10 +64,18 @@ class VisitState:
         mv.updatequantitybtn.Disable()
         mv.recheck.SetValue(mv.config.default_days_for_prescription)
         mv.follow.SetDefault()
+
         obj.old_linedrug_list = []
+        obj.new_linedrug_list.clear()
         obj.to_delete_old_linedrug_list.clear()
+
         obj.old_lineprocedure_list = []
+        obj.new_lineprocedure_list.clear()
         obj.to_delete_old_lineprocedure_list.clear()
+
+        obj.warehouse = None
+        obj.linedrug = None
+
         mv.price.Clear()
         mv.newvisitbtn.Disable()
         mv.savebtn.SetLabel("Lưu")
@@ -83,5 +91,3 @@ class VisitState:
         menubar.menuPrint.Enable(False)
         menubar.menuPreview.Enable(False)
         menubar.menuCopyVisitInfo.Enable(False)
-        obj.warehouse = None
-        obj.linedrug = None

@@ -25,7 +25,7 @@ https://github.com/vuongkienthanh/simpleclinic/releases/latest
 
 ## Hướng dẫn cài đặt / yêu cầu chức năng
 
-- Download Python 3.10
+- Download Python 3.11
 - Download python-poetry
 - Download repo này
 

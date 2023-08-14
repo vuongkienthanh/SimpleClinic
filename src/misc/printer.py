@@ -190,7 +190,8 @@ class PrintOut(wx.Printout):
             if first_page:
                 _list = [
                     {
-                        "name": drug_list.GetItemText(i, 1),
+                        "name": drug_list.GetItemText(i, 1)
+                        + (" (TT)" if drug_list.IsItemChecked(i) else ""),
                         "quantity": drug_list.GetItemText(i, 4),
                         "note": drug_list.GetItemText(i, 5),
                     }
@@ -200,7 +201,8 @@ class PrintOut(wx.Printout):
             else:
                 _list = [
                     {
-                        "name": drug_list.GetItemText(i, 1),
+                        "name": drug_list.GetItemText(i, 1)
+                        + (" (TT)" if drug_list.IsItemChecked(i) else ""),
                         "quantity": drug_list.GetItemText(i, 4),
                         "note": drug_list.GetItemText(i, 5),
                     }

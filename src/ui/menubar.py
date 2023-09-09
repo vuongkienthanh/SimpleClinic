@@ -189,11 +189,7 @@ class MyMenuBar(wx.MenuBar):
                 wx.MessageBox(
                     "Xóa thành công", "OK", style=wx.OK_DEFAULT | wx.ICON_NONE
                 )
-                visit_list_idx: int = mv.visit_list.GetFirstSelected()
-                assert visit_list_idx != -1, "visit_list not selected, cant delete"
-                mv.visit_list.DeleteItem(visit_list_idx)
-                mv.state.visit_list.pop(visit_list_idx)
-                mv.state.visit = None
+                mv.state.refresh()
             except sqlite3.Error as error:
                 wx.MessageBox("Lỗi không xóa được\n" + str(error), "Lỗi")
 

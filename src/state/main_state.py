@@ -88,10 +88,12 @@ class State:
         self._all_procedure: dict[int, Procedure] = {}
 
     def refresh_all(self) -> None:
+        "with samples & procedures"
         self.refresh()
         self.refresh_rest()
 
     def refresh(self) -> None:
+        "without samples & procedures"
         self.patient = None
         self.visit = None
         self.warehouse = None
@@ -111,7 +113,7 @@ class State:
         self.seentoday = SeenTodayState.fetch(self.mv.connection)
         self.appointment = AppointmentState.fetch(self.mv.connection)
 
-        self._all_warehouse = AllWarehouseState.fetch(self.mv.connection)
+        self.all_warehouse = AllWarehouseState.fetch(self.mv.connection)
 
         self.mv.order_book.SetSelection(0)
         VisitListState.clear_cache()
@@ -119,7 +121,7 @@ class State:
         OldLineProcedureListState.clear_cache()
 
     def refresh_rest(self) -> None:
-        self._all_sampleprescription = AllSamplePrescriptionState.fetch(
+        self.all_sampleprescription = AllSamplePrescriptionState.fetch(
             self.mv.connection
         )
         self.all_procedure = AllProcedureState.fetch(self.mv.connection)

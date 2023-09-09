@@ -109,8 +109,8 @@ class UseSamplePrescriptionBtn(wx.Button):
         dlg = SampleDialog(self.mv)
         if dlg.ShowModal() == wx.ID_OK:
             idx: int = dlg.samplelistctrl.GetFirstSelected()
-            sp_id: int = int(dlg.samplelistctrl.GetItemText(idx))
             if idx != -1:
+                sp_id: int = int(dlg.samplelistctrl.GetItemText(idx))
                 self.parent.drug_list.DeleteAllItems()
                 self.mv.state.to_delete_old_linedrug_list.extend(
                     self.mv.state.old_linedrug_list.copy()
@@ -141,3 +141,5 @@ class UseSamplePrescriptionBtn(wx.Button):
                     self.parent.drug_list.append_ui(item)
                     self.mv.state.new_linedrug_list.append(item)
                 self.mv.price.FetchPrice()
+            else:
+                wx.MessageBox("Chưa chọn toa mẫu", "Toa mẫu")

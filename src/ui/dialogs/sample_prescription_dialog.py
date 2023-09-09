@@ -25,6 +25,7 @@ class SampleDialog(wx.Dialog):
         self.dose = Dose(self, name="Liều")
         self.adddrugbtn = AddDrugButton(self)
         self.deletedrugbtn = DeleteDrugButton(self)
+        self.Bind(wx.EVT_CLOSE, lambda _: self.EndModal(wx.ID_CLOSE))
 
         def widget(w, p=0):
             s: str = w.Name

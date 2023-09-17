@@ -29,7 +29,7 @@ new_con.executescript(create_table_sql)
 new_con.executemany(
     f"""
     INSERT INTO {Patient.__tablename__} 
-    (id, {Patient.commna_joined_field_names()}) 
+    (id, {Patient.commna_joined_fields()}) 
     VALUES (?, {Patient.qmark_style_placeholders()})
     """,
     old_con.execute(f"SELECT * FROM {Patient.__tablename__}"),
@@ -37,17 +37,16 @@ new_con.executemany(
 new_con.executemany(
     f"""
     INSERT INTO {Visit.__tablename__} 
-    (id, exam_datetime, {Visit.commna_joined_field_names()}) 
+    (id, exam_datetime, {Visit.commna_joined_fields()}) 
     VALUES (:id, :exam_datetime, {Visit.named_style_placeholders()})""",
-    (
-        {col: v[col] for col in v.keys()} | {"price": 0}
-        for v in old_con.execute("SELECT * FROM visits").fetchall()
-    ),
+    old_con.execute(
+        "SELECT id, exam_datetime, diagnosis, weight, days, recheck,price,patient_id,vnote FROM visits"
+    ).fetchall(),
 )
 new_con.executemany(
     f"""
     INSERT INTO {Queue.__tablename__} 
-    (id, added_datetime, {Queue.commna_joined_field_names()}) 
+    (id, added_datetime, {Queue.commna_joined_fields()}) 
     VALUES (:id, :added_datetime, {Queue.qmark_style_placeholders()})""",
     old_con.execute(f"SELECT * FROM queuelist").fetchall(),
 )
@@ -61,7 +60,7 @@ new_con.executescript(
 new_con.executemany(
     f"""
     INSERT INTO {Warehouse.__tablename__} 
-    (id, {Warehouse.commna_joined_field_names()}) 
+    (id, {Warehouse.commna_joined_fields()}) 
     VALUES (:id,{Warehouse.named_style_placeholders()})""",
     (
         {col: wh[col] for col in wh.keys()} | {"drug_note": wh["note"]}
@@ -78,7 +77,7 @@ new_con.executescript(
 new_con.executemany(
     f"""
     INSERT INTO {SamplePrescription.__tablename__} 
-    (id, {SamplePrescription.commna_joined_field_names()}) 
+    (id, {SamplePrescription.commna_joined_fields()}) 
     VALUES (?, {SamplePrescription.qmark_style_placeholders()})
     """,
     old_con.execute(
@@ -88,21 +87,21 @@ new_con.executemany(
 new_con.executemany(
     f"""
     INSERT INTO {Procedure.__tablename__}
-    (id, {Procedure.commna_joined_field_names()})
+    (id, {Procedure.commna_joined_fields()})
     VALUES (?,{Procedure.qmark_style_placeholders()})""",
     old_con.execute("SELECT * FROM procedures").fetchall(),
 )
 new_con.executemany(
     f"""
     INSERT INTO {LineProcedure.__tablename__}
-    (id, {LineProcedure.commna_joined_field_names()})
+    (id, {LineProcedure.commna_joined_fields()})
     VALUES (?,{LineProcedure.qmark_style_placeholders()})""",
     old_con.execute("SELECT * FROM lineprocedure").fetchall(),
 )
 new_con.executemany(
     f"""
     INSERT INTO {LineSamplePrescription.__tablename__}
-    (id, {LineSamplePrescription.commna_joined_field_names()})
+    (id, {LineSamplePrescription.commna_joined_fields()})
     VALUES (:id,{LineSamplePrescription.named_style_placeholders()})""",
     (
         {col: ls[col] for col in ls.keys()} | {"warehouse_id": ls["drug_id"]}

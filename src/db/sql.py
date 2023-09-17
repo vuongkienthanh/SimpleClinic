@@ -1,4 +1,4 @@
-from .classes import *
+from .models import *
 
 create_table_sql = f"""\
 CREATE TABLE singleton (
@@ -264,7 +264,7 @@ END;
 CREATE TRIGGER visit_insert_after
 AFTER INSERT ON {Visit.__tablename__}
 BEGIN
-INSERT INTO {SeenToday.__tablename__} ({SeenToday.commna_joined_field_names()})
+INSERT INTO {SeenToday.__tablename__} ({SeenToday.commna_joined_fields()})
     VALUES (NEW.patient_id, NEW.id);
 END;
 
@@ -272,7 +272,7 @@ CREATE TRIGGER visit_insert_after_recheck
 AFTER INSERT ON {Visit.__tablename__}
 WHEN NEW.recheck > 0
 BEGIN
-INSERT INTO {Appointment.__tablename__} ({Appointment.commna_joined_field_names()})
+INSERT INTO {Appointment.__tablename__} ({Appointment.commna_joined_fields()})
 VALUES (NEW.patient_id, DATE('now','localtime', '+'||CAST(NEW.recheck AS TEXT)||' days'))
 ON CONFLICT (patient_id) DO UPDATE SET appointed_date=excluded.appointed_date;
 END;
@@ -289,7 +289,7 @@ CREATE TRIGGER visit_update_before_recheck_BT_0
 BEFORE UPDATE OF recheck ON {Visit.__tablename__}
 WHEN NEW.recheck > 0 AND OLD.recheck = 0
 BEGIN
-INSERT INTO {Appointment.__tablename__} ({Appointment.commna_joined_field_names()})
+INSERT INTO {Appointment.__tablename__} ({Appointment.commna_joined_fields()})
 VALUES (NEW.patient_id, DATE('now','localtime', '+'||CAST(NEW.recheck AS TEXT)||' days'));
 END;
 

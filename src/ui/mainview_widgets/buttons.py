@@ -1,5 +1,4 @@
 import dataclasses
-import json
 from itertools import chain
 
 import wx
@@ -140,7 +139,7 @@ class SaveBtn(wx.Button):
                     )
                     vid = con.execute(
                         f"""
-                        INSERT INTO {Visit.__tablename__} ({Visit.commna_joined_field_names()})
+                        INSERT INTO {Visit.__tablename__} ({Visit.commna_joined_fields()})
                         VALUES ({Visit.named_style_placeholders()})
                     """,
                         {
@@ -158,7 +157,7 @@ class SaveBtn(wx.Button):
                     con.executemany(
                         f"""
                         INSERT INTO {LineDrug.__tablename__}
-                        ({LineDrug.commna_joined_field_names()})
+                        ({LineDrug.commna_joined_fields()})
                         VALUES ({LineDrug.named_style_placeholders()})
                     """,
                         (
@@ -169,7 +168,7 @@ class SaveBtn(wx.Button):
                     con.executemany(
                         f"""
                         INSERT INTO {LineProcedure.__tablename__}
-                        ({LineProcedure.commna_joined_field_names()})
+                        ({LineProcedure.commna_joined_fields()})
                         VALUES ({LineProcedure.named_style_placeholders()})
                     """,
                         (
@@ -220,7 +219,7 @@ class SaveBtn(wx.Button):
                     )
                     con.execute(
                         f"""
-                        UPDATE {Visit.__tablename__} SET ({Visit.commna_joined_field_names()})
+                        UPDATE {Visit.__tablename__} SET ({Visit.commna_joined_fields()})
                         = ({Visit.qmark_style_placeholders()})
                         WHERE id = ?
                     """,
@@ -251,7 +250,7 @@ class SaveBtn(wx.Button):
                     con.executemany(
                         f"""
                         INSERT INTO {LineDrug.__tablename__}
-                        ({LineDrug.commna_joined_field_names()})
+                        ({LineDrug.commna_joined_fields()})
                         VALUES ({LineDrug.named_style_placeholders()})
                     """,
                         (
@@ -265,7 +264,7 @@ class SaveBtn(wx.Button):
                     )
                     con.executemany(
                         f"""
-                        INSERT INTO {LineProcedure.__tablename__} ({LineProcedure.commna_joined_field_names()})
+                        INSERT INTO {LineProcedure.__tablename__} ({LineProcedure.commna_joined_fields()})
                         VALUES ({LineProcedure.qmark_style_placeholders()})
                     """,
                         (

@@ -11,7 +11,11 @@ class Gender(enum.Enum):
     f = 1
 
     def __str__(self):
-        return ["Nam", "Nữ"][self.value]
+        match self.value:
+            case 0:
+                return "Nam"
+            case 1:
+                return "Nữ"
 
     @classmethod
     def from_str(cls, s: str) -> Self:
@@ -24,7 +28,6 @@ class Gender(enum.Enum):
                 raise IndexError("Invalid gender string")
 
 
-@dataclass
 class BASE:
     """
     Base Class for derived sql table
@@ -34,8 +37,8 @@ class BASE:
     """
 
     __tablename__: ClassVar[str]
-    __fields__: ClassVar[list[str]]
-    __extra_fields__: ClassVar[list[str]]
+    __fields__: ClassVar[tuple[str, ...]]
+    __extra_fields__: ClassVar[tuple[str, ...]] = ()
     id: int
 
     @classmethod
@@ -43,16 +46,20 @@ class BASE:
         return cls(**row)
 
     @classmethod
-    def fields(cls) -> list[str]:
+    def fields(cls) -> tuple[str, ...]:
         return cls.__fields__
 
     @classmethod
-    def select_fields(cls) -> list[str]:
+    def select_fields(cls) -> tuple[str, ...]:
         return cls.__fields__ + cls.__extra_fields__
 
     @classmethod
-    def commna_joined_field_names(cls) -> str:
+    def commna_joined_fields(cls) -> str:
         return ",".join(cls.fields())
+
+    @classmethod
+    def commna_joined_select_fields(cls) -> str:
+        return ",".join(cls.select_fields())
 
     @classmethod
     def qmark_style_placeholders(cls) -> str:
@@ -75,15 +82,14 @@ class Patient(BASE):
     "Bệnh nhân"
 
     __tablename__ = "patients"
-    __fields__ = [
+    __fields__ = (
         "name",
         "gender",
         "birthdate",
         "address",
         "phone",
         "past_history",
-    ]
-    __extra_fields__ = []
+    )
     id: int
     name: str
     gender: Gender
@@ -98,8 +104,8 @@ class Queue(BASE):
     "Lượt chờ khám"
 
     __tablename__ = "queue"
-    __fields__ = ["patient_id"]
-    __extra_fields__ = ["added_datetime"]
+    __fields__ = ("patient_id",)
+    __extra_fields__ = ("added_datetime",)
     id: int
     patient_id: int
     added_datetime: dt.datetime
@@ -110,8 +116,7 @@ class SeenToday(BASE):
     "Danh sách đã khám hôm nay"
 
     __tablename__ = "seen_today"
-    __fields__ = ["patient_id", "visit_id"]
-    __extra_fields__ = []
+    __fields__ = ("patient_id", "visit_id")
     id: int
     patient_id: int
     visit_id: int
@@ -122,8 +127,7 @@ class Appointment(BASE):
     "Danh sách hẹn tái khám"
 
     __tablename__ = "appointment"
-    __fields__ = ["patient_id", "appointed_date"]
-    __extra_fields__ = []
+    __fields__ = ("patient_id", "appointed_date")
     id: int
     patient_id: int
     appointed_date: dt.date
@@ -131,20 +135,10 @@ class Appointment(BASE):
 
 @dataclass(slots=True)
 class Visit(BASE):
-    """Lượt khám
-    - `exam_datetime`: Thời điểm khám bệnh
-    - `diagnoses`: Chẩn đoán
-    - `weight`: Cân nặng
-    - `days`: Số ngày cho thuốc
-    - `recheck`: Số ngày tái khám
-    - `price`: Giá thu
-    - `patient_id`: Mã bệnh nhân
-    - `follow`: Lời dặn dò
-    - `vnote`: Bệnh sử
-    """
+    "Lượt khám"
 
     __tablename__ = "visits"
-    __fields__ = [
+    __fields__ = (
         "diagnosis",
         "weight",
         "days",
@@ -152,9 +146,9 @@ class Visit(BASE):
         "price",
         "patient_id",
         "follow",
-        "vnote",
-    ]
-    __extra_fields__ = ["exam_datetime"]
+        "note",
+    )
+    __extra_fields__ = ("exam_datetime",)
     id: int
     exam_datetime: dt.datetime
     diagnosis: str
@@ -169,16 +163,10 @@ class Visit(BASE):
 
 @dataclass(slots=True)
 class LineDrug(BASE):
-    """Thuốc trong toa
-    - `warehouse_id`: Mã thuốc
-    - `times`: Số cữ
-    - `dose`: Liều một cữ
-    - `quantity`: Số lượng
-    - `outclinic`: Thuốc mua ngoài
-    """
+    "Thuốc trong toa"
 
     __tablename__ = "linedrugs"
-    __fields__ = [
+    __fields__ = (
         "warehouse_id",
         "times",
         "dose",
@@ -186,8 +174,7 @@ class LineDrug(BASE):
         "visit_id",
         "outclinic",
         "usage_note",
-    ]
-    __extra_fields__ = []
+    )
     id: int
     warehouse_id: int
     times: int
@@ -200,22 +187,10 @@ class LineDrug(BASE):
 
 @dataclass(slots=True)
 class Warehouse(BASE):
-    """Thuốc trong kho
-    - `name`: Tên thuốc
-    - `element`: Thành phần thuốc
-    - `quantity`: Số lượng
-    - `usage_unit`: Đơn vị sử dụng
-    - `usage`: Cách sử dụng
-    - `purchase_price`: Giá mua
-    - `sale_price`: Giá bán
-    - `sale_unit`: Đơn vị bán
-    - `expire_date`: Ngày hết hạn
-    - `made_by`: Xuất xứ
-    - `drug_note`: Ghi chú
-    """
+    "Thuốc trong kho"
 
     __tablename__ = "warehouse"
-    __fields__ = [
+    __fields__ = (
         "name",
         "element",
         "quantity",
@@ -227,8 +202,7 @@ class Warehouse(BASE):
         "expire_date",
         "made_by",
         "drug_note",
-    ]
-    __extra_fields__ = []
+    )
     id: int
     name: str
     element: str
@@ -248,27 +222,22 @@ class SamplePrescription(BASE):
     "Toa mẫu"
 
     __tablename__ = "sampleprescriptions"
-    __fields__ = ["name"]
-    __extra_fields__ = []
+    __fields__ = ("name",)
     id: int
     name: str
 
 
 @dataclass(slots=True)
 class LineSamplePrescription(BASE):
-    """Thuốc trong toa mẫu
-    - `times`: Liều một cữ
-    - `dose`: Số cữ
-    """
+    "Thuốc trong toa mẫu"
 
     __tablename__ = "linesampleprescriptions"
-    __fields__ = [
+    __fields__ = (
         "warehouse_id",
         "sample_id",
         "times",
         "dose",
-    ]
-    __extra_fields__ = []
+    )
     id: int
     warehouse_id: int
     sample_id: int
@@ -281,8 +250,7 @@ class Procedure(BASE):
     "Danh sách thủ thuật"
 
     __tablename__ = "procedures"
-    __fields__ = ["name", "price"]
-    __extra_fields__ = []
+    __fields__ = ("name", "price")
     id: int
     name: str
     price: int
@@ -293,8 +261,7 @@ class LineProcedure(BASE):
     "Thủ thuật của lượt khám"
 
     __tablename__ = "lineprocedures"
-    __fields__ = ["procedure_id", "visit_id"]
-    __extra_fields__ = []
+    __fields__ = ("procedure_id", "visit_id")
     id: int
     procedure_id: int
     visit_id: int

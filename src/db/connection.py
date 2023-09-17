@@ -1,9 +1,9 @@
 import datetime as dt
 import sqlite3
 from decimal import Decimal
-from typing import Self, overload
+from typing import overload
 
-from db.classes import BASE, Gender
+from db.models import BASE, Gender
 from db.sql import *
 
 
@@ -68,7 +68,7 @@ class Connection:
         self.executescript(create_trigger_sql)
         self.executescript(finalized_sql)
 
-    def update_last_open_date(self) -> dt.date | None:
+    def update_last_open_date(self) -> None:
         self.execute("UPDATE singleton SET last_open_date = ?", (dt.date.today(),))
         self.commit()
 
@@ -76,7 +76,7 @@ class Connection:
         with self:
             cur = self.execute(
                 f"""
-                INSERT INTO {t.__tablename__} ({t.commna_joined_field_names()})
+                INSERT INTO {t.__tablename__} ({t.commna_joined_fields()})
                 VALUES ({t.named_style_placeholders()})
             """,
                 base_without_id_dict,
@@ -87,7 +87,7 @@ class Connection:
     def select(self, t: type[T], id: int) -> T | None:
         row = self.execute(
             f"""
-            SELECT id, {",".join(t.select_fields())}
+            SELECT id, {t.commna_joined_select_fields()}
             FROM {t.__tablename__} WHERE id={id}""",
         ).fetchone()
         if row is None:
@@ -98,44 +98,43 @@ class Connection:
     def selectall(self, t: type[T]) -> dict[int, T]:
         rows = self.execute(
             f"""
-            SELECT id, {",".join(t.select_fields())}
+            SELECT id, {t.commna_joined_select_fields()}
             FROM {t.__tablename__}"""
         ).fetchall()
         return {row["id"]: t.parse(row) for row in rows}
 
     @overload
-    def delete(self, target: BASE) -> int | None:
+    def delete(self, target: BASE) -> int:
         ...
 
     @overload
-    def delete(self, target: type[BASE], id: int) -> int | None:
+    def delete(self, target: type[BASE], id: int) -> int:
         ...
 
     def delete(
         self,
         target,
         id: int | None = None,
-    ) -> int | None:
-        match target, id:
-            case s, None if isinstance(s, BASE):
+    ) -> int:
+        match id:
+            case None:
                 with self:
                     return self.execute(
                         f"DELETE FROM {target.__tablename__} WHERE id = {target.id}"
                     ).rowcount
-            case s, int() if issubclass(s, BASE):
+            case _:
                 with self:
                     return self.execute(
                         f"DELETE FROM {target.__tablename__} WHERE id = {id}"
                     ).rowcount
 
-    def update(self, base: BASE) -> int | None:
-        t = type(base)
+    def update(self, item: BASE) -> int:
         with self:
             return self.execute(
                 f"""
-                UPDATE {t.__tablename__} SET ({t.commna_joined_field_names()})
-                = ({t.qmark_style_placeholders()})
-                WHERE id = {base.id}
+                UPDATE {item.__tablename__} SET ({item.commna_joined_fields()})
+                = ({item.qmark_style_placeholders()})
+                WHERE id = {item.id}
             """,
-                base.qmark_style_sql_params(),
+                item.qmark_style_sql_params(),
             ).rowcount

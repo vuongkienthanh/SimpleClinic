@@ -98,12 +98,6 @@ class Config:
         shutil.copyfile(CONFIG_PATH, bak)
         shutil.copyfile(DEFAULT_CONFIG_PATH, CONFIG_PATH)
 
-    def __eq__(self, __value: Self) -> bool:
-        return vars(self).values() == vars(__value).values()
-
-    def __hash__(self) -> int:
-        return hash(vars(self).values())
-
     def header_width(self, p: float) -> int:
         w: int = DisplaySize()[0]
         return round(w * p * self.listctrl_header_scale)

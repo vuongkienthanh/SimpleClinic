@@ -20,8 +20,10 @@ class StateListCtrl(wx.ListCtrl):
             self.append_ui(item)
 
     def rebuild(self, _list):
+        self.Freeze()
         self.DeleteAllItems()
         self.build(_list)
+        self.Thaw()
 
     def append_ui(self, item):
         "add button"

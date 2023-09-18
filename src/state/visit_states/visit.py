@@ -22,6 +22,7 @@ class VisitState:
 
     def onSet(self, obj: "state.main_state.State", v: Visit) -> None:
         mv = obj.mv
+        mv.Freeze()
         mv.diagnosis.ChangeValue(v.diagnosis)
         mv.vnote.ChangeValue(check_none_to_blank(v.vnote))
         mv.weight.SetValue(v.weight)
@@ -48,12 +49,14 @@ class VisitState:
         menubar.menuPreview.Enable()
         menubar.menuCopyVisitInfo.Enable()
         mv.visit_list.SetFocus()
+        mv.Thaw()
 
     def onUnset(
         self,
         obj: "state.main_state.State",
     ) -> None:
         mv = obj.mv
+        mv.Freeze()
         mv.diagnosis.Clear()
         mv.vnote.Clear()
         mv.weight.SetValue(0)
@@ -91,3 +94,4 @@ class VisitState:
         menubar.menuPrint.Enable(False)
         menubar.menuPreview.Enable(False)
         menubar.menuCopyVisitInfo.Enable(False)
+        mv.Thaw()

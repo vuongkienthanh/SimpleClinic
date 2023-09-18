@@ -486,6 +486,10 @@ class SetupDialog(wx.Dialog):
             self.mv.order_book.prescriptionpage.drug_list.EnableCheckBoxes(
                 self.mv.config.outclinic_drug_checkbox
             )
+            self.mv.order_book.prescriptionpage.outclinic_reminder.Show(
+                self.mv.config.outclinic_drug_checkbox
+            )
+            self.mv.order_book.prescriptionpage.Layout()
             self.mv.state.refresh_all()
             self.mv.price.FetchPrice()
             e.Skip()

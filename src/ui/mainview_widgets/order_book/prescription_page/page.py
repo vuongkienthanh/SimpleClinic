@@ -28,6 +28,8 @@ class PrescriptionPage(wx.Panel):
         self.drug_list = DrugListCtrl(self)
         self.reuse_druglist_btn = ReuseDrugListButton(self)
         self.use_sample_prescription_btn = UseSamplePrescriptionBtn(self)
+        self.outclinic_reminder = wx.StaticText(self, label="\u2705: thuốc mua ngoài")
+        self.outclinic_reminder.Show(self.mv.config.outclinic_drug_checkbox)
 
         def static(s):
             return (wx.StaticText(self, label=s), 0, wx.ALIGN_CENTER | wx.RIGHT, 2)
@@ -64,10 +66,10 @@ class PrescriptionPage(wx.Panel):
             [
                 widget(self.reuse_druglist_btn),
                 widget(self.use_sample_prescription_btn),
+                (0, 0, 1),
+                widget(self.outclinic_reminder),
             ]
         )
-        if self.mv.config.outclinic_drug_checkbox:
-            btn_row.AddMany([(0, 0, 1), static("\u2705: thuốc mua ngoài")])
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.AddMany(

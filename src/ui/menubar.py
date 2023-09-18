@@ -4,6 +4,7 @@ import os.path
 import shutil
 import sqlite3
 from pathlib import Path
+from typing import cast
 
 import wx
 
@@ -121,7 +122,7 @@ class MyMenuBar(wx.MenuBar):
         self.Bind(wx.EVT_MENU, self.onResetConfig, menuResetConfig)
 
     def onRefresh(self, _):
-        mv: "mainview.MainView" = self.GetFrame()
+        mv = cast("mainview.MainView", self.GetFrame())
         mv.state.refresh_all()
 
     def onAbout(self, _):
@@ -133,25 +134,25 @@ class MyMenuBar(wx.MenuBar):
         )
 
     def onExit(self, _):
-        mv: "mainview.MainView" = self.GetFrame()
+        mv = cast("mainview.MainView", self.GetFrame())
         mv.Close()
 
     def onNewPatient(self, _):
         from ui.dialogs import NewPatientDialog
 
-        mv: "mainview.MainView" = self.GetFrame()
+        mv = cast("mainview.MainView", self.GetFrame())
         NewPatientDialog(mv).ShowModal()
 
     def onFindPatient(self, _):
         from ui.dialogs import FindPatientDialog
 
-        mv: "mainview.MainView" = self.GetFrame()
+        mv = cast("mainview.MainView", self.GetFrame())
         FindPatientDialog(mv).ShowModal()
 
     def onEditPatient(self, _):
         from ui.dialogs import EditPatientDialog
 
-        mv: "mainview.MainView" = self.GetFrame()
+        mv = cast("mainview.MainView", self.GetFrame())
         page: wx.ListCtrl = mv.patient_book.GetPage(mv.patient_book.Selection)
         idx: int = page.GetFirstSelected()
         assert idx >= 0
@@ -160,16 +161,16 @@ class MyMenuBar(wx.MenuBar):
             page.EnsureVisible(idx)
 
     def onNewVisit(self, _):
-        mv: "mainview.MainView" = self.GetFrame()
+        mv = cast("mainview.MainView", self.GetFrame())
         idx = mv.visit_list.GetFirstSelected()
         mv.visit_list.Select(idx, 0)
 
     def onInsertVisit(self, _):
-        mv: "mainview.MainView" = self.GetFrame()
+        mv = cast("mainview.MainView", self.GetFrame())
         mv.savebtn.insert_visit()
 
     def onUpdateVisit(self, _):
-        mv: "mainview.MainView" = self.GetFrame()
+        mv = cast("mainview.MainView", self.GetFrame())
         mv.savebtn.update_visit()
 
     def onDeleteVisit(self, _):
@@ -181,7 +182,7 @@ class MyMenuBar(wx.MenuBar):
             )
             == wx.YES
         ):
-            mv: "mainview.MainView" = self.GetFrame()
+            mv = cast("mainview.MainView", self.GetFrame())
             v = mv.state.visit
             assert v is not None
             try:
@@ -202,7 +203,7 @@ class MyMenuBar(wx.MenuBar):
             )
             == wx.YES
         ):
-            mv: "mainview.MainView" = self.GetFrame()
+            mv = cast("mainview.MainView", self.GetFrame())
             p = mv.state.patient
             assert p is not None
             assert mv.patient_book.GetSelection() == 0
@@ -221,14 +222,14 @@ class MyMenuBar(wx.MenuBar):
     def onPrint(self, _):
         from misc.printer import PrintOut, printdata
 
-        mv: "mainview.MainView" = self.GetFrame()
+        mv = cast("mainview.MainView", self.GetFrame())
         printout = PrintOut(mv)
         wx.Printer(wx.PrintDialogData(printdata)).Print(self, printout, False)
 
     def onPreview(self, _):
         from misc.printer import PrintOut, printdata
 
-        mv: "mainview.MainView" = self.GetFrame()
+        mv = cast("mainview.MainView", self.GetFrame())
         printout = PrintOut(mv, preview=True)
         printdialogdata = wx.PrintDialogData(printdata)
         printpreview = wx.PrintPreview(printout, data=printdialogdata)
@@ -240,7 +241,7 @@ class MyMenuBar(wx.MenuBar):
 
     def onCopyVisitInfo(self, _):
         cb: wx.Clipboard = wx.TheClipboard  # type:ignore
-        mv: "mainview.MainView" = self.GetFrame()
+        mv = cast("mainview.MainView", self.GetFrame())
         drug_list = mv.order_book.prescriptionpage.drug_list
         procedure_list = mv.order_book.procedurepage.procedure_list
 
@@ -293,26 +294,26 @@ class MyMenuBar(wx.MenuBar):
     def onWarehouse(self, _):
         from ui.dialogs import WarehouseDialog
 
-        mv: "mainview.MainView" = self.GetFrame()
+        mv = cast("mainview.MainView", self.GetFrame())
         WarehouseDialog(mv).ShowModal()
 
     def onSample(self, _):
         from ui.dialogs import SampleDialog
 
-        mv: "mainview.MainView" = self.GetFrame()
+        mv = cast("mainview.MainView", self.GetFrame())
         SampleDialog(mv).ShowModal()
 
     def onProcedure(self, _):
         from ui.dialogs import ProcedureDialog
 
-        mv: "mainview.MainView" = self.GetFrame()
+        mv = cast("mainview.MainView", self.GetFrame())
         ProcedureDialog(mv).ShowModal()
 
     def onDayReport(self, _):
         from ui.dialogs import DayFinanceReportDialog
         from ui.generics import DatePickerDialog
 
-        mv: "mainview.MainView" = self.GetFrame()
+        mv = cast("mainview.MainView", self.GetFrame())
         datepickerdialog = DatePickerDialog(mv)
         if datepickerdialog.ShowModal() == wx.ID_OK:
             DayFinanceReportDialog(mv, datepickerdialog.GetDate()).ShowModal()
@@ -321,7 +322,7 @@ class MyMenuBar(wx.MenuBar):
         from ui.dialogs import MonthFinanceReportDialog
         from ui.generics import MonthPickerDialog
 
-        mv: "mainview.MainView" = self.GetFrame()
+        mv = cast("mainview.MainView", self.GetFrame())
         monthpickerdialog = MonthPickerDialog(mv)
         if monthpickerdialog.ShowModal() == wx.ID_OK:
             MonthFinanceReportDialog(
@@ -332,7 +333,7 @@ class MyMenuBar(wx.MenuBar):
         from ui.dialogs import MonthWarehouseReportDialog
         from ui.generics import MonthPickerDialog
 
-        mv: "mainview.MainView" = self.GetFrame()
+        mv = cast("mainview.MainView", self.GetFrame())
         monthpickerdialog = MonthPickerDialog(mv)
         if monthpickerdialog.ShowModal() == wx.ID_OK:
             MonthWarehouseReportDialog(
@@ -342,14 +343,14 @@ class MyMenuBar(wx.MenuBar):
     def onSetup(self, _):
         from ui.dialogs import SetupDialog
 
-        mv: "mainview.MainView" = self.GetFrame()
+        mv = cast("mainview.MainView", self.GetFrame())
         SetupDialog(mv).ShowModal()
 
     def onOpenConfigFolder(self, _):
         wx.LaunchDefaultApplication(APP_DIR)
 
     def onReduceDatabaseSize(self, _):
-        mv: "mainview.MainView" = self.GetFrame()
+        mv = cast("mainview.MainView", self.GetFrame())
         connection = mv.connection
         pre = os.path.getsize(connection.path) >> 10
         connection.execute(f"UPDATE {Visit.__tablename__} SET follow=NULL")

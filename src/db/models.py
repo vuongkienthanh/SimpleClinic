@@ -146,7 +146,7 @@ class Visit(BASE):
         "price",
         "patient_id",
         "follow",
-        "note",
+        "vnote",
     )
     __extra_fields__ = ("exam_datetime",)
     id: int

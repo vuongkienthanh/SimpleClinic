@@ -9,6 +9,26 @@ from db.sql import *
 
 class Connection:
     def __init__(self, path: str):
+        def custom_type_date():
+            def adapt(date: dt.date) -> str:
+                return date.isoformat()
+
+            def convert(b: bytes) -> dt.date:
+                return dt.date.fromisoformat(b.decode())
+
+            sqlite3.register_adapter(dt.date, adapt)
+            sqlite3.register_converter("date", convert)
+
+        def custom_type_datetime():
+            def adapt(datetime: dt.datetime) -> str:
+                return datetime.isoformat()
+
+            def convert(b: bytes) -> dt.datetime:
+                return dt.datetime.fromisoformat(b.decode())
+
+            sqlite3.register_adapter(dt.datetime, adapt)
+            sqlite3.register_converter("timestamp", convert)
+
         def custom_type_decimal():
             def adapt(decimal: Decimal) -> str:
                 return str(decimal)
@@ -29,6 +49,8 @@ class Connection:
             sqlite3.register_adapter(Gender, adapt)
             sqlite3.register_converter("GENDER", convert)
 
+        custom_type_date()
+        custom_type_datetime()
         custom_type_decimal()
         custom_type_gender()
         self.sqlcon = sqlite3.connect(path, detect_types=sqlite3.PARSE_DECLTYPES)

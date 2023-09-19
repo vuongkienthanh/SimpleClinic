@@ -1,6 +1,7 @@
 {
   "clinic_name": "Phòng khám chuyên khoa nhi - Bs xxxx yyyyy zzzz",
   "doctor_name": "Bs xxxx yyyyy zzzz",
+  "doctor_license": "123456/HCM-CCHN",
   "clinic_address": "Qui laboriosam corporis non quasi maiores velit culpa",
   "clinic_phone_number": "0909.xxx.yyy",
   "checkup_price": 50000,
@@ -27,11 +28,11 @@
   "minimum_drug_quantity_alert": 20,
   "max_number_of_drugs_in_one_page": 8,
   "display_recent_visit_count": -1,
-  "print_scale": 1,
-  "preview_scale": 1,
   "autochange_prescription_quantity_on_day_spin": true,
   "maximize_at_start": false,
   "outclinic_drug_checkbox": true,
+  "print_scale": 1,
+  "preview_scale": 1,
   "listctrl_header_scale": 1,
   "background_color": {
     "mainview": [

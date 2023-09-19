@@ -17,6 +17,7 @@ Color = namedtuple("Color", ["r", "g", "b"])
 class Config:
     clinic_name: str
     doctor_name: str
+    doctor_license: str
     clinic_address: str
     clinic_phone_number: str
     checkup_price: int
@@ -29,11 +30,11 @@ class Config:
     print_price: bool
     max_number_of_drugs_in_one_page: int
     display_recent_visit_count: int
-    print_scale: int
-    preview_scale: int
     autochange_prescription_quantity_on_day_spin: bool
     maximize_at_start: bool
     outclinic_drug_checkbox: bool
+    print_scale: int
+    preview_scale: int
     listctrl_header_scale: int
     background_color: dict[str, Color]
 
@@ -59,6 +60,7 @@ class Config:
         return Config(
             clinic_name=config_json["clinic_name"],
             doctor_name=config_json["doctor_name"],
+            doctor_license=config_json["doctor_license"],
             clinic_address=config_json["clinic_address"],
             clinic_phone_number=config_json["clinic_phone_number"],
             checkup_price=config_json["checkup_price"],
@@ -73,13 +75,13 @@ class Config:
                 "max_number_of_drugs_in_one_page"
             ],
             display_recent_visit_count=config_json["display_recent_visit_count"],
-            print_scale=config_json["print_scale"],
-            preview_scale=config_json["preview_scale"],
             autochange_prescription_quantity_on_day_spin=config_json[
                 "autochange_prescription_quantity_on_day_spin"
             ],
             maximize_at_start=config_json["maximize_at_start"],
             outclinic_drug_checkbox=config_json["outclinic_drug_checkbox"],
+            print_scale=config_json["print_scale"],
+            preview_scale=config_json["preview_scale"],
             listctrl_header_scale=config_json["listctrl_header_scale"],
             background_color={
                 name: Color(r, g, b)

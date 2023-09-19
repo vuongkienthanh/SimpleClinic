@@ -39,6 +39,9 @@ class InfoPage(BasePage):
         self.doctor_name = wx.TextCtrl(
             self, value=self.mv.config.doctor_name, name="Tên bác sĩ"
         )
+        self.doctor_license = wx.TextCtrl(
+            self, value=self.mv.config.doctor_license, name="Chứng chỉ hành nghề"
+        )
         self.clinic_address = wx.TextCtrl(
             self, value=self.mv.config.clinic_address, name="Địa chỉ"
         )
@@ -64,12 +67,13 @@ class InfoPage(BasePage):
         for item in self.mv.config.single_sale_units:
             lc.Append((item,))
         lc.Append(("",))
-        entry_sizer = wx.FlexGridSizer(7, 2, 5, 5)
+        entry_sizer = wx.FlexGridSizer(8, 2, 5, 5)
         entry_sizer.AddGrowableCol(1)
         entry_sizer.AddMany(
             [
                 *widget(self.clinic_name, self),
                 *widget(self.doctor_name, self),
+                *widget(self.doctor_license, self),
                 *widget(self.clinic_address, self),
                 *widget(self.clinic_phone_number, self),
                 *widget(self.checkup_price, self),
@@ -405,6 +409,7 @@ class SetupDialog(wx.Dialog):
             infopage = self.infopage
             self.mv.config.clinic_name = infopage.clinic_name.Value
             self.mv.config.doctor_name = infopage.doctor_name.Value
+            self.mv.config.doctor_license = infopage.doctor_license.Value
             self.mv.config.clinic_address = infopage.clinic_address.Value
             self.mv.config.clinic_phone_number = infopage.clinic_phone_number.Value
             self.mv.config.checkup_price = int(infopage.checkup_price.Value)

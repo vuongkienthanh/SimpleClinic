@@ -152,6 +152,7 @@ class PrintOut(wx.Printout):
                 )
                 dc.DrawText("Bác sĩ khám bệnh", atx(0.63), aty(0.765))
                 draw_centered_text(self.mv.config.doctor_name, atx(0.75), aty(0.865))
+                draw_centered_text(self.mv.config.doctor_license, atx(0.75), aty(0.895))
 
             row_y = round(dcy * 0.02)
             y = aty(0.72)

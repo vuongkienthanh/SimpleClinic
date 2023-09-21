@@ -5,11 +5,12 @@ import shutil
 import sqlite3
 from pathlib import Path
 from typing import cast
+import tomllib
 
 import wx
 
 from db import LineDrug, Queue, Visit
-from misc import APP_DIR, CONFIG_PATH, DEFAULT_CONFIG_PATH, MY_DATABASE_PATH
+from misc import APP_DIR, CONFIG_PATH, DEFAULT_CONFIG_PATH, MY_DATABASE_PATH, SRC_DIR
 from ui import mainview
 
 
@@ -126,9 +127,12 @@ class MyMenuBar(wx.MenuBar):
         mv.state.refresh_all()
 
     def onAbout(self, _):
+        with open(os.path.join(os.path.dirname(SRC_DIR), "pyproject.toml"), "rb") as f:
+            version = tomllib.load(f)["tool"]["poetry"]["version"]
         wx.MessageBox(
-            "Phần mềm phòng khám Simple Clinic"
-            "Tác giả: Vương Kiến Thanh"
+            "Phần mềm phòng khám Simple Clinic\n"
+            f"{version}\n"
+            "Tác giả: Vương Kiến Thanh\n"
             "Email: thanhstardust@outlook.com",
             style=wx.OK | wx.CENTRE | wx.ICON_NONE,
         )

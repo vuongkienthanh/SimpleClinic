@@ -24,7 +24,7 @@ class QueueState:
         obj.mv.patient_book.queuelistctrl.rebuild(_list)
 
     @staticmethod
-    def fetch(connection: Connection):
+    def fetch(connection: Connection) -> list[QueueStateItem]:
         query = f"""
         SELECT
             p.id AS patient_id,

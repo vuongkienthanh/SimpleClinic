@@ -22,7 +22,7 @@ class AppointmentState:
         obj.mv.patient_book.appointmentlistctrl.rebuild(_list)
 
     @staticmethod
-    def fetch(connection: Connection):
+    def fetch(connection: Connection) -> list[AppointmentStateItem]:
         query = f"""
             SELECT
                 p.id AS patient_id,

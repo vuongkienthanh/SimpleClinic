@@ -1,9 +1,9 @@
 {
   "clinic_name": "Phòng khám chuyên khoa nhi - Bs xxxx yyyyy zzzz",
-  "doctor_name": "Bs xxxx yyyyy zzzz",
-  "doctor_license": "123456/HCM-CCHN",
   "clinic_address": "Qui laboriosam corporis non quasi maiores velit culpa",
   "clinic_phone_number": "0909.xxx.yyy",
+  "doctor_name": "Bs xxxx yyyyy zzzz",
+  "doctor_license": "123456/HCM-CCHN",
   "checkup_price": 50000,
   "default_days_for_prescription": 2,
   "single_sale_units": [
@@ -24,17 +24,82 @@
     "Tập đi vệ sinh"
   ],
   "ask_print": true,
-  "print_price": true,
   "minimum_drug_quantity_alert": 20,
-  "max_number_of_drugs_in_one_page": 8,
   "display_recent_visit_count": -1,
   "autochange_prescription_quantity_on_day_spin": true,
   "maximize_at_start": false,
   "outclinic_drug_checkbox": true,
+  "listctrl_header_scale": 1,
   "print_scale": 1,
   "preview_scale": 1,
-  "listctrl_header_scale": 1,
-  "background_color": {
+  "print_price": true,
+  "print_vnote": false,
+  "max_number_of_drugs_in_one_page": 8,
+  "drug_name_print_style": 0,
+  "follow_up_date_print_style": 0,
+  "prescription_formats": {
+    "clinic_name": {
+      "bold": false,
+      "italic": false
+    },
+    "clinic_address": {
+      "bold": false,
+      "italic": false
+    },
+    "clinic_phone_number": {
+      "bold": false,
+      "italic": false
+    },
+    "doctor_name": {
+      "bold": true,
+      "italic": false
+    },
+    "doctor_license": {
+      "bold": false,
+      "italic": false
+    },
+    "patient_name": {
+      "bold": false,
+      "italic": true
+    },
+    "weight": {
+      "bold": false,
+      "italic": true
+    },
+    "gender": {
+      "bold": false,
+      "italic": true
+    },
+    "birthdate": {
+      "bold": false,
+      "italic": true
+    },
+    "age": {
+      "bold": false,
+      "italic": true
+    },
+    "diagnosis": {
+      "bold": false,
+      "italic": true
+    },
+    "vnote": {
+      "bold": false,
+      "italic": true
+    },
+    "drug_name": {
+      "bold": false,
+      "italic": false
+    },
+    "drug_quantity": {
+      "bold": false,
+      "italic": false
+    },
+    "drug_usage_note": {
+      "bold": false,
+      "italic": true
+    }
+  },
+  "background_colors": {
     "mainview": [
       206,
       219,

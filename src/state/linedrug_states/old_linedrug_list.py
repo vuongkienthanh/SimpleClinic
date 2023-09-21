@@ -31,7 +31,7 @@ class OldLineDrugListState:
         obj.mv.order_book.prescriptionpage.drug_list.rebuild(_list)
 
     @staticmethod
-    def fetch(v: Visit, connection: Connection):
+    def fetch(v: Visit, connection: Connection) -> list[OldLineDrugListStateItem]:
         if v.id in _cache:
             return _cache[v.id]
         else:

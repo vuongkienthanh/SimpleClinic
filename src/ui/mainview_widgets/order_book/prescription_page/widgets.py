@@ -19,6 +19,7 @@ class DrugListCtrl(StateListCtrl):
         super().__init__(parent, mv=parent.mv)
         self.AppendColumn("STT", 0.03)
         self.AppendColumn("Thuốc", 0.1)
+        self.AppendColumn("Thành phần", 0.1)
         self.AppendColumn("Số cữ", 0.03)
         self.AppendColumn("Liều", 0.03)
         self.AppendColumn("Tổng cộng", 0.05)
@@ -44,6 +45,7 @@ class DrugListCtrl(StateListCtrl):
             [
                 self.ItemCount + 1,
                 wh.name,
+                wh.element,
                 times,
                 dose,
                 quantity,

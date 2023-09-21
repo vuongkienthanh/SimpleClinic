@@ -24,7 +24,9 @@ class VisitListState:
         obj.mv.visit_list.rebuild(_list)
 
     @staticmethod
-    def fetch(p: Patient, connection: Connection, config: Config):
+    def fetch(
+        p: Patient, connection: Connection, config: Config
+    ) -> list[VisitListStateItem]:
         if (p.id, config.display_recent_visit_count) in _cache:
             return _cache[(p.id, config.display_recent_visit_count)]
         else:

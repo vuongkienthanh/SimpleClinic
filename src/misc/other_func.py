@@ -41,7 +41,7 @@ def note_str_from_db(
 ) -> str:
     match note:
         case None:
-            return f"{usage} ngày {times} lần, lần {dose} {usage_unit}"
+            return f"ngày {usage} {times} lần, lần {dose} {usage_unit}"
         case n:
             return n
 
@@ -52,7 +52,7 @@ def note_str_to_db(
     match note.strip():
         case "":
             return None
-        case n if n == f"{usage} ngày {times} lần, lần {dose} {usage_unit}":
+        case n if n == f"ngày {usage} {times} lần, lần {dose} {usage_unit}":
             return None
         case n:
             return n

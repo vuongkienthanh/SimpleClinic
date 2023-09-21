@@ -25,7 +25,7 @@ class SeenTodayState:
         obj.mv.patient_book.seentodaylistctrl.rebuild(_list)
 
     @staticmethod
-    def fetch(connection: Connection):
+    def fetch(connection: Connection) -> list[SeenTodayStateItem]:
         query = f"""
             SELECT
                 p.id AS patient_id,

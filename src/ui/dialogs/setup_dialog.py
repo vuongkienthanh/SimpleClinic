@@ -5,12 +5,16 @@ import wx.adv as adv
 import wx.grid
 
 from misc import minus_bm, plus_bm
+from misc.config import (
+    Format,
+    drug_name_print_style_choices,
+    follow_up_date_print_style_choices,
+)
 from ui import mainview
 
 
 def widget(w: wx.Window, p: wx.Window):
-    s: str = w.GetName()
-    return (wx.StaticText(p, label=s), 0, wx.ALIGN_CENTER_VERTICAL), (
+    return (wx.StaticText(p, label=w.Name), 0, wx.ALIGN_CENTER_VERTICAL), (
         w,
         1,
         wx.EXPAND | wx.ALL ^ wx.LEFT,
@@ -31,22 +35,22 @@ class BasePage(wx.ScrolledWindow):
 
 
 class InfoPage(BasePage):
-    def __init__(self, parent: wx.Notebook):
+    def __init__(self, parent):
         super().__init__(parent)
         self.clinic_name = wx.TextCtrl(
             self, value=self.mv.config.clinic_name, name="Tên phòng khám"
-        )
-        self.doctor_name = wx.TextCtrl(
-            self, value=self.mv.config.doctor_name, name="Tên bác sĩ"
-        )
-        self.doctor_license = wx.TextCtrl(
-            self, value=self.mv.config.doctor_license, name="Chứng chỉ hành nghề"
         )
         self.clinic_address = wx.TextCtrl(
             self, value=self.mv.config.clinic_address, name="Địa chỉ"
         )
         self.clinic_phone_number = wx.TextCtrl(
             self, value=self.mv.config.clinic_phone_number, name="Số điện thoại"
+        )
+        self.doctor_name = wx.TextCtrl(
+            self, value=self.mv.config.doctor_name, name="Tên bác sĩ"
+        )
+        self.doctor_license = wx.TextCtrl(
+            self, value=self.mv.config.doctor_license, name="Chứng chỉ hành nghề"
         )
         self.checkup_price = wx.TextCtrl(
             self, value=str(self.mv.config.checkup_price), name="Công khám bệnh"
@@ -72,10 +76,10 @@ class InfoPage(BasePage):
         entry_sizer.AddMany(
             [
                 *widget(self.clinic_name, self),
-                *widget(self.doctor_name, self),
-                *widget(self.doctor_license, self),
                 *widget(self.clinic_address, self),
                 *widget(self.clinic_phone_number, self),
+                *widget(self.doctor_name, self),
+                *widget(self.doctor_license, self),
                 *widget(self.checkup_price, self),
                 *widget(self.days, self),
                 *widget(self.unit, self),
@@ -137,7 +141,7 @@ class FollowChoicePage(wx.Panel):
 
 
 class SystemPage(BasePage):
-    def __init__(self, parent: wx.Notebook):
+    def __init__(self, parent):
         super().__init__(parent)
         self.autochange_prescription_quantity_on_day_spin = wx.CheckBox(
             self, name="Tự động cập nhật số lượng thuốc khi thay đổi số ngày của toa"
@@ -147,20 +151,11 @@ class SystemPage(BasePage):
         )
         self.ask_print = wx.CheckBox(self, name="Hỏi in toa thuốc")
         self.ask_print.SetValue(self.mv.config.ask_print)
-        self.print_price = wx.CheckBox(self, name="In giá tiền trên toa")
-        self.print_price.SetValue(self.mv.config.print_price)
         self.alert = wx.SpinCtrl(
             self,
             initial=self.mv.config.minimum_drug_quantity_alert,
             max=10000,
             name="Lượng thuốc tối thiểu để báo động",
-        )
-        self.num_of_ld = wx.SpinCtrl(
-            self,
-            initial=self.mv.config.max_number_of_drugs_in_one_page,
-            name="Số lượng thuốc được in trong một toa\n(Tối đa: 8)",
-            min=4,
-            max=8,
         )
         self.visit_count = wx.SpinCtrl(
             self,
@@ -174,17 +169,115 @@ class SystemPage(BasePage):
             self, name="Checkbox thuốc mua ngoài"
         )
         self.outclinic_drug_checkbox.SetValue(self.mv.config.outclinic_drug_checkbox)
-        entry_sizer = wx.FlexGridSizer(8, 2, 5, 5)
+        entry_sizer = wx.FlexGridSizer(6, 2, 5, 5)
         entry_sizer.AddMany(
             [
                 *widget(self.autochange_prescription_quantity_on_day_spin, self),
                 *widget(self.ask_print, self),
-                *widget(self.print_price, self),
                 *widget(self.alert, self),
-                *widget(self.num_of_ld, self),
                 *widget(self.visit_count, self),
                 *widget(self.maximize_at_start, self),
                 *widget(self.outclinic_drug_checkbox, self),
+            ]
+        )
+        self.SetSizer(entry_sizer)
+
+
+class PrintPage(BasePage):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.print_price = wx.CheckBox(self, name="In giá tiền trên toa")
+        self.print_price.SetValue(self.mv.config.print_price)
+        self.print_vnote = wx.CheckBox(self, name="In bệnh sử")
+        self.print_vnote.SetValue(self.mv.config.print_vnote)
+        self.num_of_ld = wx.SpinCtrl(
+            self,
+            initial=self.mv.config.max_number_of_drugs_in_one_page,
+            name="Số lượng thuốc được in trong một toa\n(6 ~ 8)",
+            min=6,
+            max=8,
+        )
+        self.drug_name_print_style = wx.Choice(
+            self,
+            choices=drug_name_print_style_choices,
+            name="Định dạng tên thuốc",
+        )
+        self.drug_name_print_style.SetSelection(self.mv.config.drug_name_print_style)
+        self.follow_up_date_print_style = wx.Choice(
+            self,
+            choices=follow_up_date_print_style_choices,
+            name="Định dạng tái khám",
+        )
+        self.follow_up_date_print_style.SetSelection(
+            self.mv.config.follow_up_date_print_style
+        )
+
+        def checklistbox(name: str, format: Format) -> wx.CheckListBox:
+            w = wx.CheckListBox(self, choices=["In đậm", "In nghiêng"], name=name)
+            w.Check(0, format["bold"])
+            w.Check(1, format["italic"])
+            return w
+
+        self.clinic_name = checklistbox(
+            "Tên phòng khám", self.mv.config.get_format("clinic_name")
+        )
+        self.clinic_address = checklistbox(
+            "Địa chỉ phòng khám", self.mv.config.get_format("clinic_address")
+        )
+        self.clinic_phone_number = checklistbox(
+            "SĐT phòng khám", self.mv.config.get_format("clinic_phone_number")
+        )
+        self.doctor_name = checklistbox(
+            "Tên bác sĩ", self.mv.config.get_format("doctor_name")
+        )
+        self.doctor_license = checklistbox(
+            "CCHN", self.mv.config.get_format("doctor_license")
+        )
+        self.patient_name = checklistbox(
+            "Tên bệnh nhân", self.mv.config.get_format("patient_name")
+        )
+        self.weight = checklistbox("Cân nặng", self.mv.config.get_format("weight"))
+        self.gender = checklistbox("Giới tính", self.mv.config.get_format("gender"))
+        self.birthdate = checklistbox(
+            "Ngày sinh", self.mv.config.get_format("birthdate")
+        )
+        self.age = checklistbox("Tuổi", self.mv.config.get_format("age"))
+        self.diagnosis = checklistbox(
+            "Chẩn đoán", self.mv.config.get_format("diagnosis")
+        )
+        self.vnote = checklistbox("Bệnh sử", self.mv.config.get_format("vnote"))
+        self.drug_name = checklistbox(
+            "Tên thuốc", self.mv.config.get_format("drug_name")
+        )
+        self.drug_quantity = checklistbox(
+            "Tên thuốc", self.mv.config.get_format("drug_quantity")
+        )
+        self.drug_usage_note = checklistbox(
+            "Cách dùng thuốc", self.mv.config.get_format("drug_usage_note")
+        )
+        entry_sizer = wx.FlexGridSizer(20, 2, 5, 5)
+        entry_sizer.AddMany(
+            [
+                *widget(self.print_price, self),
+                *widget(self.print_vnote, self),
+                *widget(self.num_of_ld, self),
+                *widget(self.drug_name_print_style, self),
+                *widget(self.follow_up_date_print_style, self),
+                *widget(self.clinic_name, self),
+                *widget(self.clinic_address, self),
+                *widget(self.clinic_phone_number, self),
+                *widget(self.doctor_name, self),
+                *widget(self.weight, self),
+                *widget(self.gender, self),
+                *widget(self.birthdate, self),
+                *widget(self.age, self),
+                *widget(self.doctor_license, self),
+                *widget(self.patient_name, self),
+                *widget(self.diagnosis, self),
+                *widget(self.vnote, self),
+                *widget(self.drug_name, self),
+                *widget(self.drug_quantity, self),
+                *widget(self.drug_usage_note, self),
             ]
         )
         self.SetSizer(entry_sizer)
@@ -371,10 +464,12 @@ class SetupDialog(wx.Dialog):
         self.infopage = InfoPage(self.book)
         self.followchoicepage = FollowChoicePage(self.book)
         self.systempage = SystemPage(self.book)
+        self.printpage = PrintPage(self.book)
         self.backgroundcolorpage = BackgroundColorPage(self.book)
         self.book.AddPage(self.infopage, text="Thông tin")
         self.book.AddPage(self.followchoicepage, text="Lời dặn")
         self.book.AddPage(self.systempage, text="Hệ thống")
+        self.book.AddPage(self.printpage, text="Toa in")
         self.book.AddPage(self.backgroundcolorpage, text="Màu nền")
 
         cancelbtn = wx.Button(self, id=wx.ID_CANCEL)
@@ -408,10 +503,10 @@ class SetupDialog(wx.Dialog):
         try:
             infopage = self.infopage
             self.mv.config.clinic_name = infopage.clinic_name.Value
-            self.mv.config.doctor_name = infopage.doctor_name.Value
-            self.mv.config.doctor_license = infopage.doctor_license.Value
             self.mv.config.clinic_address = infopage.clinic_address.Value
             self.mv.config.clinic_phone_number = infopage.clinic_phone_number.Value
+            self.mv.config.doctor_name = infopage.doctor_name.Value
+            self.mv.config.doctor_license = infopage.doctor_license.Value
             self.mv.config.checkup_price = int(infopage.checkup_price.Value)
             self.mv.config.default_days_for_prescription = infopage.days.Value
             lc: wx.ListCtrl = infopage.unit.GetListCtrl()
@@ -443,17 +538,48 @@ class SetupDialog(wx.Dialog):
                 systempage.autochange_prescription_quantity_on_day_spin.Value
             )
             self.mv.config.ask_print = systempage.ask_print.Value
-            self.mv.config.print_price = systempage.print_price.Value
             self.mv.config.minimum_drug_quantity_alert = systempage.alert.Value
-            self.mv.config.max_number_of_drugs_in_one_page = systempage.num_of_ld.Value
             self.mv.config.display_recent_visit_count = systempage.visit_count.Value
             self.mv.config.maximize_at_start = systempage.maximize_at_start.Value
             self.mv.config.outclinic_drug_checkbox = (
                 systempage.outclinic_drug_checkbox.Value
             )
 
+            printpage = self.printpage
+            self.mv.config.print_price = printpage.print_price.Value
+            self.mv.config.print_vnote = printpage.print_vnote.Value
+            self.mv.config.max_number_of_drugs_in_one_page = printpage.num_of_ld.Value
+            self.mv.config.drug_name_print_style = (
+                printpage.drug_name_print_style.Selection
+            )
+            self.mv.config.follow_up_date_print_style = (
+                printpage.follow_up_date_print_style.Selection
+            )
+
+            def set_format(name: str, widget: wx.CheckListBox):
+                self.mv.config.prescription_formats[name] = {
+                    "bold": widget.IsChecked(0),
+                    "italic": widget.IsChecked(1),
+                }
+
+            set_format("clinic_name", printpage.clinic_name)
+            set_format("clinic_address", printpage.clinic_address)
+            set_format("clinic_phone_number", printpage.clinic_phone_number)
+            set_format("doctor_name", printpage.doctor_name)
+            set_format("doctor_license", printpage.doctor_license)
+            set_format("patient_name", printpage.patient_name)
+            set_format("weight", printpage.weight)
+            set_format("gender", printpage.gender)
+            set_format("birthdate", printpage.birthdate)
+            set_format("age", printpage.age)
+            set_format("diagnosis", printpage.diagnosis)
+            set_format("vnote", printpage.vnote)
+            set_format("drug_name", printpage.drug_name)
+            set_format("drug_quantity", printpage.drug_quantity)
+            set_format("drug_usage_note", printpage.drug_usage_note)
+
             def set_color(name: str, widget: wx.ColourPickerCtrl):
-                self.mv.config.background_color[name] = widget.Colour.GetIM()[:3]
+                self.mv.config.background_colors[name] = widget.Colour.GetIM()[:3]
 
             bgcolorpage = self.backgroundcolorpage
             set_color("mainview", bgcolorpage.mainview_color)

@@ -4,22 +4,30 @@ import json
 import shutil
 from collections import namedtuple
 from dataclasses import dataclass
-from typing import Any, Self
+from typing import Any, Self, TypedDict
 
-from wx import Colour, DisplaySize
+import wx
 
 from misc.paths import CONFIG_PATH, DEFAULT_CONFIG_PATH
 
+drug_name_print_style_choices = ["Tên", "Thành phần", "Tên(thành phần)"]
+follow_up_date_print_style_choices = ["sau x ngày", "vào ngày dd/mm/yyyy"]
+
 Color = namedtuple("Color", ["r", "g", "b"])
+
+
+class Format(TypedDict):
+    bold: bool
+    italic: bool
 
 
 @dataclass(eq=False, repr=False, kw_only=True)
 class Config:
     clinic_name: str
-    doctor_name: str
-    doctor_license: str
     clinic_address: str
     clinic_phone_number: str
+    doctor_name: str
+    doctor_license: str
     checkup_price: int
     default_days_for_prescription: int
     minimum_drug_quantity_alert: int
@@ -27,16 +35,20 @@ class Config:
     follow_choices_dict: dict[str, str]
     follow_choices_list: list[str]
     ask_print: bool
-    print_price: bool
-    max_number_of_drugs_in_one_page: int
     display_recent_visit_count: int
     autochange_prescription_quantity_on_day_spin: bool
     maximize_at_start: bool
     outclinic_drug_checkbox: bool
+    listctrl_header_scale: int
     print_scale: int
     preview_scale: int
-    listctrl_header_scale: int
-    background_color: dict[str, Color]
+    print_price: bool
+    print_vnote: bool
+    max_number_of_drugs_in_one_page: int
+    drug_name_print_style: int
+    follow_up_date_print_style: int
+    prescription_formats: dict[str, Format]
+    background_colors: dict[str, Color]
 
     @classmethod
     def load(cls) -> Self:
@@ -59,10 +71,10 @@ class Config:
                 config_json = json.load(f)
         return Config(
             clinic_name=config_json["clinic_name"],
-            doctor_name=config_json["doctor_name"],
-            doctor_license=config_json["doctor_license"],
             clinic_address=config_json["clinic_address"],
             clinic_phone_number=config_json["clinic_phone_number"],
+            doctor_name=config_json["doctor_name"],
+            doctor_license=config_json["doctor_license"],
             checkup_price=config_json["checkup_price"],
             default_days_for_prescription=config_json["default_days_for_prescription"],
             minimum_drug_quantity_alert=config_json["minimum_drug_quantity_alert"],
@@ -70,22 +82,38 @@ class Config:
             follow_choices_dict=config_json["follow_choices_dict"],
             follow_choices_list=config_json["follow_choices_list"],
             ask_print=config_json["ask_print"],
-            print_price=config_json["print_price"],
-            max_number_of_drugs_in_one_page=config_json[
-                "max_number_of_drugs_in_one_page"
-            ],
             display_recent_visit_count=config_json["display_recent_visit_count"],
             autochange_prescription_quantity_on_day_spin=config_json[
                 "autochange_prescription_quantity_on_day_spin"
             ],
             maximize_at_start=config_json["maximize_at_start"],
             outclinic_drug_checkbox=config_json["outclinic_drug_checkbox"],
+            listctrl_header_scale=config_json["listctrl_header_scale"],
             print_scale=config_json["print_scale"],
             preview_scale=config_json["preview_scale"],
-            listctrl_header_scale=config_json["listctrl_header_scale"],
-            background_color={
+            print_price=config_json["print_price"],
+            print_vnote=config_json["print_vnote"],
+            max_number_of_drugs_in_one_page=config_json[
+                "max_number_of_drugs_in_one_page"
+            ],
+            drug_name_print_style=max(
+                min(
+                    config_json["drug_name_print_style"],
+                    len(drug_name_print_style_choices),
+                ),
+                0,
+            ),
+            follow_up_date_print_style=max(
+                min(
+                    config_json["follow_up_date_print_style"],
+                    len(drug_name_print_style_choices),
+                ),
+                0,
+            ),
+            prescription_formats=config_json["prescription_formats"],
+            background_colors={
                 name: Color(r, g, b)
-                for (name, [r, g, b]) in config_json["background_color"].items()
+                for (name, [r, g, b]) in config_json["background_colors"].items()
             },
         )
 
@@ -101,14 +129,20 @@ class Config:
         shutil.copyfile(DEFAULT_CONFIG_PATH, CONFIG_PATH)
 
     def header_width(self, p: float) -> int:
-        w: int = DisplaySize()[0]
+        w: int = wx.DisplaySize()[0]
         return round(w * p * self.listctrl_header_scale)
 
     def header_size(self, p: float) -> tuple[int, int]:
         return (self.header_width(p), -1)
 
-    def get_background_color(self, name: str) -> Colour:
+    def get_background_color(self, name: str) -> wx.Colour:
         try:
-            return Colour(*self.background_color[name])
+            return wx.Colour(*self.background_colors[name])
         except KeyError:
-            return Colour(255, 255, 255)
+            return wx.Colour(255, 255, 255)
+
+    def get_format(self, name: str) -> Format:
+        try:
+            return self.prescription_formats[name]
+        except KeyError:
+            return {"bold": False, "italic": False}

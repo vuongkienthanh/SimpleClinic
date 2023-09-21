@@ -100,11 +100,12 @@ class SeenTodayListCtrl(BasePatientListCtrl):
         vid: int = target.visit_id
 
         p = self.mv.connection.select(Patient, pid)
-        v = self.mv.connection.select(Visit, vid)
         assert p is not None
-        assert v is not None
         self.mv.state.patient = p
-        self.mv.state.visit = v
+        for idx, item in enumerate(self.mv.state.visit_list):
+            if item.visit_id == vid:
+                self.mv.visit_list.Select(idx)
+                break
         self.SetFocus()
 
     def onDeselect(self, _):

@@ -28,7 +28,7 @@ class PrescriptionPage(wx.Panel):
         self.drug_list = DrugListCtrl(self)
         self.reuse_druglist_btn = ReuseDrugListButton(self)
         self.use_sample_prescription_btn = UseSamplePrescriptionBtn(self)
-        self.outclinic_reminder = wx.StaticText(self, label="\u2705: thuốc mua ngoài")
+        self.outclinic_reminder = wx.StaticText(self, label="Ghi chú: \u2705: thuốc mua ngoài")
         self.outclinic_reminder.Show(self.mv.config.outclinic_drug_checkbox)
 
         def static(s):

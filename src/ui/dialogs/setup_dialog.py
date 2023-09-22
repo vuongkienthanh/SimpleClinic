@@ -250,7 +250,7 @@ class PrintPage(BasePage):
             "Tên thuốc", self.mv.config.get_format("drug_name")
         )
         self.drug_quantity = checklistbox(
-            "Tên thuốc", self.mv.config.get_format("drug_quantity")
+            "Số lượng thuốc", self.mv.config.get_format("drug_quantity")
         )
         self.drug_usage_note = checklistbox(
             "Cách dùng thuốc", self.mv.config.get_format("drug_usage_note")
@@ -267,11 +267,11 @@ class PrintPage(BasePage):
                 *widget(self.clinic_address, self),
                 *widget(self.clinic_phone_number, self),
                 *widget(self.doctor_name, self),
+                *widget(self.doctor_license, self),
                 *widget(self.weight, self),
                 *widget(self.gender, self),
                 *widget(self.birthdate, self),
                 *widget(self.age, self),
-                *widget(self.doctor_license, self),
                 *widget(self.patient_name, self),
                 *widget(self.diagnosis, self),
                 *widget(self.vnote, self),

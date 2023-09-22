@@ -1,4 +1,9 @@
 # -*- mode: python ; coding: utf-8 -*-
+import tomllib
+
+with open("pyproject.toml", "rb") as f:
+    version = tomllib.load(f)["tool"]["poetry"]["version"]
+
 block_cipher = None
 
 main= Analysis(
@@ -44,5 +49,5 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='SimpleClinicV3.3.4',
+    name=f'SimpleClinicV{version}',
 )

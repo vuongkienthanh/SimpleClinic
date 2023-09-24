@@ -66,10 +66,10 @@ class DrugListCtrl(StateListCtrl):
             wh.sale_unit,
             item.usage_note,
         )
-        self.SetItem(idx, 2, times)
-        self.SetItem(idx, 3, dose)
-        self.SetItem(idx, 4, quantity)
-        self.SetItem(idx, 5, note)
+        self.SetItem(idx, 3, times)
+        self.SetItem(idx, 4, dose)
+        self.SetItem(idx, 5, quantity)
+        self.SetItem(idx, 6, note)
 
     def pop_ui(self, idx: int):
         super().pop_ui(idx)

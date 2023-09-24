@@ -67,6 +67,7 @@ class UpdateQuantityBtn(wx.Button):
 
     def onClick(self, _):
         self.update_quantity()
+        self.Disable()
 
     def update_quantity(self):
         """Update quantity in DrugList, also update price"""
@@ -85,11 +86,10 @@ class UpdateQuantityBtn(wx.Button):
             )
             drug_list.SetItem(
                 idx,
-                4,
+                5,
                 f"{item.quantity} {sale_unit_from_db(wh.sale_unit , wh.usage_unit)}",
             )
         self.mv.price.FetchPrice()
-        self.Disable()
 
 
 class NewVisitBtn(wx.Button):

@@ -89,7 +89,7 @@ class MainView(wx.Frame):
         self.order_book = OrderBook(self)
         self.recheck = RecheckCtrl(self, name="Số ngày tái khám:")
         self.norecheck = NoRecheckBtn(self)
-        self.price = PriceCtrl(self, name="Giá thu:")
+        self.price = PriceCtrl(self, name="Giá thu:", size=self.config.header_size(0.1))
         self.follow = Follow(self)
         self.newvisitbtn = NewVisitBtn(self)
         self.savebtn = SaveBtn(self)

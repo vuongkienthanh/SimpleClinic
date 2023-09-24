@@ -128,7 +128,7 @@ class MyMenuBar(wx.MenuBar):
     def onAbout(self, _):
         wx.MessageBox(
             "Phần mềm phòng khám Simple Clinic\n"
-            "V3.3.5\n"
+            "V3.3.6\n"
             "Tác giả: Vương Kiến Thanh\n"
             "Email: thanhstardust@outlook.com",
             style=wx.OK | wx.CENTRE | wx.ICON_NONE,

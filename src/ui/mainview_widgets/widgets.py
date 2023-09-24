@@ -2,18 +2,16 @@ from itertools import chain
 
 import wx
 
-from misc import (
-    calc_quantity,
-    num_to_str_price,
-    sale_unit_from_db,
-    str_to_int_price,
-    vn_weekdays,
-)
+from misc import num_to_str_price, str_to_int_price, vn_weekdays
 from ui import mainview as mv
+from ui.generics import NumberTextCtrl
 
 
 class DaysCtrl(wx.SpinCtrl):
-    """Changing DaysCtrl Value also changes RecheckCtrl Value"""
+    """
+    + RecheckCtrl Value
+    - DrugList quantity
+    """
 
     def __init__(self, mv: "mv.MainView", **kwargs):
         super().__init__(
@@ -28,49 +26,29 @@ class DaysCtrl(wx.SpinCtrl):
         self.Bind(wx.EVT_SPINCTRL, self.onSpin)
 
     def onSpin(self, e: wx.SpinEvent):
+        self.set_recheck_and_curr_drug_quantity(e)
+        self.mv.updatequantitybtn.Enable()
+
+    def set_recheck_and_curr_drug_quantity(self, e: wx.SpinEvent):
         self.mv.recheck.SetValue(e.GetPosition())
         self.mv.recheck_weekday.SetLabel(vn_weekdays(e.GetPosition()))
-        self.mv.updatequantitybtn.Enable()
         if self.mv.order_book.prescriptionpage.check_wh_do_ti_filled():
             self.mv.order_book.prescriptionpage.quantity.FetchQuantity()
 
 
 class DaysCtrlWithAutoChangePrescriptionQuantity(DaysCtrl):
-    """Changing DaysCtrl Value also changes RecheckCtrl Value
-    Also change prescription quantity"""
+    """
+    + RecheckCtrl Value
+    + DrugList quantity
+    """
 
     def onSpin(self, e: wx.SpinEvent):
-        self.mv.recheck.SetValue(e.GetPosition())
-        self.mv.recheck_weekday.SetLabel(vn_weekdays(e.GetPosition()))
-        if self.mv.order_book.prescriptionpage.check_wh_do_ti_filled():
-            self.mv.order_book.prescriptionpage.quantity.FetchQuantity()
-        self.update_quantity()
-
-    def update_quantity(self):
-        """Update quantity in DrugList, also update price"""
-        state = self.mv.state
-        drug_list = self.mv.order_book.prescriptionpage.drug_list
-        for idx, item in enumerate(
-            chain(state.old_linedrug_list, state.new_linedrug_list)
-        ):
-            wh = state.all_warehouse[item.warehouse_id]
-            item.quantity = calc_quantity(
-                times=item.times,
-                dose=item.dose,
-                days=self.mv.days.Value,
-                sale_unit=wh.sale_unit,
-                config=self.mv.config,
-            )
-            drug_list.SetItem(
-                idx,
-                4,
-                f"{item.quantity} {sale_unit_from_db(wh.sale_unit , wh.usage_unit)}",
-            )
-        self.mv.price.FetchPrice()
+        super().set_recheck_and_curr_drug_quantity(e)
+        self.mv.updatequantitybtn.update_quantity()
 
 
 class RecheckCtrl(wx.SpinCtrl):
-    """Independant of DaysCtrl"""
+    "Independant of DaysCtrl"
 
     def __init__(self, mv: "mv.MainView", **kwargs):
         super().__init__(
@@ -83,7 +61,7 @@ class RecheckCtrl(wx.SpinCtrl):
         self.Disable()
 
 
-class PriceCtrl(wx.TextCtrl):
+class PriceCtrl(NumberTextCtrl):
     """A TextCtrl with proper Vietnamese currency format
     with default set according to config"""
 

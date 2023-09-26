@@ -320,7 +320,7 @@ class PrintOut(wx.Printout):
                 i += 1
             return row(i - 1) + round(row_height / 2)
 
-        def draw_bottom(y: int, page: int) -> None:
+        def draw_bottom(y: int) -> None:
             y = aty(0.76)  # comment this out when use dynamic y
             right_point_size = aty(0.015)
             right_font = wx.Font(wx.FontInfo(right_point_size))
@@ -365,30 +365,26 @@ class PrintOut(wx.Printout):
             )
             row_height = aty(0.02)
 
-            if (not self.HasPage(2)) | (self.HasPage(2) & (page == 2)):
-                with wx.DCFontChanger(dc, left_font):
-                    if self.mv.config.print_price:
-                        t = f"Tổng cộng: {self.mv.price.Value}"
-                        if (
-                            self.mv.order_book.procedurepage.procedure_list.ItemCount
-                            > 0
-                        ):
-                            t += " (đã gồm tiền thủ thuật)"
-                        dc.DrawText(t, left_margin, row(0))
-                    if self.mv.recheck.Value != 0:
-                        match self.mv.config.follow_up_date_print_style:
-                            case 0:
-                                t = f"Tái khám sau {self.mv.recheck.Value} ngày"
-                            case 1:
-                                dst = d + dt.timedelta(days=self.mv.recheck.Value)
-                                t = f"Tái khám: {dst.strftime('%d/%m/%Y')}"
-                            case _:
-                                raise Exception("wrong style")
-                        with wx.DCFontChanger(dc, recheck_font):
-                            dc.DrawText(t, left_margin, row(1))
-                    follow = tw.wrap(self.mv.follow.expand_when_print(), width=40)
-                    for i, line in enumerate(follow):
-                        dc.DrawText(line, left_margin, row(2 + i))
+            with wx.DCFontChanger(dc, left_font):
+                if self.mv.config.print_price:
+                    t = f"Tổng cộng: {self.mv.price.Value}"
+                    if self.mv.order_book.procedurepage.procedure_list.ItemCount > 0:
+                        t += " (đã gồm tiền thủ thuật)"
+                    dc.DrawText(t, left_margin, row(0))
+                if self.mv.recheck.Value != 0:
+                    match self.mv.config.follow_up_date_print_style:
+                        case 0:
+                            t = f"Tái khám sau {self.mv.recheck.Value} ngày"
+                        case 1:
+                            dst = d + dt.timedelta(days=self.mv.recheck.Value)
+                            t = f"Tái khám: {dst.strftime('%d/%m/%Y')}"
+                        case _:
+                            raise Exception("wrong style")
+                    with wx.DCFontChanger(dc, recheck_font):
+                        dc.DrawText(t, left_margin, row(1))
+                follow = tw.wrap(self.mv.follow.expand_when_print(), width=40)
+                for i, line in enumerate(follow):
+                    dc.DrawText(line, left_margin, row(2 + i))
 
         if page == 1:
             next_row = draw_clinic_info(top_margin, page) + block_spacing
@@ -396,14 +392,14 @@ class PrintOut(wx.Printout):
             next_row = draw_patient_info(next_row) + block_spacing
             if drug_list.ItemCount != 0:
                 next_row = draw_content(next_row, first_page=True) + block_spacing
-            draw_bottom(next_row, page)
+            draw_bottom(next_row)
             return True
         elif page == 2:
             next_row = draw_clinic_info(top_margin, page) + block_spacing
             next_row = draw_title(next_row) + block_spacing
             next_row = draw_patient_info(next_row) + block_spacing
             next_row = draw_content(next_row, first_page=False) + block_spacing
-            draw_bottom(next_row, page)
+            draw_bottom(next_row)
             return True
         else:
             return False

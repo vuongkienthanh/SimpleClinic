@@ -23,10 +23,11 @@
     "Ăn nhiều rau củ",
     "Tập đi vệ sinh"
   ],
+  "app_font_size": 12,
+  "autochange_prescription_quantity_on_day_spin": true,
   "ask_print": true,
   "minimum_drug_quantity_alert": 20,
   "display_recent_visit_count": -1,
-  "autochange_prescription_quantity_on_day_spin": true,
   "maximize_at_start": false,
   "outclinic_drug_checkbox": true,
   "listctrl_header_scale": 1,
@@ -97,6 +98,10 @@
     "drug_usage_note": {
       "bold": false,
       "italic": true
+    },
+    "recheck_date": {
+      "bold": false,
+      "italic": false
     }
   },
   "background_colors": {

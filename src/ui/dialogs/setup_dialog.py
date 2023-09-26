@@ -11,6 +11,7 @@ from misc.config import (
     follow_up_date_print_style_choices,
 )
 from ui import mainview
+from ui.generics.widgets import NumberTextCtrl
 
 
 def widget(w: wx.Window, p: wx.Window):
@@ -143,6 +144,13 @@ class FollowChoicePage(wx.Panel):
 class SystemPage(BasePage):
     def __init__(self, parent):
         super().__init__(parent)
+        self.app_font_size = wx.SpinCtrl(
+            self,
+            name="App font size",
+            initial=self.mv.config.app_font_size,
+            min=9,
+            max=12,
+        )
         self.autochange_prescription_quantity_on_day_spin = wx.CheckBox(
             self, name="Tự động cập nhật số lượng thuốc khi thay đổi số ngày của toa"
         )
@@ -169,9 +177,10 @@ class SystemPage(BasePage):
             self, name="Checkbox thuốc mua ngoài"
         )
         self.outclinic_drug_checkbox.SetValue(self.mv.config.outclinic_drug_checkbox)
-        entry_sizer = wx.FlexGridSizer(6, 2, 5, 5)
+        entry_sizer = wx.FlexGridSizer(7, 2, 5, 5)
         entry_sizer.AddMany(
             [
+                *widget(self.app_font_size, self),
                 *widget(self.autochange_prescription_quantity_on_day_spin, self),
                 *widget(self.ask_print, self),
                 *widget(self.alert, self),
@@ -255,7 +264,10 @@ class PrintPage(BasePage):
         self.drug_usage_note = checklistbox(
             "Cách dùng thuốc", self.mv.config.get_format("drug_usage_note")
         )
-        entry_sizer = wx.FlexGridSizer(20, 2, 5, 5)
+        self.recheck_date = checklistbox(
+            "Tái khám", self.mv.config.get_format("recheck_date")
+        )
+        entry_sizer = wx.FlexGridSizer(21, 2, 5, 5)
         entry_sizer.AddMany(
             [
                 *widget(self.print_price, self),
@@ -278,6 +290,7 @@ class PrintPage(BasePage):
                 *widget(self.drug_name, self),
                 *widget(self.drug_quantity, self),
                 *widget(self.drug_usage_note, self),
+                *widget(self.recheck_date, self),
             ]
         )
         self.SetSizer(entry_sizer)
@@ -534,6 +547,7 @@ class SetupDialog(wx.Dialog):
                 self.mv.follow.Append(item)
 
             systempage = self.systempage
+            self.mv.config.app_font_size = systempage.app_font_size.Value
             self.mv.config.autochange_prescription_quantity_on_day_spin = (
                 systempage.autochange_prescription_quantity_on_day_spin.Value
             )
@@ -577,6 +591,7 @@ class SetupDialog(wx.Dialog):
             set_format("drug_name", printpage.drug_name)
             set_format("drug_quantity", printpage.drug_quantity)
             set_format("drug_usage_note", printpage.drug_usage_note)
+            set_format("recheck_date", printpage.recheck_date)
 
             def set_color(name: str, widget: wx.ColourPickerCtrl):
                 self.mv.config.background_colors[name] = widget.Colour.GetIM()[:3]

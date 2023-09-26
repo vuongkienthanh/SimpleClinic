@@ -25,12 +25,14 @@ from ui.menubar import MyMenuBar
 class MainView(wx.Frame):
     def __init__(self, connection: "db.Connection"):
         super().__init__(
-            parent=None, pos=(20, 20), title="PHẦN MỀM PHÒNG KHÁM SIMPLE CLINIC"
+            parent=None, pos=(0, 20), title="PHẦN MỀM PHÒNG KHÁM SIMPLE CLINIC"
         )
 
         self.connection = connection
         self.config = Config.load()
         self.state = State(self)
+
+        self.SetFont(wx.Font(wx.FontInfo(self.config.app_font_size)))
 
         if self.config.maximize_at_start:
             self.Maximize()

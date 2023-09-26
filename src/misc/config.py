@@ -34,9 +34,10 @@ class Config:
     single_sale_units: list[str]
     follow_choices_dict: dict[str, str]
     follow_choices_list: list[str]
+    app_font_size: int
+    autochange_prescription_quantity_on_day_spin: bool
     ask_print: bool
     display_recent_visit_count: int
-    autochange_prescription_quantity_on_day_spin: bool
     maximize_at_start: bool
     outclinic_drug_checkbox: bool
     listctrl_header_scale: int
@@ -81,11 +82,12 @@ class Config:
             single_sale_units=config_json["single_sale_units"],
             follow_choices_dict=config_json["follow_choices_dict"],
             follow_choices_list=config_json["follow_choices_list"],
-            ask_print=config_json["ask_print"],
-            display_recent_visit_count=config_json["display_recent_visit_count"],
+            app_font_size=config_json["app_font_size"],
             autochange_prescription_quantity_on_day_spin=config_json[
                 "autochange_prescription_quantity_on_day_spin"
             ],
+            ask_print=config_json["ask_print"],
+            display_recent_visit_count=config_json["display_recent_visit_count"],
             maximize_at_start=config_json["maximize_at_start"],
             outclinic_drug_checkbox=config_json["outclinic_drug_checkbox"],
             listctrl_header_scale=config_json["listctrl_header_scale"],
@@ -130,7 +132,7 @@ class Config:
 
     def header_width(self, p: float) -> int:
         w: int = wx.DisplaySize()[0]
-        return round(w * p * self.listctrl_header_scale)
+        return round(w * p * self.listctrl_header_scale / 9 * self.app_font_size)
 
     def header_size(self, p: float) -> tuple[int, int]:
         return (self.header_width(p), -1)

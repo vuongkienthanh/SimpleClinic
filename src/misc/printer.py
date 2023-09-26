@@ -321,6 +321,7 @@ class PrintOut(wx.Printout):
             return row(i - 1) + round(row_height / 2)
 
         def draw_bottom(y: int, page: int) -> None:
+            y = aty(0.76)  # comment this out when use dynamic y
             right_point_size = aty(0.015)
             right_font = wx.Font(wx.FontInfo(right_point_size))
             doctor_name_font = wx.Font(
@@ -357,6 +358,11 @@ class PrintOut(wx.Printout):
 
             left_point_size = aty(0.012)
             left_font = wx.Font(wx.FontInfo(left_point_size))
+            recheck_font = wx.Font(
+                wx.FontInfo(left_point_size)
+                .Bold(self.mv.config.get_format("recheck_date")["bold"])
+                .Italic(self.mv.config.get_format("recheck_date")["italic"])
+            )
             row_height = aty(0.02)
 
             if (not self.HasPage(2)) | (self.HasPage(2) & (page == 2)):
@@ -375,10 +381,11 @@ class PrintOut(wx.Printout):
                                 t = f"Tái khám sau {self.mv.recheck.Value} ngày"
                             case 1:
                                 dst = d + dt.timedelta(days=self.mv.recheck.Value)
-                                t = f"Tái khám vào ngày {dst.strftime('%d/%m/%Y')}"
+                                t = f"Tái khám: {dst.strftime('%d/%m/%Y')}"
                             case _:
                                 raise Exception("wrong style")
-                        dc.DrawText(t, left_margin, row(1))
+                        with wx.DCFontChanger(dc, recheck_font):
+                            dc.DrawText(t, left_margin, row(1))
                     follow = tw.wrap(self.mv.follow.expand_when_print(), width=40)
                     for i, line in enumerate(follow):
                         dc.DrawText(line, left_margin, row(2 + i))

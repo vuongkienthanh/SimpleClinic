@@ -225,7 +225,10 @@ class MyMenuBar(wx.MenuBar):
 
         mv = cast("mainview.MainView", self.GetFrame())
         printout = PrintOut(mv)
-        wx.Printer(wx.PrintDialogData(printdata)).Print(self, printout, False)
+        printdialog = wx.PrintDialog(mv)
+        if printdialog.ShowModal() == wx.ID_OK:
+            printdialog.PrintDialogData.SetPrintData(printdata)
+            wx.Printer(printdialog.PrintDialogData).Print(mv, printout, False)
 
     def onPreview(self, _):
         from misc.printer import PrintOut, printdata

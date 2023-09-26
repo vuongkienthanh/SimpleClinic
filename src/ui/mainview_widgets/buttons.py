@@ -188,7 +188,7 @@ class SaveBtn(wx.Button):
                         ):
                             printout = PrintOut(self.mv)
                             wx.Printer(wx.PrintDialogData(printdata)).Print(
-                                self, printout, False
+                                self.mv, printout, False
                             )
                     self.mv.state.refresh()
             except Exception as error:

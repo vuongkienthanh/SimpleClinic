@@ -21,7 +21,6 @@ class WarehouseState:
         pg.usage.SetLabel(wh.usage)
         pg.usage_unit.SetLabel(wh.usage_unit)
         pg.sale_unit.SetLabel(sale_unit_from_db(wh.sale_unit, wh.usage_unit))
-        pg.drug_picker.SelectAll()
 
     def onUnset(self, obj: "state.main_state.State") -> None:
         pg = obj.mv.order_book.prescriptionpage

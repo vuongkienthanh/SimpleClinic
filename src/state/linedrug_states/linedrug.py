@@ -41,7 +41,6 @@ class LineDrugState:
                 item.usage_note,
             )
         )
-        page.SetFocus()
 
     def onUnset(
         self,
@@ -54,4 +53,3 @@ class LineDrugState:
         page.dose.Clear()
         page.quantity.Clear()
         page.note.Clear()
-        page.SetFocus()

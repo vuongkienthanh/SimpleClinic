@@ -2,14 +2,10 @@ import wx
 
 from misc import (
     calc_quantity,
-    k_number,
-    k_special,
-    k_tab,
     note_str_from_db,
     times_dose_quantity_note_str,
 )
 from state.linedrug_states import LineDrugListStateItem
-from ui import mainview as mv
 from ui.generics import DoseTextCtrl, NumberTextCtrl, StateListCtrl
 from ui.mainview_widgets.order_book.prescription_page import page
 
@@ -128,7 +124,6 @@ class Times(NumberTextCtrl):
     def __init__(self, parent: "page.PrescriptionPage"):
         super().__init__(parent, size=parent.mv.config.header_size(0.03))
         self.parent = parent
-        self.mv = mv
         self.SetHint("lần")
         self.Bind(wx.EVT_TEXT, self.onText)
 
@@ -142,7 +137,6 @@ class Dose(DoseTextCtrl):
     def __init__(self, parent: "page.PrescriptionPage"):
         super().__init__(parent, size=parent.mv.config.header_size(0.03))
         self.parent = parent
-        self.mv = mv
         self.SetHint("liều")
         self.Bind(wx.EVT_TEXT, self.onText)
 
@@ -154,51 +148,31 @@ class Dose(DoseTextCtrl):
 
 class Quantity(NumberTextCtrl):
     def __init__(self, parent: "page.PrescriptionPage"):
-        super().__init__(
-            parent, size=parent.mv.config.header_size(0.03), style=wx.TE_PROCESS_TAB
-        )
+        super().__init__(parent, size=parent.mv.config.header_size(0.03))
         self.parent = parent
-        self.mv = parent.mv
         self.SetHint("Enter")
-        self.Bind(wx.EVT_CHAR, self.onChar)
 
     def FetchQuantity(self):
         times = int(self.parent.times.Value)
         dose = self.parent.dose.Value
-        days = self.mv.days.Value
-        wh = self.mv.state.warehouse
+        days = self.parent.mv.days.Value
+        wh = self.parent.mv.state.warehouse
         assert wh is not None
-        res = calc_quantity(times, dose, days, wh.sale_unit, self.mv.config)
+        res = calc_quantity(times, dose, days, wh.sale_unit, self.parent.mv.config)
         if res is not None:
             self.SetValue(str(res))
         else:
             self.Clear()
-
-    def onChar(self, e: wx.KeyEvent):
-        kc = e.KeyCode
-        if kc in k_tab:
-            if e.ShiftDown():
-                self.parent.dose.SetFocus()
-            else:
-                self.parent.note.SetFocus()
-                self.parent.note.SetInsertionPointEnd()
-        elif kc in k_special + k_number:
-            e.Skip()
 
 
 class NoteCtrl(wx.TextCtrl):
     def __init__(self, parent: "page.PrescriptionPage"):
         super().__init__(parent, style=wx.TE_PROCESS_ENTER)
         self.parent = parent
-        self.Bind(wx.EVT_CHAR, self.onChar)
+        self.Bind(wx.EVT_TEXT_ENTER, self.onEnter)
 
-    def onChar(self, e: wx.KeyEvent):
-        if e.KeyCode in (wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER):
-            self.parent.add_drug_btn.Add()
-        elif e.KeyCode == k_tab:
-            pass
-        else:
-            e.Skip()
+    def onEnter(self, _):
+        self.parent.add_drug_btn.Add()
 
     def FetchNote(self):
         wh = self.parent.parent.mv.state.warehouse

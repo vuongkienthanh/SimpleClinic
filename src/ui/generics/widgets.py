@@ -6,7 +6,7 @@ import wx
 import wx.adv
 
 from db import Gender
-from misc import bd_to_vn_age, k_decimal, k_hash, k_number, k_slash, k_special, k_tab
+from misc import bd_to_vn_age, k_decimal, k_hash, k_number, k_slash, k_special
 
 
 class GenderChoice(wx.Choice):
@@ -162,7 +162,7 @@ class NumberTextCtrl(wx.TextCtrl):
         self.Bind(wx.EVT_CHAR, self.onChar)
 
     def key_list(self):
-        return k_number + k_tab + k_special
+        return k_number + k_special
 
     def onChar(self, e: wx.KeyEvent):
         if e.KeyCode in self.key_list():

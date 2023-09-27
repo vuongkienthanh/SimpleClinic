@@ -37,7 +37,7 @@ class PrescriptionPage(wx.Panel):
             return (wx.StaticText(self, label=s), 0, wx.ALIGN_CENTER | wx.RIGHT, 2)
 
         def widget(w, p=0, s=2):
-            return (w, p, wx.RIGHT, s)
+            return (w, p, wx.ALIGN_CENTER | wx.RIGHT, s)
 
         drug_row = wx.BoxSizer(wx.HORIZONTAL)
         drug_row.AddMany(

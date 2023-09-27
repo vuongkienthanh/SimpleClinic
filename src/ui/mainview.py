@@ -97,11 +97,16 @@ class MainView(wx.Frame):
         self.savebtn = SaveBtn(self)
 
         def widget(w, p=0, r=5):
-            return (w, p, wx.EXPAND | wx.RIGHT, r)
+            return (w, p, wx.EXPAND | wx.RIGHT | wx.DOWN, r)
 
         def widget_with_name(w, p=0, r=5):
             return (
-                (wx.StaticText(self, label=w.Name), 0, wx.ALIGN_CENTER | wx.RIGHT, 2),
+                (
+                    wx.StaticText(self, label=w.Name),
+                    0,
+                    wx.ALIGN_CENTER | wx.RIGHT | wx.DOWN,
+                    2,
+                ),
                 widget(w, p, r),
             )
 
@@ -145,7 +150,7 @@ class MainView(wx.Frame):
                 *widget_with_name(self.recheck),
                 widget(self.norecheck),
                 (0, 0, 1),
-                *widget_with_name(self.price, 0, 0),
+                *widget_with_name(self.price),
             ]
         )
         btn_row = wx.BoxSizer(wx.HORIZONTAL)
@@ -166,17 +171,17 @@ class MainView(wx.Frame):
                 (wx.StaticText(self, label=self.vnote.Name), 0, wx.EXPAND),
                 widget(self.vnote, 1),
                 (weight_row, 0, wx.EXPAND),
-                (self.order_book, 3, wx.EXPAND),
+                widget(self.order_book, 6),
                 (recheck_row, 0, wx.EXPAND),
-                (self.follow, 0, wx.EXPAND),
+                widget(self.follow, 0),
                 (btn_row, 0, wx.EXPAND),
             ]
         )
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         sizer.AddMany(
             [
-                (left_sizer, 4, wx.EXPAND | wx.ALL, 10),
-                (right_sizer, 6, wx.EXPAND | wx.ALL, 10),
+                (left_sizer, 2, wx.EXPAND | wx.ALL, 10),
+                (right_sizer, 3, wx.EXPAND | wx.ALL, 10),
             ]
         )
         self.SetSizerAndFit(sizer)

@@ -237,7 +237,7 @@ class MyMenuBar(wx.MenuBar):
         printout = PrintOut(mv, preview=True)
         printdialogdata = wx.PrintDialogData(printdata)
         printpreview = wx.PrintPreview(printout, data=printdialogdata)
-        printpreview.SetZoom(85)
+        printpreview.SetZoom(100)
         frame = wx.PreviewFrame(printpreview, mv)
         frame.Maximize()
         frame.Initialize()

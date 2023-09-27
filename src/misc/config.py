@@ -108,7 +108,7 @@ class Config:
             recheck_date_print_style=max(
                 min(
                     config_json["recheck_date_print_style"],
-                    len(drug_name_print_style_choices),
+                    len(recheck_date_print_style_choices),
                 ),
                 0,
             ),

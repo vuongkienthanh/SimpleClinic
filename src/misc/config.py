@@ -132,7 +132,7 @@ class Config:
 
     def header_width(self, p: float) -> int:
         w: int = wx.DisplaySize()[0]
-        return round(w * p * self.listctrl_header_scale / 9 * self.app_font_size)
+        return round(w * p * self.listctrl_header_scale)
 
     def header_size(self, p: float) -> tuple[int, int]:
         return (self.header_width(p), -1)

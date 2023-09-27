@@ -17,9 +17,9 @@ class PatientBook(wx.Notebook):
         self.queuelistctrl = QueuePatientListCtrl(self)
         self.seentodaylistctrl = SeenTodayListCtrl(self)
         self.appointmentlistctrl = AppointmentListCtrl(self)
-        self.AddPage(page=self.queuelistctrl, text="Danh sách chờ khám", select=True)
-        self.AddPage(page=self.seentodaylistctrl, text="Danh sách đã khám hôm nay")
-        self.AddPage(page=self.appointmentlistctrl, text="Danh sách tái khám")
+        self.AddPage(page=self.queuelistctrl, text="BN chờ", select=True)
+        self.AddPage(page=self.seentodaylistctrl, text="BN đã khám hôm nay")
+        self.AddPage(page=self.appointmentlistctrl, text="BN tái khám")
         self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGING, self.onChanging)
 
     def onChanging(self, e: wx.BookCtrlEvent):

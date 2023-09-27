@@ -11,7 +11,7 @@ import wx
 from misc.paths import CONFIG_PATH, DEFAULT_CONFIG_PATH
 
 drug_name_print_style_choices = ["Tên", "Thành phần", "Tên(thành phần)"]
-follow_up_date_print_style_choices = ["sau x ngày", "vào ngày dd/mm/yyyy"]
+recheck_date_print_style_choices = ["sau x ngày", "vào ngày dd/mm/yyyy"]
 
 Color = namedtuple("Color", ["r", "g", "b"])
 
@@ -47,7 +47,7 @@ class Config:
     print_vnote: bool
     max_number_of_drugs_in_one_page: int
     drug_name_print_style: int
-    follow_up_date_print_style: int
+    recheck_date_print_style: int
     prescription_formats: dict[str, Format]
     background_colors: dict[str, Color]
 
@@ -105,9 +105,9 @@ class Config:
                 ),
                 0,
             ),
-            follow_up_date_print_style=max(
+            recheck_date_print_style=max(
                 min(
-                    config_json["follow_up_date_print_style"],
+                    config_json["recheck_date_print_style"],
                     len(drug_name_print_style_choices),
                 ),
                 0,

@@ -37,7 +37,7 @@
   "print_vnote": false,
   "max_number_of_drugs_in_one_page": 8,
   "drug_name_print_style": 0,
-  "follow_up_date_print_style": 0,
+  "recheck_date_print_style": 0,
   "prescription_formats": {
     "clinic_name": {
       "bold": false,

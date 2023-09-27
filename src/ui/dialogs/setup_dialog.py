@@ -8,10 +8,9 @@ from misc import minus_bm, plus_bm
 from misc.config import (
     Format,
     drug_name_print_style_choices,
-    follow_up_date_print_style_choices,
+    recheck_date_print_style_choices,
 )
 from ui import mainview
-from ui.generics.widgets import NumberTextCtrl
 
 
 def widget(w: wx.Window, p: wx.Window):
@@ -212,13 +211,13 @@ class PrintPage(BasePage):
             name="Định dạng tên thuốc",
         )
         self.drug_name_print_style.SetSelection(self.mv.config.drug_name_print_style)
-        self.follow_up_date_print_style = wx.Choice(
+        self.recheck_date_print_style = wx.Choice(
             self,
-            choices=follow_up_date_print_style_choices,
+            choices=recheck_date_print_style_choices,
             name="Định dạng tái khám",
         )
-        self.follow_up_date_print_style.SetSelection(
-            self.mv.config.follow_up_date_print_style
+        self.recheck_date_print_style.SetSelection(
+            self.mv.config.recheck_date_print_style
         )
 
         def checklistbox(name: str, format: Format) -> wx.CheckListBox:
@@ -274,7 +273,7 @@ class PrintPage(BasePage):
                 *widget(self.print_vnote, self),
                 *widget(self.num_of_ld, self),
                 *widget(self.drug_name_print_style, self),
-                *widget(self.follow_up_date_print_style, self),
+                *widget(self.recheck_date_print_style, self),
                 *widget(self.clinic_name, self),
                 *widget(self.clinic_address, self),
                 *widget(self.clinic_phone_number, self),
@@ -566,8 +565,8 @@ class SetupDialog(wx.Dialog):
             self.mv.config.drug_name_print_style = (
                 printpage.drug_name_print_style.Selection
             )
-            self.mv.config.follow_up_date_print_style = (
-                printpage.follow_up_date_print_style.Selection
+            self.mv.config.recheck_date_print_style = (
+                printpage.recheck_date_print_style.Selection
             )
 
             def set_format(name: str, widget: wx.CheckListBox):

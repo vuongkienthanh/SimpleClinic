@@ -372,7 +372,7 @@ class PrintOut(wx.Printout):
                         t += " (đã gồm tiền thủ thuật)"
                     dc.DrawText(t, left_margin, row(0))
                 if self.mv.recheck.Value != 0:
-                    match self.mv.config.follow_up_date_print_style:
+                    match self.mv.config.recheck_date_print_style:
                         case 0:
                             t = f"Tái khám sau {self.mv.recheck.Value} ngày"
                         case 1:

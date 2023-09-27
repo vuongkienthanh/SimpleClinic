@@ -73,7 +73,7 @@ class MainView(wx.Frame):
             self, style=wx.TE_MULTILINE, name="Bệnh nền, dị ứng:"
         )
         self.diagnosis = wx.TextCtrl(self, name="Chẩn đoán:")
-        self.vnote = wx.TextCtrl(self, style=wx.TE_MULTILINE, name="Bệnh sử")
+        self.vnote = wx.TextCtrl(self, style=wx.TE_MULTILINE, name="Bệnh sử:")
         self.weight = WeightCtrl(self, max=200, name="Cân nặng (kg):")
         self.get_weight_btn = GetWeightBtn(self)
         if self.config.autochange_prescription_quantity_on_day_spin:
@@ -92,7 +92,7 @@ class MainView(wx.Frame):
         self.recheck = RecheckCtrl(self, name="Số ngày tái khám:")
         self.norecheck = NoRecheckBtn(self)
         self.price = PriceCtrl(self, name="Giá thu:", size=self.config.header_size(0.1))
-        self.follow = Follow(self)
+        self.follow = Follow(self, name="Lời dặn:")
         self.newvisitbtn = NewVisitBtn(self)
         self.savebtn = SaveBtn(self)
 
@@ -153,6 +153,8 @@ class MainView(wx.Frame):
                 *widget_with_name(self.price),
             ]
         )
+        follow_up_row = wx.BoxSizer(wx.HORIZONTAL)
+        follow_up_row.AddMany(widget_with_name(self.follow, 1))
         btn_row = wx.BoxSizer(wx.HORIZONTAL)
         btn_row.AddMany(
             [
@@ -173,7 +175,7 @@ class MainView(wx.Frame):
                 (weight_row, 0, wx.EXPAND),
                 widget(self.order_book, 6),
                 (recheck_row, 0, wx.EXPAND),
-                widget(self.follow, 0),
+                (follow_up_row, 0, wx.EXPAND),
                 (btn_row, 0, wx.EXPAND),
             ]
         )

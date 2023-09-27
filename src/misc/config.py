@@ -27,7 +27,6 @@ class Config:
     clinic_address: str
     clinic_phone_number: str
     doctor_name: str
-    doctor_license: str
     checkup_price: int
     default_days_for_prescription: int
     minimum_drug_quantity_alert: int
@@ -42,7 +41,6 @@ class Config:
     print_scale: int
     preview_scale: int
     print_vnote: bool
-    max_number_of_drugs_in_one_page: int
     drug_name_print_style: int
     recheck_date_print_style: int
     prescription_formats: dict[str, Format]
@@ -72,7 +70,6 @@ class Config:
             clinic_address=config_json["clinic_address"],
             clinic_phone_number=config_json["clinic_phone_number"],
             doctor_name=config_json["doctor_name"],
-            doctor_license="",
             checkup_price=config_json["checkup_price"],
             default_days_for_prescription=config_json["default_days_for_prescription"],
             minimum_drug_quantity_alert=config_json["minimum_drug_quantity_alert"],
@@ -89,7 +86,6 @@ class Config:
             print_scale=config_json["print_scale"],
             preview_scale=config_json["preview_scale"],
             print_vnote=config_json["print_vnote"],
-            max_number_of_drugs_in_one_page=7,
             drug_name_print_style=max(
                 min(
                     config_json["drug_name_print_style"],

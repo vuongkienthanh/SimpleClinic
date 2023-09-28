@@ -1,5 +1,4 @@
 import datetime as dt
-import textwrap as tw
 
 import wx
 
@@ -77,7 +76,7 @@ class PrintOut(wx.Printout):
             return size.y
 
         def draw_clinic_info(y: int, page: int) -> int:
-            point_size = aty(0.012)
+            point_size = aty(0.015)
             basic_font = wx.Font(wx.FontInfo(point_size))
             clinic_name_font = wx.Font(
                 wx.FontInfo(point_size)
@@ -116,16 +115,16 @@ class PrintOut(wx.Printout):
             return row(2)
 
         def draw_title(y: int) -> int:
-            title = wx.Font(wx.FontInfo(aty(0.02)).Bold())
+            title = wx.Font(wx.FontInfo(aty(0.03)).Bold())
             with wx.DCFontChanger(dc, title):
                 text_height = draw_centered_text("ĐƠN THUỐC", round(dcx / 2), y)
                 return round(text_height / 2) + y
 
         def draw_patient_info(y: int) -> int:
-            basic = wx.Font(wx.FontInfo(aty(0.015)))
+            basic = wx.Font(wx.FontInfo(aty(0.02)))
             row_height = aty(0.026)
-            diagnosis = tw.wrap(self.mv.diagnosis.Value, 60)[0]
-            vnote = tw.wrap(self.mv.vnote.Value, 50)[0]
+            diagnosis =self.mv.diagnosis.Value
+            vnote = self.mv.vnote.Value
 
             def row(i):
                 return y + row_height * i
@@ -207,8 +206,8 @@ class PrintOut(wx.Printout):
                 return row(5)
 
         def draw_content(y: int, first_page=True) -> int:
-            basic = wx.Font(wx.FontInfo(aty(0.015)))
-            bigger = wx.Font(wx.FontInfo(aty(0.018)))
+            basic = wx.Font(wx.FontInfo(aty(0.02)))
+            bigger = wx.Font(wx.FontInfo(aty(0.022)))
 
             row_height = aty(0.055)
             indent = atx(0.12)
@@ -287,7 +286,7 @@ class PrintOut(wx.Printout):
         def draw_bottom(y: int ) -> None:
             y = aty(0.76)  # comment this out when use dynamic y
 
-            right_basic = wx.Font(wx.FontInfo(aty(0.015)))
+            right_basic = wx.Font(wx.FontInfo(aty(0.018)))
             date_text = self.mv.visit_list.GetItemText(
                 self.mv.visit_list.GetFirstSelected(), 1
             )
@@ -302,17 +301,16 @@ class PrintOut(wx.Printout):
             with wx.DCFontChanger(dc, right_basic.Bold()):
                 dc.DrawText("Ghi chú:", left_margin, row(-1))
             with wx.DCFontChanger(dc, right_basic):
-                follow = tw.wrap(self.mv.follow.Value, width=50)[:2]
+                follow = self.mv.follow.Value
                 indent = atx(0.2)
-                for i, line in enumerate(follow):
-                    dc.DrawText(line, indent, row(i - 1))
+                dc.DrawText(follow, indent, row(- 1))
                 draw_centered_text(
                     f"Ngày {d.day:02} tháng {d.month:02} năm {d.year:04}",
                     right_margin,
                     row(1),
                 )
                 draw_centered_text("Bác sĩ khám bệnh", right_margin, row(2))
-            with wx.DCFontChanger(dc, right_basic.Bold()):
+            with wx.DCFontChanger(dc, wx.Font(wx.FontInfo(aty(0.016))).Bold()):
                 draw_centered_text(self.mv.config.doctor_name, right_margin, row(5))
 
             left_basic = wx.Font(wx.FontInfo(aty(0.012)))

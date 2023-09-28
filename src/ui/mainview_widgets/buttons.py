@@ -309,7 +309,7 @@ class PrintBtn(wx.Button):
         printdialog = wx.PrintDialog(self.mv)
         if printdialog.ShowModal() == wx.ID_OK:
             printdialog.PrintDialogData.SetPrintData(printdata)
-            wx.Printer(printdialog.PrintDialogData).Print(mv, printout, False)
+            wx.Printer(printdialog.PrintDialogData).Print(self.mv, printout, False)
 
 
 class PreviewBtn(wx.Button):

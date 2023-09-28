@@ -22,75 +22,8 @@
   "listctrl_header_scale": 1,
   "print_scale": 1,
   "preview_scale": 1,
-  "print_vnote": false,
   "drug_name_print_style": 0,
   "recheck_date_print_style": 0,
-  "prescription_formats": {
-    "clinic_name": {
-      "bold": false,
-      "italic": false
-    },
-    "clinic_address": {
-      "bold": false,
-      "italic": false
-    },
-    "clinic_phone_number": {
-      "bold": false,
-      "italic": false
-    },
-    "doctor_name": {
-      "bold": true,
-      "italic": false
-    },
-    "doctor_license": {
-      "bold": false,
-      "italic": false
-    },
-    "patient_name": {
-      "bold": false,
-      "italic": true
-    },
-    "weight": {
-      "bold": false,
-      "italic": true
-    },
-    "gender": {
-      "bold": false,
-      "italic": true
-    },
-    "birthdate": {
-      "bold": false,
-      "italic": true
-    },
-    "age": {
-      "bold": false,
-      "italic": true
-    },
-    "diagnosis": {
-      "bold": false,
-      "italic": true
-    },
-    "vnote": {
-      "bold": false,
-      "italic": true
-    },
-    "drug_name": {
-      "bold": false,
-      "italic": false
-    },
-    "drug_quantity": {
-      "bold": false,
-      "italic": false
-    },
-    "drug_usage_note": {
-      "bold": false,
-      "italic": true
-    },
-    "recheck_date": {
-      "bold": false,
-      "italic": false
-    }
-  },
   "background_colors": {
     "mainview": [
       206,

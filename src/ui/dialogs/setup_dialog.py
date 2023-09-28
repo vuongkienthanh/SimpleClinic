@@ -3,7 +3,6 @@ import wx.adv as adv
 import wx.grid
 
 from misc.config import (
-    Format,
     drug_name_print_style_choices,
     recheck_date_print_style_choices,
 )
@@ -135,8 +134,6 @@ class SystemPage(BasePage):
 class PrintPage(BasePage):
     def __init__(self, parent):
         super().__init__(parent)
-        self.print_vnote = wx.CheckBox(self, name="In bệnh sử")
-        self.print_vnote.SetValue(self.mv.config.print_vnote)
         self.drug_name_print_style = wx.Choice(
             self,
             choices=drug_name_print_style_choices,
@@ -152,70 +149,11 @@ class PrintPage(BasePage):
             self.mv.config.recheck_date_print_style
         )
 
-        def checklistbox(name: str, format: Format) -> wx.CheckListBox:
-            w = wx.CheckListBox(self, choices=["In đậm", "In nghiêng"], name=name)
-            w.Check(0, format["bold"])
-            w.Check(1, format["italic"])
-            return w
-
-        self.clinic_name = checklistbox(
-            "Tên phòng khám", self.mv.config.get_format("clinic_name")
-        )
-        self.clinic_address = checklistbox(
-            "Địa chỉ phòng khám", self.mv.config.get_format("clinic_address")
-        )
-        self.clinic_phone_number = checklistbox(
-            "SĐT phòng khám", self.mv.config.get_format("clinic_phone_number")
-        )
-        self.doctor_name = checklistbox(
-            "Tên bác sĩ", self.mv.config.get_format("doctor_name")
-        )
-        self.patient_name = checklistbox(
-            "Tên bệnh nhân", self.mv.config.get_format("patient_name")
-        )
-        self.weight = checklistbox("Cân nặng", self.mv.config.get_format("weight"))
-        self.gender = checklistbox("Giới tính", self.mv.config.get_format("gender"))
-        self.birthdate = checklistbox(
-            "Ngày sinh", self.mv.config.get_format("birthdate")
-        )
-        self.age = checklistbox("Tuổi", self.mv.config.get_format("age"))
-        self.diagnosis = checklistbox(
-            "Chẩn đoán", self.mv.config.get_format("diagnosis")
-        )
-        self.vnote = checklistbox("Bệnh sử", self.mv.config.get_format("vnote"))
-        self.drug_name = checklistbox(
-            "Tên thuốc", self.mv.config.get_format("drug_name")
-        )
-        self.drug_quantity = checklistbox(
-            "Số lượng thuốc", self.mv.config.get_format("drug_quantity")
-        )
-        self.drug_usage_note = checklistbox(
-            "Cách dùng thuốc", self.mv.config.get_format("drug_usage_note")
-        )
-        self.recheck_date = checklistbox(
-            "Tái khám", self.mv.config.get_format("recheck_date")
-        )
-        entry_sizer = wx.FlexGridSizer(18, 2, 5, 5)
+        entry_sizer = wx.FlexGridSizer(2, 2, 5, 5)
         entry_sizer.AddMany(
             [
-                *widget(self.print_vnote, self),
                 *widget(self.drug_name_print_style, self),
                 *widget(self.recheck_date_print_style, self),
-                *widget(self.clinic_name, self),
-                *widget(self.clinic_address, self),
-                *widget(self.clinic_phone_number, self),
-                *widget(self.doctor_name, self),
-                *widget(self.weight, self),
-                *widget(self.gender, self),
-                *widget(self.birthdate, self),
-                *widget(self.age, self),
-                *widget(self.patient_name, self),
-                *widget(self.diagnosis, self),
-                *widget(self.vnote, self),
-                *widget(self.drug_name, self),
-                *widget(self.drug_quantity, self),
-                *widget(self.drug_usage_note, self),
-                *widget(self.recheck_date, self),
             ]
         )
         self.SetSizer(entry_sizer)
@@ -465,35 +403,12 @@ class SetupDialog(wx.Dialog):
             )
 
             printpage = self.printpage
-            self.mv.config.print_vnote = printpage.print_vnote.Value
             self.mv.config.drug_name_print_style = (
                 printpage.drug_name_print_style.Selection
             )
             self.mv.config.recheck_date_print_style = (
                 printpage.recheck_date_print_style.Selection
             )
-
-            def set_format(name: str, widget: wx.CheckListBox):
-                self.mv.config.prescription_formats[name] = {
-                    "bold": widget.IsChecked(0),
-                    "italic": widget.IsChecked(1),
-                }
-
-            set_format("clinic_name", printpage.clinic_name)
-            set_format("clinic_address", printpage.clinic_address)
-            set_format("clinic_phone_number", printpage.clinic_phone_number)
-            set_format("doctor_name", printpage.doctor_name)
-            set_format("patient_name", printpage.patient_name)
-            set_format("weight", printpage.weight)
-            set_format("gender", printpage.gender)
-            set_format("birthdate", printpage.birthdate)
-            set_format("age", printpage.age)
-            set_format("diagnosis", printpage.diagnosis)
-            set_format("vnote", printpage.vnote)
-            set_format("drug_name", printpage.drug_name)
-            set_format("drug_quantity", printpage.drug_quantity)
-            set_format("drug_usage_note", printpage.drug_usage_note)
-            set_format("recheck_date", printpage.recheck_date)
 
             def set_color(name: str, widget: wx.ColourPickerCtrl):
                 self.mv.config.background_colors[name] = widget.Colour.GetIM()[:3]

@@ -22,12 +22,13 @@ class PrintOut(wx.Printout):
         super().__init__(title="Toa thuốc")
         self.mv = mv
         self.preview = preview
+        self.num_of_ld = 7
 
     def HasPage(self, page):
         "Relative to `num_of_ld`"
         x, y = divmod(
             self.mv.order_book.prescriptionpage.drug_list.ItemCount,
-            self.mv.config.max_number_of_drugs_in_one_page,
+            self.num_of_ld,
         )
         if page <= (x + bool(y)):
             return True
@@ -42,8 +43,7 @@ class PrintOut(wx.Printout):
             return (1, 1, 1, 1)
         else:
             x, y = divmod(
-                self.mv.order_book.prescriptionpage.drug_list.ItemCount,
-                self.mv.config.max_number_of_drugs_in_one_page,
+                self.mv.order_book.prescriptionpage.drug_list.ItemCount, self.num_of_ld
             )
         return (1, x + bool(y), 1, x + bool(y))
 
@@ -63,12 +63,11 @@ class PrintOut(wx.Printout):
         def aty(f: float) -> int:
             return round(dcy * f)
 
-        top_margin = aty(0.05)
+        top_margin = aty(0.03)
         block_spacing = aty(0.03)
         left_margin = atx(0.06)
         right_column = atx(0.7)
 
-        num_of_ld = self.mv.config.max_number_of_drugs_in_one_page
         drug_list = self.mv.order_book.prescriptionpage.drug_list
 
         def draw_centered_text(s: str, x: int, y: int) -> int:
@@ -82,18 +81,18 @@ class PrintOut(wx.Printout):
             basic_font = wx.Font(wx.FontInfo(point_size))
             clinic_name_font = wx.Font(
                 wx.FontInfo(point_size)
-                .Bold(self.mv.config.get_format("clinic_name")["bold"])
-                .Italic(self.mv.config.get_format("clinic_name")["italic"])
+                # .Bold()
+                # .Italic()
             )
             clinic_address_font = wx.Font(
                 wx.FontInfo(point_size)
-                .Bold(self.mv.config.get_format("clinic_address")["bold"])
-                .Italic(self.mv.config.get_format("clinic_address")["italic"])
+                # .Bold()
+                # .Italic()
             )
             clinic_phone_number_font = wx.Font(
                 wx.FontInfo(point_size)
-                .Bold(self.mv.config.get_format("clinic_phone_number")["bold"])
-                .Italic(self.mv.config.get_format("clinic_phone_number")["italic"])
+                # .Bold()
+                # .Italic()
             )
             row_height = aty(0.017)
 
@@ -123,130 +122,83 @@ class PrintOut(wx.Printout):
                 return round(text_height / 2) + y
 
         def draw_patient_info(y: int) -> int:
-            point_size = aty(0.015)
-            basic_info = wx.Font(wx.FontInfo(point_size))
-            patient_name_font = wx.Font(
-                wx.FontInfo(point_size)
-                .Bold(self.mv.config.get_format("patient_name")["bold"])
-                .Italic(self.mv.config.get_format("patient_name")["italic"])
-            )
-            weight_font = wx.Font(
-                wx.FontInfo(point_size)
-                .Bold(self.mv.config.get_format("weight")["bold"])
-                .Italic(self.mv.config.get_format("weight")["italic"])
-            )
-            gender_font = wx.Font(
-                wx.FontInfo(point_size)
-                .Bold(self.mv.config.get_format("gender")["bold"])
-                .Italic(self.mv.config.get_format("gender")["italic"])
-            )
-            birthdate_font = wx.Font(
-                wx.FontInfo(point_size)
-                .Bold(self.mv.config.get_format("birthdate")["bold"])
-                .Italic(self.mv.config.get_format("birthdate")["italic"])
-            )
-            age_font = wx.Font(
-                wx.FontInfo(point_size)
-                .Bold(self.mv.config.get_format("age")["bold"])
-                .Italic(self.mv.config.get_format("age")["italic"])
-            )
-            diagnosis_font = wx.Font(
-                wx.FontInfo(point_size)
-                .Bold(self.mv.config.get_format("diagnosis")["bold"])
-                .Italic(self.mv.config.get_format("diagnosis")["italic"])
-            )
-            vnote_font = wx.Font(
-                wx.FontInfo(point_size)
-                .Bold(self.mv.config.get_format("vnote")["bold"])
-                .Italic(self.mv.config.get_format("vnote")["italic"])
-            )
+            basic = wx.Font(wx.FontInfo(aty(0.015)))
             row_height = aty(0.026)
-            indent = atx(0.25)
-            middle = atx(0.3)
-            diagnosis = tw.wrap(self.mv.diagnosis.Value, 50)
-            if len(diagnosis) > 2:
-                diagnosis = diagnosis[:2]
-                diagnosis[-1] = diagnosis[-1][:-3] + "..."
-            vnote = tw.wrap(self.mv.vnote.Value, 50)
-            if len(vnote) > 2:
-                vnote = vnote[:2]
-                vnote[-1] = vnote[-1][:-3] + "..."
+            diagnosis = tw.wrap(self.mv.diagnosis.Value, 50)[0]
+            vnote = tw.wrap(self.mv.vnote.Value, 50)[0]
 
             def row(i):
                 return y + row_height * i
 
-            s1 = "Họ tên:"
-            s2 = "CN:"
-            s3 = "Giới:"
-            s4 = "SN:"
-            s5 = "Chẩn đoán:"
-            s6 = "Bệnh sử:"
-            with wx.DCFontChanger(dc, basic_info):
-                dc.DrawText(s1, left_margin, row(0))
-                dc.DrawText(s2, right_column, row(0))
-                dc.DrawText(s3, left_margin, row(1))
-                dc.DrawText(s4, middle, row(1))
-                dc.DrawText(s5, left_margin, row(2))
-                if self.mv.config.print_vnote:
-                    dc.DrawText(s6, left_margin, row(3 + len(diagnosis) - 1))
-
-            with wx.DCFontChanger(dc, patient_name_font):
-                dc.DrawText(
-                    self.mv.name.Value,
-                    left_margin + dc.GetTextExtent(s1).x + whitespace,
-                    row(0),
-                )
-            with wx.DCFontChanger(dc, weight_font):
-                dc.DrawText(
-                    str(self.mv.weight.Value) + " kg",
-                    right_column + dc.GetTextExtent(s2).x + whitespace,
-                    row(0),
-                )
-            with wx.DCFontChanger(dc, gender_font):
+            with wx.DCFontChanger(dc, basic):
+                t = "Họ tên:"
+                dc.DrawText(t, left_margin, row(0))
+                with wx.DCFontChanger(dc, basic.Bold()):
+                    dc.DrawText(
+                        self.mv.name.Value,
+                        left_margin + dc.GetTextExtent(t).x + whitespace,
+                        row(0),
+                    )
+                t = "GT:"
+                indent = atx(0.55)
+                dc.DrawText(t, indent, row(0))
                 dc.DrawText(
                     str(self.mv.gender.Value),
-                    left_margin + dc.GetTextExtent(s3).x + whitespace,
-                    row(1),
+                    indent + dc.GetTextExtent(t).x + whitespace,
+                    row(0),
                 )
-            with wx.DCFontChanger(dc, birthdate_font):
+                t = "Tuổi:"
+                indent = atx(0.7)
+                dc.DrawText(t, indent, row(0))
                 dc.DrawText(
-                    self.mv.birthdate.Value,
-                    middle + dc.GetTextExtent(s4).x + whitespace,
+                    self.mv.age.Value,
+                    indent + dc.GetTextExtent(t).x + whitespace,
+                    row(0),
+                )
+                t = "Địa chỉ:"
+                dc.DrawText(t, left_margin, row(1))
+                dc.DrawText(
+                    self.mv.address.Value,
+                    left_margin + dc.GetTextExtent(t).x + whitespace,
                     row(1),
                 )
-            with wx.DCFontChanger(dc, age_font):
-                dc.DrawText(self.mv.age.Value, right_column, row(1))
-            with wx.DCFontChanger(dc, diagnosis_font):
-                for i, line in enumerate(diagnosis):
-                    dc.DrawText(line, indent, row(2 + i))
-            if self.mv.config.print_vnote & (len(vnote) > 0):
-                with wx.DCFontChanger(dc, vnote_font):
-                    for i, line in enumerate(vnote):
-                        dc.DrawText(line, indent, row(len(diagnosis) + 2 + i))
-            if self.mv.config.print_vnote:
-                return row(1 + len(diagnosis) + max(1, len(vnote)))
-            else:
-                return row(1 + len(diagnosis))
+                t = "SĐT:"
+                dc.DrawText(t, left_margin, row(2))
+                dc.DrawText(
+                    self.mv.phone.Value,
+                    left_margin + dc.GetTextExtent(t).x + whitespace,
+                    row(2),
+                )
+                t = "Biểu hiện lâm sàng:"
+                dc.DrawText(t, left_margin, row(3))
+                dc.DrawText(
+                    vnote, left_margin + dc.GetTextExtent(t).x + whitespace, row(3)
+                )
+                t = "Nhiệt độ:"
+                dc.DrawText(t, left_margin, row(4))
+                t = "Cân nặng:"
+                indent = atx(0.3)
+                dc.DrawText(t, indent, row(4))
+                dc.DrawText(
+                    str(self.mv.weight.Value) + " kg",
+                    indent + dc.GetTextExtent(t).x + whitespace,
+                    row(4),
+                )
+                t = "Chiều cao:"
+                indent = atx(0.6)
+                dc.DrawText(t, indent, row(4))
+                t = "Chẩn đoán:"
+                dc.DrawText(t, left_margin, row(5))
+                dc.DrawText(
+                    diagnosis,
+                    left_margin + dc.GetTextExtent(t).x + whitespace,
+                    row(5),
+                )
+                return row(5)
 
         def draw_content(y: int, first_page=True) -> int:
-            point_size = aty(0.015)
-            bigger_point_size = aty(0.018)
-            basic_font = wx.Font(wx.FontInfo(point_size))
-            drug_name_font = wx.Font(
-                wx.FontInfo(bigger_point_size)
-                .Bold(self.mv.config.get_format("drug_name")["bold"])
-                .Italic(self.mv.config.get_format("drug_name")["italic"])
-            )
-            drug_quantity_font = wx.Font(
-                wx.FontInfo(bigger_point_size)
-                .Bold(self.mv.config.get_format("drug_quantity")["bold"])
-                .Italic(self.mv.config.get_format("drug_quantity")["italic"])
-            )
-            drug_usage_note_font = wx.Font(
-                wx.FontInfo(point_size)
-                .Bold(self.mv.config.get_format("drug_usage_note")["bold"])
-                .Italic(self.mv.config.get_format("drug_usage_note")["italic"])
-            )
+            basic = wx.Font(wx.FontInfo(aty(0.015)))
+            bigger = wx.Font(wx.FontInfo(aty(0.018)))
 
             row_height = aty(0.055)
             indent = atx(0.12)
@@ -254,24 +206,27 @@ class PrintOut(wx.Printout):
             def row(i):
                 return y + row_height * i
 
-            def name_only(i: int) -> str:
+            def name(i: int) -> str:
                 return drug_list.GetItemText(i, 1)
 
-            def element_only(i: int) -> str:
+            def element(i: int) -> str:
                 return drug_list.GetItemText(i, 2)
 
             def name_element(i: int) -> str:
-                return f"{drug_list.GetItemText(i, 1)}({drug_list.GetItemText(i,2)})"[
-                    :30
-                ]
+                return f"{name(i)}({element(i)})"
+
+            def element_name(i: int) -> str:
+                return f"{element(i)}({name(i)})"
 
             match self.mv.config.drug_name_print_style:
                 case 0:
-                    get_drug_name = name_only
+                    get_drug_name = name
                 case 1:
-                    get_drug_name = element_only
+                    get_drug_name = element
                 case 2:
                     get_drug_name = name_element
+                case 3:
+                    get_drug_name = element_name
                 case _:
                     raise Exception("cant get drug name print style")
 
@@ -289,7 +244,7 @@ class PrintOut(wx.Printout):
                         "quantity": drug_list.GetItemText(i, 5),
                         "note": drug_list.GetItemText(i, 6),
                     }
-                    for i in range(min(num_of_ld, drug_list.ItemCount))
+                    for i in range(min(self.num_of_ld, drug_list.ItemCount))
                 ]
                 added_idx_number = 0
             else:
@@ -305,82 +260,69 @@ class PrintOut(wx.Printout):
                         "quantity": drug_list.GetItemText(i, 5),
                         "note": drug_list.GetItemText(i, 6),
                     }
-                    for i in range(num_of_ld, drug_list.ItemCount)
+                    for i in range(self.num_of_ld, drug_list.ItemCount)
                 ]
-                added_idx_number = num_of_ld
+                added_idx_number = self.num_of_ld
             for dl in _list:
-                with wx.DCFontChanger(dc, basic_font):
+                with wx.DCFontChanger(dc, basic.Bold()):
                     dc.DrawText(f"{i+1+added_idx_number}/", left_margin, row(i))
-                with wx.DCFontChanger(dc, drug_name_font):
                     dc.DrawText(dl["name"], indent, row(i))
-                with wx.DCFontChanger(dc, drug_quantity_font):
+                with wx.DCFontChanger(dc, bigger.Bold()):
                     dc.DrawText(dl["quantity"], right_column, row(i))
-                with wx.DCFontChanger(dc, drug_usage_note_font):
+                with wx.DCFontChanger(dc, basic):
                     dc.DrawText(dl["note"], indent, row(i) + round(row_height / 2))
                 i += 1
             return row(i - 1) + round(row_height / 2)
 
         def draw_bottom(y: int ) -> None:
             y = aty(0.76)  # comment this out when use dynamic y
-            right_point_size = aty(0.015)
-            right_font = wx.Font(wx.FontInfo(right_point_size))
-            doctor_name_font = wx.Font(
-                wx.FontInfo(right_point_size)
-                .Bold(self.mv.config.get_format("doctor_name")["bold"])
-                .Italic(self.mv.config.get_format("doctor_name")["italic"])
-            )
+
+            right_basic = wx.Font(wx.FontInfo(aty(0.015)))
             date_text = self.mv.visit_list.GetItemText(
                 self.mv.visit_list.GetFirstSelected(), 1
             )
             d = dt.datetime.strptime(date_text, "%d/%m/%Y %H:%M").date()
+
             row_height = aty(0.03)
             right_margin = atx(0.75)
 
             def row(i):
                 return y + row_height * i
 
-            with wx.DCFontChanger(dc, right_font.Bold()):
+            with wx.DCFontChanger(dc, right_basic.Bold()):
                 dc.DrawText("Ghi chú:", left_margin, row(-1))
-            with wx.DCFontChanger(dc, right_font):
+            with wx.DCFontChanger(dc, right_basic):
                 follow = tw.wrap(self.mv.follow.Value, width=50)[:2]
                 indent = atx(0.2)
                 for i, line in enumerate(follow):
                     dc.DrawText(line, indent, row(i - 1))
-
-            with wx.DCFontChanger(dc, right_font):
                 draw_centered_text(
                     f"Ngày {d.day:02} tháng {d.month:02} năm {d.year:04}",
                     right_margin,
                     row(1),
                 )
                 draw_centered_text("Bác sĩ khám bệnh", right_margin, row(2))
-            with wx.DCFontChanger(dc, doctor_name_font):
+            with wx.DCFontChanger(dc, right_basic.Bold()):
                 draw_centered_text(self.mv.config.doctor_name, right_margin, row(5))
 
-            left_point_size = aty(0.012)
-            left_font = wx.Font(wx.FontInfo(left_point_size))
-            recheck_font = wx.Font(
-                wx.FontInfo(aty(0.015))
-                .Bold(self.mv.config.get_format("recheck_date")["bold"])
-                .Italic(self.mv.config.get_format("recheck_date")["italic"])
-            )
+            left_basic = wx.Font(wx.FontInfo(aty(0.012)))
+            left_bigger = wx.Font(wx.FontInfo(aty(0.015)))
             row_height = aty(0.025)
 
-            with wx.DCFontChanger(dc, left_font):
-                if self.mv.recheck.Value != 0:
-                    match self.mv.config.recheck_date_print_style:
-                        case 0:
-                            t = f"Tái khám sau {self.mv.recheck.Value} ngày"
-                        case 1:
-                            dst = d + dt.timedelta(days=self.mv.recheck.Value)
-                            t = f"Tái khám: {dst.strftime('%d/%m/%Y')}"
-                        case _:
-                            raise Exception("wrong style")
-                    with wx.DCFontChanger(dc, recheck_font):
-                        dc.DrawText(t, left_margin, row(1))
-            with wx.DCFontChanger(dc, left_font.Bold()):
+            if self.mv.recheck.Value != 0:
+                match self.mv.config.recheck_date_print_style:
+                    case 0:
+                        t = f"Tái khám sau {self.mv.recheck.Value} ngày"
+                    case 1:
+                        dst = d + dt.timedelta(days=self.mv.recheck.Value)
+                        t = f"Tái khám: {dst.strftime('%d/%m/%Y')}"
+                    case _:
+                        raise Exception("wrong style")
+                with wx.DCFontChanger(dc, left_bigger.Bold()):
+                    dc.DrawText(t, left_margin, row(1))
+            with wx.DCFontChanger(dc, left_basic.Bold()):
                 dc.DrawText("Tái khám ngay khi:", left_margin, row(3))
-            with wx.DCFontChanger(dc, left_font):
+            with wx.DCFontChanger(dc, left_basic):
                 second_col = left_margin + atx(0.23)
                 dc.DrawText("*Lau mát khi sốt", left_margin, row(2))
                 dc.DrawText("*Uống nhiều nước", second_col, row(2))

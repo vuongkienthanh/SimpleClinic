@@ -10,7 +10,7 @@ import wx
 
 from misc.paths import CONFIG_PATH, DEFAULT_CONFIG_PATH
 
-drug_name_print_style_choices = ["Tên", "Thành phần", "Tên(thành phần)"]
+drug_name_print_style_choices = ["Tên", "Thành phần", "Tên(thành phần)", "Thành phần(tên)"]
 recheck_date_print_style_choices = ["sau x ngày", "vào ngày dd/mm/yyyy"]
 
 Color = namedtuple("Color", ["r", "g", "b"])
@@ -40,10 +40,8 @@ class Config:
     listctrl_header_scale: int
     print_scale: int
     preview_scale: int
-    print_vnote: bool
     drug_name_print_style: int
     recheck_date_print_style: int
-    prescription_formats: dict[str, Format]
     background_colors: dict[str, Color]
 
     @classmethod
@@ -85,7 +83,6 @@ class Config:
             listctrl_header_scale=config_json["listctrl_header_scale"],
             print_scale=config_json["print_scale"],
             preview_scale=config_json["preview_scale"],
-            print_vnote=config_json["print_vnote"],
             drug_name_print_style=max(
                 min(
                     config_json["drug_name_print_style"],
@@ -100,7 +97,6 @@ class Config:
                 ),
                 0,
             ),
-            prescription_formats=config_json["prescription_formats"],
             background_colors={
                 name: Color(r, g, b)
                 for (name, [r, g, b]) in config_json["background_colors"].items()
@@ -130,9 +126,3 @@ class Config:
             return wx.Colour(*self.background_colors[name])
         except KeyError:
             return wx.Colour(255, 255, 255)
-
-    def get_format(self, name: str) -> Format:
-        try:
-            return self.prescription_formats[name]
-        except KeyError:
-            return {"bold": False, "italic": False}

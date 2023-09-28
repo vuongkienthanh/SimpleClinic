@@ -49,9 +49,6 @@ class InfoPage(BasePage):
         self.doctor_name = wx.TextCtrl(
             self, value=self.mv.config.doctor_name, name="Tên bác sĩ"
         )
-        self.doctor_license = wx.TextCtrl(
-            self, value=self.mv.config.doctor_license, name="Chứng chỉ hành nghề"
-        )
         self.checkup_price = wx.TextCtrl(
             self, value=str(self.mv.config.checkup_price), name="Công khám bệnh"
         )
@@ -71,7 +68,7 @@ class InfoPage(BasePage):
         for item in self.mv.config.single_sale_units:
             lc.Append((item,))
         lc.Append(("",))
-        entry_sizer = wx.FlexGridSizer(8, 2, 5, 5)
+        entry_sizer = wx.FlexGridSizer(7, 2, 5, 5)
         entry_sizer.AddGrowableCol(1)
         entry_sizer.AddMany(
             [
@@ -79,7 +76,6 @@ class InfoPage(BasePage):
                 *widget(self.clinic_address, self),
                 *widget(self.clinic_phone_number, self),
                 *widget(self.doctor_name, self),
-                *widget(self.doctor_license, self),
                 *widget(self.checkup_price, self),
                 *widget(self.days, self),
                 *widget(self.unit, self),
@@ -194,17 +190,8 @@ class SystemPage(BasePage):
 class PrintPage(BasePage):
     def __init__(self, parent):
         super().__init__(parent)
-        self.print_price = wx.CheckBox(self, name="In giá tiền trên toa")
-        self.print_price.SetValue(self.mv.config.print_price)
         self.print_vnote = wx.CheckBox(self, name="In bệnh sử")
         self.print_vnote.SetValue(self.mv.config.print_vnote)
-        self.num_of_ld = wx.SpinCtrl(
-            self,
-            initial=self.mv.config.max_number_of_drugs_in_one_page,
-            name="Số lượng thuốc được in trong một toa\n(6 ~ 8)",
-            min=6,
-            max=8,
-        )
         self.drug_name_print_style = wx.Choice(
             self,
             choices=drug_name_print_style_choices,
@@ -238,9 +225,6 @@ class PrintPage(BasePage):
         self.doctor_name = checklistbox(
             "Tên bác sĩ", self.mv.config.get_format("doctor_name")
         )
-        self.doctor_license = checklistbox(
-            "CCHN", self.mv.config.get_format("doctor_license")
-        )
         self.patient_name = checklistbox(
             "Tên bệnh nhân", self.mv.config.get_format("patient_name")
         )
@@ -266,19 +250,16 @@ class PrintPage(BasePage):
         self.recheck_date = checklistbox(
             "Tái khám", self.mv.config.get_format("recheck_date")
         )
-        entry_sizer = wx.FlexGridSizer(21, 2, 5, 5)
+        entry_sizer = wx.FlexGridSizer(18, 2, 5, 5)
         entry_sizer.AddMany(
             [
-                *widget(self.print_price, self),
                 *widget(self.print_vnote, self),
-                *widget(self.num_of_ld, self),
                 *widget(self.drug_name_print_style, self),
                 *widget(self.recheck_date_print_style, self),
                 *widget(self.clinic_name, self),
                 *widget(self.clinic_address, self),
                 *widget(self.clinic_phone_number, self),
                 *widget(self.doctor_name, self),
-                *widget(self.doctor_license, self),
                 *widget(self.weight, self),
                 *widget(self.gender, self),
                 *widget(self.birthdate, self),
@@ -518,7 +499,6 @@ class SetupDialog(wx.Dialog):
             self.mv.config.clinic_address = infopage.clinic_address.Value
             self.mv.config.clinic_phone_number = infopage.clinic_phone_number.Value
             self.mv.config.doctor_name = infopage.doctor_name.Value
-            self.mv.config.doctor_license = infopage.doctor_license.Value
             self.mv.config.checkup_price = int(infopage.checkup_price.Value)
             self.mv.config.default_days_for_prescription = infopage.days.Value
             lc: wx.ListCtrl = infopage.unit.GetListCtrl()
@@ -559,9 +539,7 @@ class SetupDialog(wx.Dialog):
             )
 
             printpage = self.printpage
-            self.mv.config.print_price = printpage.print_price.Value
             self.mv.config.print_vnote = printpage.print_vnote.Value
-            self.mv.config.max_number_of_drugs_in_one_page = printpage.num_of_ld.Value
             self.mv.config.drug_name_print_style = (
                 printpage.drug_name_print_style.Selection
             )
@@ -579,7 +557,6 @@ class SetupDialog(wx.Dialog):
             set_format("clinic_address", printpage.clinic_address)
             set_format("clinic_phone_number", printpage.clinic_phone_number)
             set_format("doctor_name", printpage.doctor_name)
-            set_format("doctor_license", printpage.doctor_license)
             set_format("patient_name", printpage.patient_name)
             set_format("weight", printpage.weight)
             set_format("gender", printpage.gender)

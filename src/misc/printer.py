@@ -248,7 +248,7 @@ class PrintOut(wx.Printout):
                 .Italic(self.mv.config.get_format("drug_usage_note")["italic"])
             )
 
-            row_height = aty(0.055 * 8 / self.mv.config.max_number_of_drugs_in_one_page)
+            row_height = aty(0.055)
             indent = atx(0.12)
 
             def row(i):
@@ -320,7 +320,7 @@ class PrintOut(wx.Printout):
                 i += 1
             return row(i - 1) + round(row_height / 2)
 
-        def draw_bottom(y: int) -> None:
+        def draw_bottom(y: int ) -> None:
             y = aty(0.76)  # comment this out when use dynamic y
             right_point_size = aty(0.015)
             right_font = wx.Font(wx.FontInfo(right_point_size))
@@ -328,11 +328,6 @@ class PrintOut(wx.Printout):
                 wx.FontInfo(right_point_size)
                 .Bold(self.mv.config.get_format("doctor_name")["bold"])
                 .Italic(self.mv.config.get_format("doctor_name")["italic"])
-            )
-            doctor_license_font = wx.Font(
-                wx.FontInfo(right_point_size)
-                .Bold(self.mv.config.get_format("doctor_license")["bold"])
-                .Italic(self.mv.config.get_format("doctor_license")["italic"])
             )
             date_text = self.mv.visit_list.GetItemText(
                 self.mv.visit_list.GetFirstSelected(), 1
@@ -344,33 +339,34 @@ class PrintOut(wx.Printout):
             def row(i):
                 return y + row_height * i
 
+            with wx.DCFontChanger(dc, right_font.Bold()):
+                dc.DrawText("Ghi chú:", left_margin, row(-1))
+            with wx.DCFontChanger(dc, right_font):
+                follow = tw.wrap(self.mv.follow.Value, width=50)[:2]
+                indent = atx(0.2)
+                for i, line in enumerate(follow):
+                    dc.DrawText(line, indent, row(i - 1))
+
             with wx.DCFontChanger(dc, right_font):
                 draw_centered_text(
                     f"Ngày {d.day:02} tháng {d.month:02} năm {d.year:04}",
                     right_margin,
-                    row(0),
+                    row(1),
                 )
-                draw_centered_text("Bác sĩ khám bệnh", right_margin, row(1))
+                draw_centered_text("Bác sĩ khám bệnh", right_margin, row(2))
             with wx.DCFontChanger(dc, doctor_name_font):
-                draw_centered_text(self.mv.config.doctor_name, right_margin, row(4))
-            with wx.DCFontChanger(dc, doctor_license_font):
-                draw_centered_text(self.mv.config.doctor_license, right_margin, row(5))
+                draw_centered_text(self.mv.config.doctor_name, right_margin, row(5))
 
             left_point_size = aty(0.012)
             left_font = wx.Font(wx.FontInfo(left_point_size))
             recheck_font = wx.Font(
-                wx.FontInfo(left_point_size)
+                wx.FontInfo(aty(0.015))
                 .Bold(self.mv.config.get_format("recheck_date")["bold"])
                 .Italic(self.mv.config.get_format("recheck_date")["italic"])
             )
-            row_height = aty(0.02)
+            row_height = aty(0.025)
 
             with wx.DCFontChanger(dc, left_font):
-                if self.mv.config.print_price:
-                    t = f"Tổng cộng: {self.mv.price.Value}"
-                    if self.mv.order_book.procedurepage.procedure_list.ItemCount > 0:
-                        t += " (đã gồm tiền thủ thuật)"
-                    dc.DrawText(t, left_margin, row(0))
                 if self.mv.recheck.Value != 0:
                     match self.mv.config.recheck_date_print_style:
                         case 0:
@@ -382,9 +378,20 @@ class PrintOut(wx.Printout):
                             raise Exception("wrong style")
                     with wx.DCFontChanger(dc, recheck_font):
                         dc.DrawText(t, left_margin, row(1))
-                follow = tw.wrap(self.mv.follow.expand_when_print(), width=40)
-                for i, line in enumerate(follow):
-                    dc.DrawText(line, left_margin, row(2 + i))
+            with wx.DCFontChanger(dc, left_font.Bold()):
+                dc.DrawText("Tái khám ngay khi:", left_margin, row(3))
+            with wx.DCFontChanger(dc, left_font):
+                second_col = left_margin + atx(0.23)
+                dc.DrawText("*Lau mát khi sốt", left_margin, row(2))
+                dc.DrawText("*Uống nhiều nước", second_col, row(2))
+                dc.DrawText("*Sốt cao không giảm", left_margin, row(4))
+                dc.DrawText("*Thở bất thường", left_margin, row(5))
+                dc.DrawText("*Bệnh nặng hơn", left_margin, row(6))
+                dc.DrawText("*Tím tái", second_col, row(4))
+                dc.DrawText("*Ói nhiều", second_col, row(5))
+                dc.DrawText("*Bỏ ăn uống", second_col, row(6))
+                dc.DrawText("*Khát nước", left_margin, row(7))
+                dc.DrawText("*Tiểu máu", second_col, row(7))
 
         if page == 1:
             next_row = draw_clinic_info(top_margin, page) + block_spacing

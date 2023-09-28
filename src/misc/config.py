@@ -32,8 +32,6 @@ class Config:
     default_days_for_prescription: int
     minimum_drug_quantity_alert: int
     single_sale_units: list[str]
-    follow_choices_dict: dict[str, str]
-    follow_choices_list: list[str]
     app_font_size: int
     autochange_prescription_quantity_on_day_spin: bool
     ask_print: bool
@@ -75,13 +73,11 @@ class Config:
             clinic_address=config_json["clinic_address"],
             clinic_phone_number=config_json["clinic_phone_number"],
             doctor_name=config_json["doctor_name"],
-            doctor_license=config_json["doctor_license"],
+            doctor_license="",
             checkup_price=config_json["checkup_price"],
             default_days_for_prescription=config_json["default_days_for_prescription"],
             minimum_drug_quantity_alert=config_json["minimum_drug_quantity_alert"],
             single_sale_units=config_json["single_sale_units"],
-            follow_choices_dict=config_json["follow_choices_dict"],
-            follow_choices_list=config_json["follow_choices_list"],
             app_font_size=config_json["app_font_size"],
             autochange_prescription_quantity_on_day_spin=config_json[
                 "autochange_prescription_quantity_on_day_spin"
@@ -93,11 +89,9 @@ class Config:
             listctrl_header_scale=config_json["listctrl_header_scale"],
             print_scale=config_json["print_scale"],
             preview_scale=config_json["preview_scale"],
-            print_price=config_json["print_price"],
+            print_price=False,
             print_vnote=config_json["print_vnote"],
-            max_number_of_drugs_in_one_page=config_json[
-                "max_number_of_drugs_in_one_page"
-            ],
+            max_number_of_drugs_in_one_page=7,
             drug_name_print_style=max(
                 min(
                     config_json["drug_name_print_style"],

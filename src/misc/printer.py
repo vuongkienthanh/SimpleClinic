@@ -124,7 +124,7 @@ class PrintOut(wx.Printout):
         def draw_patient_info(y: int) -> int:
             basic = wx.Font(wx.FontInfo(aty(0.015)))
             row_height = aty(0.026)
-            diagnosis = tw.wrap(self.mv.diagnosis.Value, 50)[0]
+            diagnosis = tw.wrap(self.mv.diagnosis.Value, 60)[0]
             vnote = tw.wrap(self.mv.vnote.Value, 50)[0]
 
             def row(i):

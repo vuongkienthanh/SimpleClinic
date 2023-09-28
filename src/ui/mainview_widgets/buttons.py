@@ -151,6 +151,8 @@ class SaveBtn(wx.Button):
                             "patient_id": p.id,
                             "vnote": check_blank_to_none(mv.vnote.Value),
                             "follow": check_blank_to_none(mv.follow.Value),
+                            "temperature": mv.temperature.GetTemperature(),
+                            "height": mv.height.GetHeight(),
                         },
                     ).lastrowid
                     assert vid is not None
@@ -200,7 +202,7 @@ class SaveBtn(wx.Button):
         if self.mv.check_diag_wt_filled():
             p = state.patient
             assert p is not None
-            past_history = check_blank_to_none(self.mv.past_history.Value)
+            past_history = check_blank_to_none(mv.past_history.Value)
             v = state.visit
             assert v is not None
             v.diagnosis = mv.diagnosis.Value.strip()
@@ -208,11 +210,13 @@ class SaveBtn(wx.Button):
             v.days = mv.days.Value
             v.recheck = mv.recheck.Value
             v.price = mv.price.GetPrice()
-            v.vnote = check_blank_to_none(self.mv.vnote.Value)
-            v.follow = check_blank_to_none(self.mv.follow.Value)
+            v.vnote = check_blank_to_none(mv.vnote.Value)
+            v.follow = check_blank_to_none(mv.follow.Value)
+            v.temperature = mv.temperature.GetTemperature()
+            v.height = mv.height.GetHeight()
 
             try:
-                with self.mv.connection as con:
+                with mv.connection as con:
                     con.execute(
                         f"UPDATE {Patient.__tablename__} SET past_history = ? WHERE id = ?",
                         (past_history, p.id),
@@ -277,15 +281,15 @@ class SaveBtn(wx.Button):
                     "Cập nhật lượt khám",
                     style=wx.OK_DEFAULT | wx.ICON_NONE,
                 )
-                if self.mv.config.ask_print:
+                if mv.config.ask_print:
                     if (
                         wx.MessageBox("In toa về?", "In toa", style=wx.YES | wx.NO)
                         == wx.YES
                     ):
-                        printout = PrintOut(self.mv)
+                        printout = PrintOut(mv)
                         wx.Printer(wx.PrintDialogData(printdata)).Print(
                             self, printout, False
                         )
-                self.mv.state.refresh()
+                mv.state.refresh()
             except Exception as error:
                 wx.MessageBox(f"Lỗi không Cập nhật lượt khám được\n{error}", "Lỗi")

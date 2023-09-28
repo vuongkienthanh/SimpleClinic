@@ -1,6 +1,5 @@
 import datetime as dt
 import sqlite3
-from decimal import Decimal
 from typing import overload
 
 from db.models import BASE, Gender
@@ -29,16 +28,6 @@ class Connection:
             sqlite3.register_adapter(dt.datetime, adapt)
             sqlite3.register_converter("timestamp", convert)
 
-        def custom_type_decimal():
-            def adapt(decimal: Decimal) -> str:
-                return str(decimal)
-
-            def convert(b: bytes) -> Decimal:
-                return Decimal(b.decode())
-
-            sqlite3.register_adapter(Decimal, adapt)
-            sqlite3.register_converter("DECIMAL", convert)
-
         def custom_type_gender():
             def adapt(gender: Gender) -> int:
                 return gender.value
@@ -51,7 +40,6 @@ class Connection:
 
         custom_type_date()
         custom_type_datetime()
-        custom_type_decimal()
         custom_type_gender()
         self.sqlcon = sqlite3.connect(path, detect_types=sqlite3.PARSE_DECLTYPES)
         self.sqlcon.row_factory = sqlite3.Row

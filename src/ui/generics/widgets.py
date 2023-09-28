@@ -1,5 +1,4 @@
 import datetime as dt
-from decimal import Decimal
 from typing import Any
 
 import wx
@@ -54,18 +53,11 @@ class DatabaseChoice(wx.Choice):
         self._choice_to_db = {}
         self._db_to_choice = {}
 
-
-class WeightCtrl(wx.SpinCtrlDouble):
+class DecimalSpinCtrl(wx.SpinCtrlDouble):
     def __init__(self, parent: wx.Window, **kwargs):
         super().__init__(parent, **kwargs)
         self.SetDigits(1)
-        self.Disable()
 
-    def GetWeight(self) -> Decimal:
-        return Decimal(self.Value)
-
-    def SetWeight(self, value: Decimal | int):
-        super().SetValue(str(value))
 
 
 class CalendarDatePicker(wx.adv.CalendarCtrl):

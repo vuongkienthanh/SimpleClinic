@@ -18,19 +18,23 @@ CREATE TABLE {Visit.__tablename__} (
     id INTEGER PRIMARY KEY,
     exam_datetime TIMESTAMP DEFAULT (datetime('now', 'localtime')),
     diagnosis TEXT NOT NULL,
-    weight DECIMAL NOT NULL,
+    weight INTEGER NOT NULL, -- real weight *10
     days INTEGER NOT NULL,
     recheck INTEGER NOT NULL,
     price INTEGER NOT NULL,
     patient_id INTEGER NOT NULL,
     vnote TEXT,
     follow TEXT,
+    temperature INTEGER,
+    height INTEGER,
     CONSTRAINT ref_patient FOREIGN KEY (patient_id) REFERENCES {Patient.__tablename__} (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
     CONSTRAINT recheck_BE_0 CHECK (recheck >=0),
     CONSTRAINT days_BE_0 CHECK (days >= 0),
-    CONSTRAINT weight_BT_0 CHECK (weight > 0) 
+    CONSTRAINT weight_BT_0 CHECK (weight > 0),
+    CONSTRAINT temperature_BT_0 CHECK (temperature >= 0),
+    CONSTRAINT height_BT_0 CHECK (height >= 0)
 );
 CREATE TABLE {Queue.__tablename__} (
     id INTEGER PRIMARY KEY,

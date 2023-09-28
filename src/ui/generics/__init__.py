@@ -10,5 +10,5 @@ from .widgets import (
     NumberTextCtrl,
     PhoneTextCtrl,
     ReadonlyVNAgeCtrl,
-    WeightCtrl,
+    DecimalSpinCtrl,
 )

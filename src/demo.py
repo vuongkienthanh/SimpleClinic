@@ -1,6 +1,5 @@
 import csv
 import datetime as dt
-import decimal
 import os
 
 from db import *
@@ -29,8 +28,6 @@ class CSVReader(csv.DictReader):
                 row[n] = dt.date.fromisoformat(row[n])
             elif t == dt.datetime:
                 row[n] = dt.datetime.fromisoformat(row[n])
-            elif t == Decimal:
-                row[n] = Decimal(row[n])
             elif t == str | None:
                 if row[n] == "":
                     row[n] = None
@@ -87,13 +84,15 @@ def sample_con():
         Visit,
         {
             "diagnosis": "Viêm ruột thừa",
-            "weight": decimal.Decimal(10),
+            "weight": 10,
             "days": 2,
             "recheck": 2,
             "price": 1000000,
             "patient_id": 6,
             "follow": "follow",
             "vnote": "fake",
+            "temperature": 375,
+            "height": 100,
         },
     )
     print("Fake data generated")

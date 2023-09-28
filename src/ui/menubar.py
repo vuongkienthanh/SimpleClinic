@@ -357,10 +357,8 @@ class MyMenuBar(wx.MenuBar):
         mv = cast("mainview.MainView", self.GetFrame())
         connection = mv.connection
         pre = os.path.getsize(connection.path) >> 10
-        connection.execute(f"UPDATE {Visit.__tablename__} SET follow=NULL")
-        connection.execute(f"UPDATE {LineDrug.__tablename__} SET usage_note=NULL")
-        connection.commit()
         connection.execute("VACUUM")
+        connection.commit()
         post = os.path.getsize(connection.path) >> 10
         wx.MessageBox(
             f"Kích thước trước khi thu gọn: {pre} KB"

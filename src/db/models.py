@@ -2,7 +2,6 @@ import datetime as dt
 import enum
 from collections.abc import Mapping
 from dataclasses import dataclass
-from decimal import Decimal
 from typing import Any, ClassVar, Self, TypeVar
 
 
@@ -147,18 +146,22 @@ class Visit(BASE):
         "patient_id",
         "follow",
         "vnote",
+        "temperature",
+        "height",
     )
     __extra_fields__ = ("exam_datetime",)
     id: int
     exam_datetime: dt.datetime
     diagnosis: str
-    weight: Decimal
+    weight: int
     days: int
     recheck: int
     price: int
     patient_id: int
-    follow: str | None = None
     vnote: str | None = None
+    follow: str | None = None
+    temperature: int | None = None
+    height: int | None = None
 
 
 @dataclass(slots=True)

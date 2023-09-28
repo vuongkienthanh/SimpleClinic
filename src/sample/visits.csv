@@ -1,12 +1,12 @@
-id,diagnosis,weight,days,recheck,price,patient_id,exam_datetime,vnote,follow
-1,viêm họng cấp,10,2,2,100000,1,2022-01-01T15:30:01.000000,ho không sốt,
-2,sốt siêu vi,12.3,2,2,100000,10,2021-12-31T16:59:59.000000,sốt 2 ngày,
-3,đau đầu,30,5,2,100000,6,2022-01-31T16:00:00.000000,,
-4,viêm amydan,50,2,2,100000,7,2022-01-31T16:10:02.000000,,
-5,viêm họng,15,3,3,100000,8,2022-04-01T16:40:40.000000,"khó thở",
-6,viêm phế quản,20,3,3,100000,7,2022-05-06T17:00:00.000000,,
-7,tiêu chảy,20,3,3,100000,2,2022-02-01T18:30:00.000000,,"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Malesuada nunc vel risus commodo viverra maecenas accumsan lacus vel. Pulvinar proin gravida hendrerit lectus. Eu lobortis elementum nibh tellus molestie nunc non blandit massa."
-8,rối loạn tiêu hóa,21.5,3,3,100000,3,2022-02-28T18:21:21.000000,,
-9,viêm da,40,3,3,100000,4,2022-03-01T19:00:00.000000,,
-10,"viêm da tiết bã, suy thận cấp trước thận, tăng huyết áp thai kỳ, đái tháo đường týp 2, blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah",23.5,3,3,100000,1,2022-05-05T20:00:00.000000,"viêm da tiết bã, suy thận cấp trước thận, tăng huyết áp thai kỳ, đái tháo đường týp 2, blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah",Dấu hiệu nặng TCM
-11,"viêm da tiết bã, suy thận cấp trước thận, tăng huyết áp thai kỳ, đái tháo đường týp 2, blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah",23.5,3,3,100000,1,2022-05-05T21:00:00.000000,,Dấu hiệu chung
+id,diagnosis,weight,days,recheck,price,patient_id,exam_datetime,vnote,follow,temperature,height
+1,viêm họng cấp,100,2,2,100000,1,2022-01-01T15:30:01.000000,ho không sốt,,,
+2,sốt siêu vi,123,2,2,100000,10,2021-12-31T16:59:59.000000,sốt 2 ngày,,,
+3,đau đầu,300,5,2,100000,6,2022-01-31T16:00:00.000000,,,,
+4,viêm amydan,500,2,2,100000,7,2022-01-31T16:10:02.000000,,,,
+5,viêm họng,150,3,3,100000,8,2022-04-01T16:40:40.000000,"khó thở",,,
+6,viêm phế quản,200,3,3,100000,7,2022-05-06T17:00:00.000000,,,,
+7,tiêu chảy,200,3,3,100000,2,2022-02-01T18:30:00.000000,,"Lorem ipsum dolor sit amet",,
+8,rối loạn tiêu hóa,215,3,3,100000,3,2022-02-28T18:21:21.000000,,,,
+9,viêm da,400,3,3,100000,4,2022-03-01T19:00:00.000000,,,,
+10,"viêm da tiết bã, suy thận cấp trước thận, tăng huyết áp thai kỳ, đái tháo đường týp 2",235,3,3,100000,1,2022-05-05T20:00:00.000000,"bệnh sử abc xyz",Dấu hiệu nặng TCM,,
+11,"viêm da tiết bã, suy thận cấp trước thận, tăng huyết áp thai kỳ, đái tháo đường týp 2",235,3,3,100000,1,2022-05-05T21:00:00.000000,,Dấu hiệu chung,,

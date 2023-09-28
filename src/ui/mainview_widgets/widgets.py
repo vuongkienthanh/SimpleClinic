@@ -4,8 +4,58 @@ import wx
 
 from misc import num_to_str_price, str_to_int_price, vn_weekdays
 from ui import mainview as mv
-from ui.generics import NumberTextCtrl
+from ui.generics import NumberTextCtrl, DecimalSpinCtrl
 
+
+class WeightCtrl(DecimalSpinCtrl):
+    def __init__(self, mv: "mv.MainView", **kwargs):
+        super().__init__(mv, **kwargs)
+        self.Disable()
+
+    def GetWeight(self) -> int:
+        return int(self.Value * 10)
+
+    def SetWeight(self, value: int):
+        super().SetValue(value / 10)
+
+
+class TemperatureCtrl(DecimalSpinCtrl):
+    def __init__(self, mv: "mv.MainView", **kwargs):
+        super().__init__(mv, **kwargs)
+        self.Disable()
+
+    def GetTemperature(self) -> int | None:
+        match self.Value:
+            case 0:
+                return None
+            case v:
+                return int(v * 10)
+
+    def SetTemperature(self, value: int|None):
+        match value:
+            case int(v):
+                super().SetValue(v / 10)
+            case None:
+                super().SetValue(0)
+
+class HeightCtrl(wx.SpinCtrl):
+    def __init__(self, mv: "mv.MainView", **kwargs):
+        super().__init__(mv, **kwargs)
+        self.Disable()
+
+    def GetHeight(self) -> int | None:
+        match self.Value:
+            case 0:
+                return None
+            case v:
+                return int(v)
+
+    def SetHeight(self, value: int|None):
+        match value:
+            case int(v):
+                super().SetValue(v)
+            case None:
+                super().SetValue(0)
 
 class DaysCtrl(wx.SpinCtrl):
     """

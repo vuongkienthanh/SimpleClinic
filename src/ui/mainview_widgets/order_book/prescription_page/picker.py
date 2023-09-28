@@ -3,6 +3,7 @@ import wx
 from db import Warehouse
 from ui import mainview
 from ui.mainview_widgets.order_book import order_book
+from misc import check_none_to_blank
 
 
 class DrugPopup(wx.ComboPopup):
@@ -21,7 +22,7 @@ class DrugPopup(wx.ComboPopup):
         self.lc.AppendColumn("Đơn vị", width=self.mv.config.header_width(0.03))
         self.lc.AppendColumn("Đơn giá", width=self.mv.config.header_width(0.03))
         self.lc.AppendColumn("Cách dùng", width=self.mv.config.header_width(0.04))
-        self.lc.AppendColumn("Hạn sử dụng", width=self.mv.config.header_width(0.055))
+        self.lc.AppendColumn("Ghi chú", width=self.mv.config.header_width(0.055))
         self.lc.Bind(wx.EVT_MOTION, self.OnMotion)
         self.lc.Bind(wx.EVT_LEFT_DOWN, self.OnLeftDown)
         self.lc.Bind(wx.EVT_CHAR, self.onChar)
@@ -61,10 +62,10 @@ class DrugPopup(wx.ComboPopup):
             self.check_min_quantity_and_color(item, index)
 
     def append_ui(self, item: Warehouse):
-        if item.expire_date is None:
-            expire_date = ""
+        if item.drug_note is None:
+            note = ""
         else:
-            expire_date = item.expire_date.strftime("%d/%m/%Y")
+            note = item.drug_note
         self.lc.Append(
             [
                 item.name,
@@ -73,7 +74,7 @@ class DrugPopup(wx.ComboPopup):
                 item.usage_unit,
                 int(item.sale_price),
                 item.usage,
-                expire_date,
+                note,
             ]
         )
 

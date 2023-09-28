@@ -88,7 +88,7 @@ class SystemPage(BasePage):
             name="App font size",
             initial=self.mv.config.app_font_size,
             min=9,
-            max=12,
+            max=20,
         )
         self.autochange_prescription_quantity_on_day_spin = wx.CheckBox(
             self, name="Tự động cập nhật số lượng thuốc khi thay đổi số ngày của toa"

@@ -20,6 +20,7 @@ class DrugListCtrl(StateListCtrl):
         self.AppendColumn("Liều", 0.03)
         self.AppendColumn("Tổng cộng", 0.05)
         self.AppendColumn("Cách dùng", 0.15)
+        self.AppendColumn("Giá tiền", 0.15)
         if self.mv.config.outclinic_drug_checkbox:
             self.EnableCheckBoxes()
         self.Bind(wx.EVT_LIST_ITEM_CHECKED, self.onCheck)
@@ -46,6 +47,7 @@ class DrugListCtrl(StateListCtrl):
                 dose,
                 quantity,
                 note,
+                str(wh.sale_price * item.quantity),
             ]
         )
         if item.outclinic:
@@ -66,6 +68,7 @@ class DrugListCtrl(StateListCtrl):
         self.SetItem(idx, 4, dose)
         self.SetItem(idx, 5, quantity)
         self.SetItem(idx, 6, note)
+        self.SetItem(idx, 7, str(wh.sale_price * item.quantity))
 
     def pop_ui(self, idx: int):
         super().pop_ui(idx)

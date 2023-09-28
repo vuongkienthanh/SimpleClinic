@@ -163,8 +163,6 @@ class MainView(wx.Frame):
                 *widget_with_name(self.price),
             ]
         )
-        # follow_up_row = wx.BoxSizer(wx.HORIZONTAL)
-        # follow_up_row.AddMany(widget_with_name(self.follow, 1))
         btn_row = wx.BoxSizer(wx.HORIZONTAL)
         btn_row.AddMany(
             [

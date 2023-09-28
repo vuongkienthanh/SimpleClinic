@@ -75,43 +75,22 @@ class PrintOut(wx.Printout):
             dc.DrawText(s, round(x - size.x / 2), y)
             return size.y
 
-        def draw_clinic_info(y: int, page: int) -> int:
+        def draw_clinic_info(y: int) -> int:
             point_size = aty(0.015)
-            basic_font = wx.Font(wx.FontInfo(point_size))
-            clinic_name_font = wx.Font(
-                wx.FontInfo(point_size)
-                # .Bold()
-                # .Italic()
-            )
-            clinic_address_font = wx.Font(
-                wx.FontInfo(point_size)
-                # .Bold()
-                # .Italic()
-            )
-            clinic_phone_number_font = wx.Font(
-                wx.FontInfo(point_size)
-                # .Bold()
-                # .Italic()
-            )
+            basic = wx.Font(wx.FontInfo(point_size))
             row_height = aty(0.017)
 
             def row(i):
                 return y + row_height * i
 
-            with wx.DCFontChanger(dc, clinic_name_font):
+            with wx.DCFontChanger(dc, basic):
                 dc.DrawText(self.mv.config.clinic_name, left_margin, row(0))
-            with wx.DCFontChanger(dc, clinic_address_font):
                 dc.DrawText(
                     "Địa chỉ: " + self.mv.config.clinic_address, left_margin, row(1)
                 )
-            with wx.DCFontChanger(dc, clinic_phone_number_font):
                 dc.DrawText(
                     "SĐT: " + self.mv.config.clinic_phone_number, left_margin, row(2)
                 )
-            if self.HasPage(2):
-                with wx.DCFontChanger(dc, basic_font):
-                    right_margin = atx(0.75)
-                    draw_centered_text(f"Trang {page}/2", right_margin, row(0))
             return row(2)
 
         def draw_title(y: int) -> int:
@@ -123,7 +102,7 @@ class PrintOut(wx.Printout):
         def draw_patient_info(y: int) -> int:
             basic = wx.Font(wx.FontInfo(aty(0.02)))
             row_height = aty(0.026)
-            diagnosis =self.mv.diagnosis.Value
+            diagnosis = self.mv.diagnosis.Value
             vnote = self.mv.vnote.Value
 
             def row(i):
@@ -162,48 +141,49 @@ class PrintOut(wx.Printout):
                     row(1),
                 )
                 t = "SĐT:"
-                dc.DrawText(t, left_margin, row(2))
+                indent = atx(0.55)
+                dc.DrawText(t, indent, row(1))
                 dc.DrawText(
                     self.mv.phone.Value,
-                    left_margin + dc.GetTextExtent(t).x + whitespace,
-                    row(2),
+                    indent + dc.GetTextExtent(t).x + whitespace,
+                    row(1),
                 )
                 t = "Biểu hiện lâm sàng:"
-                dc.DrawText(t, left_margin, row(3))
+                dc.DrawText(t, left_margin, row(2))
                 dc.DrawText(
-                    vnote, left_margin + dc.GetTextExtent(t).x + whitespace, row(3)
+                    vnote, left_margin + dc.GetTextExtent(t).x + whitespace, row(2)
                 )
                 t = "Nhiệt độ:"
-                dc.DrawText(t, left_margin, row(4))
+                dc.DrawText(t, left_margin, row(3))
                 dc.DrawText(
                     str(self.mv.temperature.Value),
                     left_margin + dc.GetTextExtent(t).x + whitespace,
-                    row(4),
+                    row(3),
                 )
                 t = "Cân nặng:"
                 indent = atx(0.3)
-                dc.DrawText(t, indent, row(4))
+                dc.DrawText(t, indent, row(3))
                 dc.DrawText(
                     str(self.mv.weight.Value) + " kg",
                     indent + dc.GetTextExtent(t).x + whitespace,
-                    row(4),
+                    row(3),
                 )
                 t = "Chiều cao:"
                 indent = atx(0.6)
-                dc.DrawText(t, indent, row(4))
+                dc.DrawText(t, indent, row(3))
                 dc.DrawText(
                     str(self.mv.height.Value) + " cm",
                     indent + dc.GetTextExtent(t).x + whitespace,
-                    row(4),
+                    row(3),
                 )
                 t = "Chẩn đoán:"
-                dc.DrawText(t, left_margin, row(5))
+                dc.DrawText(t, left_margin, row(4))
                 dc.DrawText(
                     diagnosis,
                     left_margin + dc.GetTextExtent(t).x + whitespace,
-                    row(5),
+                    row(4),
                 )
-                return row(5)
+                return row(4)
 
         def draw_content(y: int, first_page=True) -> int:
             basic = wx.Font(wx.FontInfo(aty(0.02)))
@@ -283,7 +263,7 @@ class PrintOut(wx.Printout):
                 i += 1
             return row(i - 1) + round(row_height / 2)
 
-        def draw_bottom(y: int ) -> None:
+        def draw_bottom(y: int) -> None:
             y = aty(0.76)  # comment this out when use dynamic y
 
             right_basic = wx.Font(wx.FontInfo(aty(0.018)))
@@ -303,7 +283,7 @@ class PrintOut(wx.Printout):
             with wx.DCFontChanger(dc, right_basic):
                 follow = self.mv.follow.Value
                 indent = atx(0.2)
-                dc.DrawText(follow, indent, row(- 1))
+                dc.DrawText(follow, indent, row(-1))
                 draw_centered_text(
                     f"Ngày {d.day:02} tháng {d.month:02} năm {d.year:04}",
                     right_margin,
@@ -344,7 +324,7 @@ class PrintOut(wx.Printout):
                 dc.DrawText("*Tiểu máu", second_col, row(7))
 
         if page == 1:
-            next_row = draw_clinic_info(top_margin, page) + block_spacing
+            next_row = draw_clinic_info(top_margin) + round(block_spacing*1.5)
             next_row = draw_title(next_row) + block_spacing
             next_row = draw_patient_info(next_row) + block_spacing
             if drug_list.ItemCount != 0:
@@ -352,7 +332,7 @@ class PrintOut(wx.Printout):
             draw_bottom(next_row)
             return True
         elif page == 2:
-            next_row = draw_clinic_info(top_margin, page) + block_spacing
+            next_row = draw_clinic_info(top_margin) + round(block_spacing*1.5)
             next_row = draw_title(next_row) + block_spacing
             next_row = draw_patient_info(next_row) + block_spacing
             next_row = draw_content(next_row, first_page=False) + block_spacing

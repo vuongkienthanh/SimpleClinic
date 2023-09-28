@@ -176,6 +176,11 @@ class PrintOut(wx.Printout):
                 )
                 t = "Nhiệt độ:"
                 dc.DrawText(t, left_margin, row(4))
+                dc.DrawText(
+                    str(self.mv.temperature.Value),
+                    left_margin + dc.GetTextExtent(t).x + whitespace,
+                    row(4),
+                )
                 t = "Cân nặng:"
                 indent = atx(0.3)
                 dc.DrawText(t, indent, row(4))
@@ -187,6 +192,11 @@ class PrintOut(wx.Printout):
                 t = "Chiều cao:"
                 indent = atx(0.6)
                 dc.DrawText(t, indent, row(4))
+                dc.DrawText(
+                    str(self.mv.height.Value) + " cm",
+                    indent + dc.GetTextExtent(t).x + whitespace,
+                    row(4),
+                )
                 t = "Chẩn đoán:"
                 dc.DrawText(t, left_margin, row(5))
                 dc.DrawText(

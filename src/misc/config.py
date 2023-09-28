@@ -41,7 +41,6 @@ class Config:
     listctrl_header_scale: int
     print_scale: int
     preview_scale: int
-    print_price: bool
     print_vnote: bool
     max_number_of_drugs_in_one_page: int
     drug_name_print_style: int
@@ -89,7 +88,6 @@ class Config:
             listctrl_header_scale=config_json["listctrl_header_scale"],
             print_scale=config_json["print_scale"],
             preview_scale=config_json["preview_scale"],
-            print_price=False,
             print_vnote=config_json["print_vnote"],
             max_number_of_drugs_in_one_page=7,
             drug_name_print_style=max(

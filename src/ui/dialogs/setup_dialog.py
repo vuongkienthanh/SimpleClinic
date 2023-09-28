@@ -1,10 +1,7 @@
-from itertools import chain
-
 import wx
 import wx.adv as adv
 import wx.grid
 
-from misc import minus_bm, plus_bm
 from misc.config import (
     Format,
     drug_name_print_style_choices,
@@ -82,58 +79,6 @@ class InfoPage(BasePage):
             ]
         )
         self.SetSizer(entry_sizer)
-
-
-class FollowChoicePage(wx.Panel):
-    def __init__(self, parent: wx.Notebook):
-        super().__init__(parent)
-        mv: "mainview.MainView" = parent.Parent.mv
-        self.grid = wx.grid.Grid(self)
-        self.grid.CreateGrid(8, 2)
-        self.grid.SetColLabelValue(0, "Lời dặn dò")
-        self.grid.SetColLabelValue(1, "Mở rộng khi in")
-        self.grid.SetColSize(0, mv.config.header_width(0.1))
-        self.grid.SetColSize(1, mv.config.header_width(0.3))
-        self.grid.HideRowLabels()
-        addbtn = wx.BitmapButton(self, bitmap=wx.Bitmap(plus_bm))
-        deletebtn = wx.BitmapButton(self, bitmap=wx.Bitmap(minus_bm))
-        btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        btn_sizer.AddMany(
-            [
-                (0, 0, 1),
-                (addbtn, 0, wx.RIGHT, 5),
-                (deletebtn, 0, wx.RIGHT, 5),
-            ]
-        )
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.AddMany(
-            [
-                (self.grid, 1, wx.EXPAND | wx.ALL, 5),
-                (btn_sizer, 0, wx.EXPAND | wx.ALL, 5),
-            ]
-        )
-        self.SetSizer(sizer)
-        for idx, item in enumerate(
-            chain(
-                mv.config.follow_choices_dict.keys(),
-                mv.config.follow_choices_list,
-            )
-        ):
-            try:
-                self.grid.SetCellValue(idx, 0, item)
-            except Exception:
-                self.grid.AppendRows()
-                self.grid.SetCellValue(idx, 0, item)
-        for idx, item in enumerate(mv.config.follow_choices_dict.values()):
-            try:
-                self.grid.SetCellValue(idx, 1, item)
-            except Exception:
-                self.grid.AppendRows()
-                self.grid.SetCellValue(idx, 1, item)
-        addbtn.Bind(wx.EVT_BUTTON, lambda _: self.grid.AppendRows())
-        deletebtn.Bind(
-            wx.EVT_BUTTON, lambda _: self.grid.DeleteRows(self.grid.Table.RowsCount - 1)
-        )
 
 
 class SystemPage(BasePage):
@@ -455,12 +400,10 @@ class SetupDialog(wx.Dialog):
         self.mv = parent
         self.book = wx.Notebook(self)
         self.infopage = InfoPage(self.book)
-        self.followchoicepage = FollowChoicePage(self.book)
         self.systempage = SystemPage(self.book)
         self.printpage = PrintPage(self.book)
         self.backgroundcolorpage = BackgroundColorPage(self.book)
         self.book.AddPage(self.infopage, text="Thông tin")
-        self.book.AddPage(self.followchoicepage, text="Lời dặn")
         self.book.AddPage(self.systempage, text="Hệ thống")
         self.book.AddPage(self.printpage, text="Toa in")
         self.book.AddPage(self.backgroundcolorpage, text="Màu nền")
@@ -507,23 +450,6 @@ class SetupDialog(wx.Dialog):
                 for idx in range(lc.ItemCount)
                 if lc.GetItemText(idx).strip() != ""
             ]
-
-            grid = self.followchoicepage.grid
-            follow_choices_dict = {}
-            follow_choices_list = []
-            for idx in range(0, grid.Table.RowsCount):
-                k = grid.GetCellValue(idx, 0).strip()
-                v = grid.GetCellValue(idx, 1).strip()
-                if k != "":
-                    if v == "":
-                        follow_choices_list.append(k)
-                    else:
-                        follow_choices_dict[k] = v
-            self.mv.config.follow_choices_dict = follow_choices_dict
-            self.mv.config.follow_choices_list = follow_choices_list
-            self.mv.follow.Clear()
-            for item in chain(follow_choices_dict.keys(), follow_choices_list):
-                self.mv.follow.Append(item)
 
             systempage = self.systempage
             self.mv.config.app_font_size = systempage.app_font_size.Value

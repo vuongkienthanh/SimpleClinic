@@ -7,7 +7,6 @@ from ui.generics import DateTextCtrl, PhoneTextCtrl, ReadonlyVNAgeCtrl
 from ui.mainview_widgets import (
     DaysCtrl,
     DaysCtrlWithAutoChangePrescriptionQuantity,
-    Follow,
     GetWeightBtn,
     NewVisitBtn,
     NoRecheckBtn,
@@ -20,7 +19,9 @@ from ui.mainview_widgets import (
     VisitListCtrl,
     WeightCtrl,
     TemperatureCtrl,
-    HeightCtrl
+    HeightCtrl,
+    PrintBtn,
+    PreviewBtn,
 )
 from ui.menubar import MyMenuBar
 
@@ -97,9 +98,11 @@ class MainView(wx.Frame):
         self.recheck = RecheckCtrl(self, name="Số ngày tái khám:")
         self.norecheck = NoRecheckBtn(self)
         self.price = PriceCtrl(self, name="Giá thu:", size=self.config.header_size(0.1))
-        self.follow = Follow(self, name="Lời dặn:")
+        self.follow = wx.TextCtrl(self, style=wx.TE_MULTILINE, name="Ghi chú:")
         self.newvisitbtn = NewVisitBtn(self)
         self.savebtn = SaveBtn(self)
+        self.printbtn = PrintBtn(self)
+        self.previewbtn = PreviewBtn(self)
 
         def widget(w, p=0, r=5):
             return (w, p, wx.EXPAND | wx.RIGHT | wx.DOWN, r)
@@ -167,6 +170,8 @@ class MainView(wx.Frame):
             [
                 widget(self.newvisitbtn),
                 widget(self.savebtn),
+                widget(self.printbtn),
+                widget(self.previewbtn),
             ]
         )
         right_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -182,15 +187,16 @@ class MainView(wx.Frame):
                 (weight_row, 0, wx.EXPAND),
                 widget(self.order_book, 6),
                 (recheck_row, 0, wx.EXPAND),
-                (follow_up_row, 0, wx.EXPAND),
+                (wx.StaticText(self, label=self.follow.Name), 0, wx.EXPAND),
+                widget(self.follow, 1, 10),
                 (btn_row, 0, wx.EXPAND),
             ]
         )
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         sizer.AddMany(
             [
-                (left_sizer, 2, wx.EXPAND | wx.ALL, 10),
-                (right_sizer, 3, wx.EXPAND | wx.ALL, 10),
+                (left_sizer, 1, wx.EXPAND | wx.ALL, 10),
+                (right_sizer, 4, wx.EXPAND | wx.ALL, 10),
             ]
         )
         self.SetSizerAndFit(sizer)

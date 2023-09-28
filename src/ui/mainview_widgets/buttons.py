@@ -293,3 +293,40 @@ class SaveBtn(wx.Button):
                 mv.state.refresh()
             except Exception as error:
                 wx.MessageBox(f"Lỗi không Cập nhật lượt khám được\n{error}", "Lỗi")
+
+
+class PrintBtn(wx.Button):
+    def __init__(self, parent: "mv.MainView"):
+        super().__init__(parent, label="In")
+        self.mv = parent
+        self.Disable()
+        self.Bind(wx.EVT_BUTTON, self.onClick)
+
+    def onClick(self, _):
+        from misc.printer import PrintOut, printdata
+
+        printout = PrintOut(self.mv)
+        printdialog = wx.PrintDialog(self.mv)
+        if printdialog.ShowModal() == wx.ID_OK:
+            printdialog.PrintDialogData.SetPrintData(printdata)
+            wx.Printer(printdialog.PrintDialogData).Print(mv, printout, False)
+
+
+class PreviewBtn(wx.Button):
+    def __init__(self, parent: "mv.MainView"):
+        super().__init__(parent, label="Xem trước")
+        self.mv = parent
+        self.Disable()
+        self.Bind(wx.EVT_BUTTON, self.onClick)
+
+    def onClick(self, _):
+        from misc.printer import PrintOut, printdata
+
+        printout = PrintOut(self.mv, preview=True)
+        printdialogdata = wx.PrintDialogData(printdata)
+        printpreview = wx.PrintPreview(printout, data=printdialogdata)
+        printpreview.SetZoom(100)
+        frame = wx.PreviewFrame(printpreview, self.mv)
+        frame.Maximize()
+        frame.Initialize()
+        frame.Show()

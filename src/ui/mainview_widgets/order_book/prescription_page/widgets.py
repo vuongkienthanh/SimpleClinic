@@ -122,35 +122,51 @@ class DrugListCtrl(StateListCtrl):
 
 class Times(NumberTextCtrl):
     def __init__(self, parent: "page.PrescriptionPage"):
-        super().__init__(parent, size=parent.mv.config.header_size(0.03))
+        super().__init__(
+            parent, size=parent.mv.config.header_size(0.03), style=wx.TE_PROCESS_ENTER
+        )
         self.parent = parent
         self.SetHint("lần")
         self.Bind(wx.EVT_TEXT, self.onText)
+        self.Bind(wx.EVT_TEXT_ENTER, self.focus_next)
 
     def onText(self, _):
         if self.parent.check_wh_do_ti_filled():
             self.parent.quantity.FetchQuantity()
             self.parent.note.FetchNote()
+
+    def focus_next(self, _):
+        self.parent.dose.SetFocus()
 
 
 class Dose(DoseTextCtrl):
     def __init__(self, parent: "page.PrescriptionPage"):
-        super().__init__(parent, size=parent.mv.config.header_size(0.03))
+        super().__init__(
+            parent, size=parent.mv.config.header_size(0.03), style=wx.TE_PROCESS_ENTER
+        )
         self.parent = parent
         self.SetHint("liều")
         self.Bind(wx.EVT_TEXT, self.onText)
+        self.Bind(wx.EVT_TEXT_ENTER, self.focus_next)
 
     def onText(self, _):
         if self.parent.check_wh_do_ti_filled():
             self.parent.quantity.FetchQuantity()
             self.parent.note.FetchNote()
 
+    def focus_next(self, _):
+        self.parent.quantity.SetFocus()
+        self.parent.quantity.SetInsertionPointEnd()
+
 
 class Quantity(NumberTextCtrl):
     def __init__(self, parent: "page.PrescriptionPage"):
-        super().__init__(parent, size=parent.mv.config.header_size(0.03))
+        super().__init__(
+            parent, size=parent.mv.config.header_size(0.03), style=wx.TE_PROCESS_ENTER
+        )
         self.parent = parent
         self.SetHint("Enter")
+        self.Bind(wx.EVT_TEXT_ENTER, self.focus_next)
 
     def FetchQuantity(self):
         times = int(self.parent.times.Value)
@@ -163,6 +179,10 @@ class Quantity(NumberTextCtrl):
             self.SetValue(str(res))
         else:
             self.Clear()
+
+    def focus_next(self, _):
+        self.parent.note.SetFocus()
+        self.parent.note.SetInsertionPointEnd()
 
 
 class NoteCtrl(wx.TextCtrl):

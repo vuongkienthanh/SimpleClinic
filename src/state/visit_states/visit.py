@@ -39,6 +39,8 @@ class VisitState:
         mv.savebtn.SetLabel("Cập nhật")
         mv.price.SetPrice(v.price)
         mv.newvisitbtn.Enable()
+        mv.printbtn.Enable()
+        mv.previewbtn.Enable()
         mv.order_book.prescriptionpage.reuse_druglist_btn.Enable()
         menubar: "menubar.MyMenuBar" = mv.MenuBar
         menubar.menuNewVisit.Enable()
@@ -70,7 +72,7 @@ class VisitState:
         )
         mv.updatequantitybtn.Disable()
         mv.recheck.SetValue(mv.config.default_days_for_prescription)
-        mv.follow.SetDefault()
+        mv.follow.Clear()
 
         obj.old_linedrug_list = []
         obj.new_linedrug_list.clear()
@@ -85,6 +87,8 @@ class VisitState:
 
         mv.price.Clear()
         mv.newvisitbtn.Disable()
+        mv.printbtn.Disable()
+        mv.previewbtn.Disable()
         mv.savebtn.SetLabel("Lưu")
         mv.order_book.prescriptionpage.reuse_druglist_btn.Disable()
         mv.order_book.procedurepage.procedure_picker.Select(wx.NOT_FOUND)

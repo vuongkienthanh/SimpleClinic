@@ -267,10 +267,7 @@ class PrintOut(wx.Printout):
             y = aty(0.76)  # comment this out when use dynamic y
 
             right_basic = wx.Font(wx.FontInfo(aty(0.018)))
-            date_text = self.mv.visit_list.GetItemText(
-                self.mv.visit_list.GetFirstSelected(), 1
-            )
-            d = dt.datetime.strptime(date_text, "%d/%m/%Y %H:%M").date()
+            d = dt.date.today()
 
             row_height = aty(0.03)
             right_margin = atx(0.75)

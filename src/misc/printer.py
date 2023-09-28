@@ -334,10 +334,7 @@ class PrintOut(wx.Printout):
                 .Bold(self.mv.config.get_format("doctor_license")["bold"])
                 .Italic(self.mv.config.get_format("doctor_license")["italic"])
             )
-            date_text = self.mv.visit_list.GetItemText(
-                self.mv.visit_list.GetFirstSelected(), 1
-            )
-            d = dt.datetime.strptime(date_text, "%d/%m/%Y %H:%M").date()
+            d = dt.date.today()
             row_height = aty(0.03)
             right_margin = atx(0.75)
 

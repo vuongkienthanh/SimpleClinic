@@ -219,6 +219,17 @@ class PrintOut(wx.Printout):
                 case _:
                     raise Exception("cant get drug name print style")
 
+            def get_timing(times: int) -> str:
+                match times:
+                    case 1:
+                        return "Buổi sáng"
+                    case 2:
+                        return "Buổi sáng, chiều"
+                    case 3:
+                        return "Buổi sáng, trưa, chiều"
+                    case _:
+                        return ""
+
             i = 0
             if first_page:
                 _list = [
@@ -232,6 +243,7 @@ class PrintOut(wx.Printout):
                         ),
                         "quantity": drug_list.GetItemText(i, 5),
                         "note": drug_list.GetItemText(i, 6),
+                        "timing": get_timing(int(drug_list.GetItemText(i, 3))),
                     }
                     for i in range(min(self.num_of_ld, drug_list.ItemCount))
                 ]
@@ -248,10 +260,12 @@ class PrintOut(wx.Printout):
                         ),
                         "quantity": drug_list.GetItemText(i, 5),
                         "note": drug_list.GetItemText(i, 6),
+                        "timing": get_timing(int(drug_list.GetItemText(i, 3))),
                     }
                     for i in range(self.num_of_ld, drug_list.ItemCount)
                 ]
                 added_idx_number = self.num_of_ld
+            right_column_for_timing = atx(0.62)
             for dl in _list:
                 with wx.DCFontChanger(dc, basic.Bold()):
                     dc.DrawText(f"{i+1+added_idx_number}/", left_margin, row(i))
@@ -260,6 +274,11 @@ class PrintOut(wx.Printout):
                     dc.DrawText(dl["quantity"], right_column, row(i))
                 with wx.DCFontChanger(dc, basic):
                     dc.DrawText(dl["note"], indent, row(i) + round(row_height / 2))
+                    dc.DrawText(
+                        dl["timing"],
+                        right_column_for_timing,
+                        row(i) + round(row_height / 2),
+                    )
                 i += 1
             return row(i - 1) + round(row_height / 2)
 
@@ -321,7 +340,7 @@ class PrintOut(wx.Printout):
                 dc.DrawText("*Tiểu máu", second_col, row(7))
 
         if page == 1:
-            next_row = draw_clinic_info(top_margin) + round(block_spacing*1.5)
+            next_row = draw_clinic_info(top_margin) + round(block_spacing * 1.5)
             next_row = draw_title(next_row) + block_spacing
             next_row = draw_patient_info(next_row) + block_spacing
             if drug_list.ItemCount != 0:
@@ -329,7 +348,7 @@ class PrintOut(wx.Printout):
             draw_bottom(next_row)
             return True
         elif page == 2:
-            next_row = draw_clinic_info(top_margin) + round(block_spacing*1.5)
+            next_row = draw_clinic_info(top_margin) + round(block_spacing * 1.5)
             next_row = draw_title(next_row) + block_spacing
             next_row = draw_patient_info(next_row) + block_spacing
             next_row = draw_content(next_row, first_page=False) + block_spacing

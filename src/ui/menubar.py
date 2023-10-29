@@ -262,8 +262,8 @@ class MyMenuBar(wx.MenuBar):
                     "{}/ {} {} {}".format(
                         i + 1,
                         drug_list.GetItemText(i, 1),
-                        drug_list.GetItemText(i, 4),
                         drug_list.GetItemText(i, 5),
+                        drug_list.GetItemText(i, 6),
                     )
                     for i in range(drug_list.ItemCount)
                 ]

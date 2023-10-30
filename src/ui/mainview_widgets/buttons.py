@@ -151,8 +151,6 @@ class SaveBtn(wx.Button):
                             "patient_id": p.id,
                             "vnote": check_blank_to_none(mv.vnote.Value),
                             "follow": check_blank_to_none(mv.follow.Value),
-                            "temperature": mv.temperature.GetTemperature(),
-                            "height": mv.height.GetHeight(),
                         },
                     ).lastrowid
                     assert vid is not None
@@ -212,8 +210,6 @@ class SaveBtn(wx.Button):
             v.price = mv.price.GetPrice()
             v.vnote = check_blank_to_none(mv.vnote.Value)
             v.follow = check_blank_to_none(mv.follow.Value)
-            v.temperature = mv.temperature.GetTemperature()
-            v.height = mv.height.GetHeight()
 
             try:
                 with mv.connection as con:

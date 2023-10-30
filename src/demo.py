@@ -91,8 +91,6 @@ def sample_con():
             "patient_id": 6,
             "follow": "follow",
             "vnote": "fake",
-            "temperature": 375,
-            "height": 100,
         },
     )
     print("Fake data generated")

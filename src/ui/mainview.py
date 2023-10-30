@@ -19,8 +19,6 @@ from ui.mainview_widgets import (
     UpdateQuantityBtn,
     VisitListCtrl,
     WeightCtrl,
-    TemperatureCtrl,
-    HeightCtrl
 )
 from ui.menubar import MyMenuBar
 
@@ -77,10 +75,8 @@ class MainView(wx.Frame):
         )
         self.diagnosis = wx.TextCtrl(self, name="Chẩn đoán:")
         self.vnote = wx.TextCtrl(self, style=wx.TE_MULTILINE, name="Bệnh sử:")
-        self.temperature = TemperatureCtrl(self, max=45, name="Nhiệt độ:")
         self.weight = WeightCtrl(self, max=200, name="Cân nặng (kg):")
         self.get_weight_btn = GetWeightBtn(self)
-        self.height = HeightCtrl(self, max=200, name="Chiều cao (cm):")
         if self.config.autochange_prescription_quantity_on_day_spin:
             self.days = DaysCtrlWithAutoChangePrescriptionQuantity(
                 self, name="Số ngày cho toa:"
@@ -141,10 +137,8 @@ class MainView(wx.Frame):
         weight_row = wx.BoxSizer(wx.HORIZONTAL)
         weight_row.AddMany(
             [
-                *widget_with_name(self.temperature),
                 *widget_with_name(self.weight),
                 widget(self.get_weight_btn),
-                *widget_with_name(self.height),
                 *widget_with_name(self.days),
                 (wx.StaticText(self, label="\u21D2"), 0, wx.RIGHT | wx.ALIGN_CENTER, 0),
                 (self.recheck_weekday, 0, wx.RIGHT | wx.ALIGN_CENTER, 30),

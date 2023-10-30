@@ -26,8 +26,6 @@ class VisitState:
         mv.diagnosis.ChangeValue(v.diagnosis)
         mv.vnote.ChangeValue(check_none_to_blank(v.vnote))
         mv.weight.SetWeight(v.weight)
-        mv.temperature.SetTemperature(v.temperature)
-        mv.height.SetHeight(v.height)
         mv.days.SetValue(v.days)
         mv.recheck_weekday.SetLabel(vn_weekdays(v.days))
         mv.recheck.SetValue(v.recheck)
@@ -63,8 +61,6 @@ class VisitState:
         mv.diagnosis.Clear()
         mv.vnote.Clear()
         mv.weight.SetWeight(0)
-        mv.temperature.SetTemperature(None)
-        mv.height.SetHeight(None)
         mv.days.SetValue(mv.config.default_days_for_prescription)
         mv.recheck_weekday.SetLabel(
             vn_weekdays(mv.config.default_days_for_prescription)

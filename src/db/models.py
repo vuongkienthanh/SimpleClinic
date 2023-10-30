@@ -146,8 +146,6 @@ class Visit(BASE):
         "patient_id",
         "follow",
         "vnote",
-        "temperature",
-        "height",
     )
     __extra_fields__ = ("exam_datetime",)
     id: int
@@ -160,8 +158,6 @@ class Visit(BASE):
     patient_id: int
     vnote: str | None = None
     follow: str | None = None
-    temperature: int | None = None
-    height: int | None = None
 
 
 @dataclass(slots=True)

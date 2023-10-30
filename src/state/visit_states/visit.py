@@ -58,6 +58,7 @@ class VisitState:
         obj: "state.main_state.State",
     ) -> None:
         mv = obj.mv
+        mv.recheck_weekday.SetLabel("")
         mv.Freeze()
         mv.diagnosis.Clear()
         mv.vnote.Clear()

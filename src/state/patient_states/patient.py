@@ -21,6 +21,8 @@ class PatientState:
 
     def onSet(self, obj: "state.main_state.State", p: Patient) -> None:
         mv = obj.mv
+        obj.visit = None
+        mv.Freeze()
         mv.name.ChangeValue(p.name)
         mv.gender.ChangeValue(str(p.gender))
         mv.birthdate.ChangeValue(p.birthdate.strftime("%d/%m/%Y"))
@@ -37,8 +39,8 @@ class PatientState:
         mv.recheck.Enable()
         mv.norecheck.Enable()
         mv.order_book.prescriptionpage.use_sample_prescription_btn.Enable()
-        obj.visit = None
         obj.visit_list = VisitListState.fetch(p, mv.connection, mv.config)
+
         if len(obj.visit_list) > 0:
             mv.get_weight_btn.Enable()
         else:
@@ -55,9 +57,12 @@ class PatientState:
             menubar.menuDeleteQueue.Enable()
             menubar.menuPrint.Enable(False)
             menubar.menuPreview.Enable(False)
+        mv.Thaw()
 
     def onUnset(self, obj: "state.main_state.State") -> None:
         mv = obj.mv
+        obj.visit = None
+        mv.Freeze()
         mv.name.Clear()
         mv.gender.Clear()
         mv.birthdate.Clear()
@@ -75,7 +80,6 @@ class PatientState:
         mv.recheck.Disable()
         mv.norecheck.Disable()
         mv.order_book.prescriptionpage.use_sample_prescription_btn.Disable()
-        obj.visit = None
         obj.visit_list = []
 
         menubar: "menubar.MyMenuBar" = mv.MenuBar
@@ -84,3 +88,4 @@ class PatientState:
         menubar.menuPrint.Enable(False)
         menubar.menuPreview.Enable(False)
         menubar.menuDeleteQueue.Enable(False)
+        mv.Thaw()

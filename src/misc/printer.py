@@ -95,7 +95,7 @@ class PrintOut(wx.Printout):
                 .Bold(self.mv.config.get_format("clinic_phone_number")["bold"])
                 .Italic(self.mv.config.get_format("clinic_phone_number")["italic"])
             )
-            row_height = aty(0.017)
+            row_height = aty(0.02)
 
             def row(i):
                 return y + row_height * i
@@ -384,7 +384,7 @@ class PrintOut(wx.Printout):
                         dc.DrawText(t, left_margin, row(1))
                 follow = tw.wrap(self.mv.follow.expand_when_print(), width=40)
                 for i, line in enumerate(follow):
-                    dc.DrawText(line, left_margin, row(2 + i))
+                    dc.DrawText(line, left_margin, row(3 + i))
 
         if page == 1:
             next_row = draw_clinic_info(top_margin, page) + block_spacing

@@ -334,7 +334,10 @@ class PrintOut(wx.Printout):
                 .Bold(self.mv.config.get_format("doctor_license")["bold"])
                 .Italic(self.mv.config.get_format("doctor_license")["italic"])
             )
-            d = dt.date.today()
+            if self.mv.state.visit:
+                d = self.mv.state.visit.exam_datetime.date()
+            else:
+                d = dt.date.today()
             row_height = aty(0.03)
             right_margin = atx(0.75)
 

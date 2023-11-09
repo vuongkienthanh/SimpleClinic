@@ -71,7 +71,7 @@ class VisitState:
         )
         mv.updatequantitybtn.Disable()
         mv.recheck.SetValue(mv.config.default_days_for_prescription)
-        mv.follow.SetDefault()
+        mv.follow.Clear()
 
         obj.old_linedrug_list = []
         obj.new_linedrug_list.clear()

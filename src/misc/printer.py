@@ -366,6 +366,7 @@ class PrintOut(wx.Printout):
             row_height = aty(0.02)
 
             with wx.DCFontChanger(dc, left_font):
+                dc.DrawText(f"Ghi chú: {self.mv.follow.Value}", left_margin, row(-2))
                 if self.mv.config.print_price:
                     t = f"Tổng cộng: {self.mv.price.Value}"
                     if self.mv.order_book.procedurepage.procedure_list.ItemCount > 0:
@@ -382,9 +383,17 @@ class PrintOut(wx.Printout):
                             raise Exception("wrong style")
                     with wx.DCFontChanger(dc, recheck_font):
                         dc.DrawText(t, left_margin, row(1))
-                follow = tw.wrap(self.mv.follow.expand_when_print(), width=40)
-                for i, line in enumerate(follow):
-                    dc.DrawText(line, left_margin, row(2 + i))
+                second_col = left_margin + atx(0.23)
+                dc.DrawText("*Lau mát khi sốt", left_margin, row(3))
+                dc.DrawText("*Uống nhiều nước", second_col, row(3))
+                dc.DrawText("*Sốt cao không giảm", left_margin, row(4))
+                dc.DrawText("*Thở bất thường", left_margin, row(5))
+                dc.DrawText("*Bệnh nặng hơn", left_margin, row(6))
+                dc.DrawText("*Tím tái", second_col, row(4))
+                dc.DrawText("*Ói nhiều", second_col, row(5))
+                dc.DrawText("*Bỏ ăn uống", second_col, row(6))
+                dc.DrawText("*Khát nước", left_margin, row(7))
+                dc.DrawText("*Tiểu máu", second_col, row(7))
 
         if page == 1:
             next_row = draw_clinic_info(top_margin, page) + block_spacing

@@ -146,33 +146,11 @@ class PriceCtrl(NumberTextCtrl):
         return str_to_int_price(self.Value)
 
 
-class Follow(wx.ComboBox):
-    """A Combobox which is able to:
-    - use only the `key` in `follow_choices_dict` and `follow_choices_list`
-    """
-
+class Follow(wx.TextCtrl):
     def __init__(self, mv: "mv.MainView", **kwargs):
         super().__init__(
             mv,
-            style=wx.CB_DROPDOWN,
-            choices=list(
-                chain(
-                    mv.config.follow_choices_dict.keys(), mv.config.follow_choices_list
-                )
-            ),
+            style=wx.TE_MULTILINE,
             **kwargs,
         )
         self.mv = mv
-        self.SetDefault()
-
-    def expand_when_print(self) -> str:
-        "expand `key` -> `key: value` in config"
-        k = self.Value.strip()
-        if k in self.mv.config.follow_choices_dict.keys():
-            return f"{k}: {self.mv.config.follow_choices_dict[k]}"
-        else:
-            return k
-
-    def SetDefault(self):
-        "use when visit is `None`"
-        self.SetSelection(0)

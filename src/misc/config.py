@@ -32,8 +32,6 @@ class Config:
     default_days_for_prescription: int
     minimum_drug_quantity_alert: int
     single_sale_units: list[str]
-    follow_choices_dict: dict[str, str]
-    follow_choices_list: list[str]
     app_font_size: int
     autochange_prescription_quantity_on_day_spin: bool
     ask_print: bool
@@ -80,8 +78,6 @@ class Config:
             default_days_for_prescription=config_json["default_days_for_prescription"],
             minimum_drug_quantity_alert=config_json["minimum_drug_quantity_alert"],
             single_sale_units=config_json["single_sale_units"],
-            follow_choices_dict=config_json["follow_choices_dict"],
-            follow_choices_list=config_json["follow_choices_list"],
             app_font_size=config_json["app_font_size"],
             autochange_prescription_quantity_on_day_spin=config_json[
                 "autochange_prescription_quantity_on_day_spin"

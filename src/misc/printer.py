@@ -230,7 +230,7 @@ class PrintOut(wx.Printout):
 
         def draw_content(y: int, first_page=True) -> int:
             point_size = aty(0.015)
-            bigger_point_size = aty(0.018)
+            bigger_point_size = aty(0.016)
             basic_font = wx.Font(wx.FontInfo(point_size))
             drug_name_font = wx.Font(
                 wx.FontInfo(bigger_point_size)
@@ -265,6 +265,17 @@ class PrintOut(wx.Printout):
                     :30
                 ]
 
+            def get_timing(times: int) -> str:
+                match times:
+                    case 2:
+                        return "Buổi sáng, chiều"
+                    case 3:
+                        return "Buổi sáng, trưa, tối"
+                    case 4:
+                        return "Buổi sáng, trưa, chiều, tối"
+                    case _:
+                        return ""
+
             match self.mv.config.drug_name_print_style:
                 case 0:
                     get_drug_name = name_only
@@ -288,6 +299,7 @@ class PrintOut(wx.Printout):
                         ),
                         "quantity": drug_list.GetItemText(i, 5),
                         "note": drug_list.GetItemText(i, 6),
+                        "timing": get_timing(int(drug_list.GetItemText(i, 3))),
                     }
                     for i in range(min(num_of_ld, drug_list.ItemCount))
                 ]
@@ -304,6 +316,7 @@ class PrintOut(wx.Printout):
                         ),
                         "quantity": drug_list.GetItemText(i, 5),
                         "note": drug_list.GetItemText(i, 6),
+                        "timing": get_timing(int(drug_list.GetItemText(i, 3))),
                     }
                     for i in range(num_of_ld, drug_list.ItemCount)
                 ]
@@ -317,6 +330,11 @@ class PrintOut(wx.Printout):
                     dc.DrawText(dl["quantity"], right_column, row(i))
                 with wx.DCFontChanger(dc, drug_usage_note_font):
                     dc.DrawText(dl["note"], indent, row(i) + round(row_height / 2))
+                    dc.DrawText(
+                        dl["timing"],
+                        right_column - round(indent / 2),
+                        row(i) + round(row_height / 2),
+                    )
                 i += 1
             return row(i - 1) + round(row_height / 2)
 

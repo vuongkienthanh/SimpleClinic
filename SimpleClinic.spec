@@ -49,5 +49,4 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name=f'SimpleClinicV{version}',
-)
+    name=f'SimpleClinicV{version}-BsCan',)
